@@ -47,6 +47,7 @@ import { useTheme } from "next-themes";
 import React, { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LogoCard() {
   const { theme, setTheme } = useTheme();
@@ -86,6 +87,7 @@ export default function LogoCard() {
           {/* <div className="flex-shrink-0"> */}
           <Link href="/" className="flex-shrink-0">
             <GiHolosphere size={40} />
+            {/* <Image src="/logo.png" width={30} height={30} alt="dyloge" /> */}
           </Link>
           {/* </div> */}
           {/* <div className="text-right"> */}
