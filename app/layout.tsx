@@ -507,98 +507,130 @@ export default function RootLayout({
   return (
     <html lang="en" className={vazir.className} dir="rtl">
       <body>
-        {!session ? (
+        {/* {!session ? (
           <Auth />
-        ) : (
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            disableTransitionOnChange
-          >
-            <SidebarProvider>
-              <Sidebar collapsible="offcanvas" variant="inset" side="right">
-                <SidebarHeader>
-                  <LogoCard />
-                  <Separator orientation="horizontal" />
-                  <SidebarMenu>
-                    <SidebarMenuItem></SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarHeader>
-                <SidebarContent>
-                  <SidebarGroup>
-                    <SidebarGroupLabel>تاریخچه گفتگو</SidebarGroupLabel>
-                    <SidebarMenu>
-                      {data.navMain.map((item) => (
-                        <Collapsible
-                          key={item.title}
-                          asChild
-                          defaultOpen={item.isActive}
-                          className="group/collapsible"
-                        >
-                          <SidebarMenuItem>
-                            <CollapsibleTrigger asChild>
-                              <SidebarMenuButton tooltip={item.title}>
-                                {item.icon && <item.icon className="prose" />}
-                                <span>{item.title}</span>
-                                <ChevronLeft className="mr-auto transition-transform duration-200 group-data-[state=open]/collapsible:-rotate-90" />
-                              </SidebarMenuButton>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent>
-                              <SidebarMenuSub>
-                                {item.items?.map((subItem) => (
-                                  <SidebarMenuSubItem key={subItem.title}>
-                                    <SidebarMenuSubButton asChild>
-                                      <a
-                                        href={subItem.url}
-                                        className="flex justify-between"
-                                      >
-                                        <span className="text-xs text-muted-foreground">
-                                          {subItem.title}
-                                        </span>
-                                      </a>
-                                    </SidebarMenuSubButton>
-                                  </SidebarMenuSubItem>
-                                ))}
-                              </SidebarMenuSub>
-                            </CollapsibleContent>
-                          </SidebarMenuItem>
-                        </Collapsible>
-                      ))}
-                    </SidebarMenu>
-                  </SidebarGroup>
-                  <Separator orientation="horizontal" />
-                  <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-                    <SidebarGroupLabel>خریدها</SidebarGroupLabel>
-                    <SidebarMenu>
-                      {data.projects.map((item) => (
-                        <SidebarMenuItem key={item.name}>
-                          <SidebarMenuButton asChild>
-                            <Link href={item.url}>
-                              <item.icon className="prose" />
-                              <span>{item.name}</span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </SidebarGroup>
-                </SidebarContent>
+        ) : ( */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          disableTransitionOnChange
+        >
+          <SidebarProvider>
+            <Sidebar collapsible="offcanvas" variant="inset" side="right">
+              <SidebarHeader>
+                <LogoCard />
                 <Separator orientation="horizontal" />
-                <SidebarFooter>
+                <SidebarMenu>
+                  <SidebarMenuItem></SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarHeader>
+              <SidebarContent>
+                <SidebarGroup>
+                  <SidebarGroupLabel>تاریخچه گفتگو</SidebarGroupLabel>
                   <SidebarMenu>
-                    <SidebarMenuItem>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <SidebarMenuButton
-                            size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                          >
+                    {data.navMain.map((item) => (
+                      <Collapsible
+                        key={item.title}
+                        asChild
+                        defaultOpen={item.isActive}
+                        className="group/collapsible"
+                      >
+                        <SidebarMenuItem>
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuButton tooltip={item.title}>
+                              {item.icon && <item.icon className="prose" />}
+                              <span>{item.title}</span>
+                              <ChevronLeft className="mr-auto transition-transform duration-200 group-data-[state=open]/collapsible:-rotate-90" />
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <SidebarMenuSub>
+                              {item.items?.map((subItem) => (
+                                <SidebarMenuSubItem key={subItem.title}>
+                                  <SidebarMenuSubButton asChild>
+                                    <a
+                                      href={subItem.url}
+                                      className="flex justify-between"
+                                    >
+                                      <span className="text-xs text-muted-foreground">
+                                        {subItem.title}
+                                      </span>
+                                    </a>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              ))}
+                            </SidebarMenuSub>
+                          </CollapsibleContent>
+                        </SidebarMenuItem>
+                      </Collapsible>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroup>
+                <Separator orientation="horizontal" />
+                <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+                  <SidebarGroupLabel>خریدها</SidebarGroupLabel>
+                  <SidebarMenu>
+                    {data.projects.map((item) => (
+                      <SidebarMenuItem key={item.name}>
+                        <SidebarMenuButton asChild>
+                          <Link href={item.url}>
+                            <item.icon className="prose" />
+                            <span>{item.name}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroup>
+              </SidebarContent>
+              <Separator orientation="horizontal" />
+              <SidebarFooter>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuButton
+                          size="lg"
+                          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                        >
+                          <Avatar className="h-8 w-8 rounded-lg">
+                            <AvatarImage
+                              src={data.user.avatar}
+                              alt={data.user.name}
+                            />
+
+                            <Image
+                              src="/sample.jpg"
+                              className="rounded-lg"
+                              width={100}
+                              height={100}
+                              alt="avatar"
+                            />
+                          </Avatar>
+                          <div className="grid flex-1 text-left text-sm leading-tight">
+                            <span className="truncate font-semibold">
+                              {data.user.name}
+                            </span>
+                            <span className="truncate text-xs">
+                              {data.user.email}
+                            </span>
+                          </div>
+                          <ChevronsUpDown className="ml-auto size-4" />
+                        </SidebarMenuButton>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                        side="bottom"
+                        align="end"
+                        sideOffset={4}
+                      >
+                        <DropdownMenuLabel className="p-0 font-normal">
+                          <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                             <Avatar className="h-8 w-8 rounded-lg">
                               <AvatarImage
                                 src={data.user.avatar}
                                 alt={data.user.name}
                               />
-
                               <Image
                                 src="/sample.jpg"
                                 className="rounded-lg"
@@ -615,87 +647,55 @@ export default function RootLayout({
                                 {data.user.email}
                               </span>
                             </div>
-                            <ChevronsUpDown className="ml-auto size-4" />
-                          </SidebarMenuButton>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                          side="bottom"
-                          align="end"
-                          sideOffset={4}
-                        >
-                          <DropdownMenuLabel className="p-0 font-normal">
-                            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                              <Avatar className="h-8 w-8 rounded-lg">
-                                <AvatarImage
-                                  src={data.user.avatar}
-                                  alt={data.user.name}
-                                />
-                                <Image
-                                  src="/sample.jpg"
-                                  className="rounded-lg"
-                                  width={100}
-                                  height={100}
-                                  alt="avatar"
-                                />
-                              </Avatar>
-                              <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-semibold">
-                                  {data.user.name}
-                                </span>
-                                <span className="truncate text-xs">
-                                  {data.user.email}
-                                </span>
-                              </div>
-                            </div>
-                          </DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                              <Sparkles className="prose" />
-                              <p className="text-sm prose-sm">
-                                ارتقاء حساب کاربری
-                              </p>
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                              <BadgeCheck className="prose" />
-                              <p className="text-sm prose-sm"> حساب کاربری</p>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <CreditCard className="prose" />
-                              <p className="text-sm prose-sm">پرداخت ها</p>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Bell className="prose" />
-                              <p className="text-sm prose-sm">پیام ها</p>
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={handleSignOut}>
-                            <LogOut className="prose text-destructive" />
-                            <p className="text-sm prose-sm">خروج</p>
+                          </div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem>
+                            <Sparkles className="prose" />
+                            <p className="text-sm prose-sm">
+                              ارتقاء حساب کاربری
+                            </p>
                           </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarFooter>
-                <SidebarRail />
-              </Sidebar>
-              <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                  <div className="flex items-center gap-2 px-4">
-                    <SidebarTrigger />
-                  </div>
-                </header>
-                {children}
-              </SidebarInset>
-            </SidebarProvider>
-          </ThemeProvider>
-        )}
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem>
+                            <BadgeCheck className="prose" />
+                            <p className="text-sm prose-sm"> حساب کاربری</p>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <CreditCard className="prose" />
+                            <p className="text-sm prose-sm">پرداخت ها</p>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Bell className="prose" />
+                            <p className="text-sm prose-sm">پیام ها</p>
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleSignOut}>
+                          <LogOut className="prose text-destructive" />
+                          <p className="text-sm prose-sm">خروج</p>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarFooter>
+              <SidebarRail />
+            </Sidebar>
+            <SidebarInset>
+              <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+                <div className="flex items-center gap-2 px-4">
+                  <SidebarTrigger />
+                </div>
+              </header>
+              {children}
+            </SidebarInset>
+          </SidebarProvider>
+        </ThemeProvider>
+        {/* )} */}
       </body>
     </html>
   );

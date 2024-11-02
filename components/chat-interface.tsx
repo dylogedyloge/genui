@@ -95,11 +95,47 @@
 // };
 
 // export default ChatInterface;
+
+// "use client";
+
+// import { useChat } from "ai/react";
+
+// const ChatInterface = ({ agentType, onBack }) => {
+//   const { messages, input, handleInputChange, handleSubmit } = useChat({
+//     api: "/api/chat",
+//   });
+
+//   return (
+//     <div>
+//       <button onClick={onBack}>Back</button>
+//       <h2>{agentType} Chat</h2>
+//       <div>
+//         {messages.map((msg) => (
+//           <div key={msg.id}>
+//             {msg.role === "user" ? "User: " : "AI: "}
+//             {msg.content}
+//           </div>
+//         ))}
+//       </div>
+//       <form onSubmit={handleSubmit}>
+//         <input
+//           value={input}
+//           onChange={handleInputChange}
+//           placeholder="Type your message..."
+//         />
+//         <button type="submit">Send</button>
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default ChatInterface;
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, SendHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/utils/supabase-client";
+import { useChat } from "ai/react";
 
 type Message = {
   text: string;
@@ -119,7 +155,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   onBack,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputMessage, setInputMessage] = useState("");
+
+  // Using useChat hook from Vercel AI SDK
+  const {
+    messages: aiMessages,
+    input,
+    handleInputChange,
+    handleSubmit,
+  } = useChat({
+    api: "/api/chat",
+  });
 
   useEffect(() => {
     fetchMessages();
@@ -135,37 +180,36 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     if (error) {
       console.error("Error fetching messages:", error);
     } else {
-      setMessages(data || []);
+      const formattedMessages =
+        data.map((msg) => ({
+          text: msg.content,
+          isUser: msg.isUser,
+          timestamp: new Date(msg.created_at),
+        })) || [];
+
+      setMessages(formattedMessages);
     }
   };
 
   const handleSendMessage = async () => {
-    if (inputMessage.trim()) {
+    if (input.trim()) {
       const newMessage = {
         chat_id: chatId,
-        content: inputMessage,
+        content: input,
         is_user: true,
       };
 
-      const { error } = await supabase.from("messages").insert(newMessage);
+      // Insert user message into Supabase
+      await supabase.from("messages").insert(newMessage);
 
-      if (error) {
-        console.error("Error sending message:", error);
-      } else {
-        setInputMessage("");
-        fetchMessages(); // Refetch messages to include the new one
+      // Fetch updated messages
+      fetchMessages();
 
-        // Simulate bot response
-        setTimeout(async () => {
-          const botResponse = {
-            chat_id: chatId,
-            content: "بزودی کارشناسان ما با شما تماس می گیرند",
-            is_user: false,
-          };
-          await supabase.from("messages").insert(botResponse);
-          fetchMessages(); // Refetch messages to include bot response
-        }, 1000);
-      }
+      // Call handleSubmit to send the message to AI
+      await handleSubmit();
+
+      // Fetch updated messages after AI response
+      fetchMessages();
     }
   };
 
@@ -176,7 +220,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         برگشت
       </Button>
       <div className="flex-grow overflow-auto space-y-4 mb-4">
-        {messages.map((message, index) => (
+        {/* Combine local and AI messages */}
+        {[
+          ...messages,
+          ...aiMessages.map((aiMsg) => ({
+            text: aiMsg.content, // Assuming aiMsg has a content property
+            isUser: false,
+            timestamp: new Date(), // You may want to adjust this based on actual response time
+          })),
+        ].map((message, index) => (
           <div
             key={index}
             className={`flex ${
@@ -202,13 +254,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div className="flex items-center gap-2">
           <Input
             type="text"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
+            value={input}
+            onChange={handleInputChange} // Use handleInputChange from useChat
             placeholder="پیام خود را بنویسید..."
             className="flex-grow border-none"
-            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()} // Call handleSendMessage on Enter
           />
           <Button size="icon" onClick={handleSendMessage}>
+            {" "}
+            {/* Use handleSendMessage */}
             <SendHorizontal className="w-4 h-4 -rotate-180" />
             <span className="sr-only">ارسال</span>
           </Button>
