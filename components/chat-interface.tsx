@@ -44,6 +44,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([
+    "قیمت بلیط‌های پرواز استانبول چقدره؟",
+    "پروازهای مستقیم به دبی رو می‌خوام",
+    "بهترین زمان پرواز به آنتالیا کیه؟",
+  ]);
 
   useEffect(() => {
     setMounted(true);
@@ -155,6 +160,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
+  const handleSuggestionClick = async (question: string) => {
+    // Set the input value directly
+    handleInputChange({ target: { value: question } } as any);
+
+    // Call handleSendMessage without an event
+    await handleSendMessage();
+  };
+
   return (
     <div className="flex flex-col p-4 h-full">
       <Button variant="secondary" className="self-end mb-4" onClick={onBack}>
@@ -189,7 +202,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 dangerouslySetInnerHTML={{ __html: message.text }}
               />
               {mounted && (
-                <p className="text-xs mt-1 opacity-50">
+                <p className="text-xs mt-1 opacity-50 text-left">
                   {formatPersianTime(message.timestamp)}
                 </p>
               )}
@@ -198,18 +211,28 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         ))}
       </div>
       <div className="p-4">
+        <div className="flex flex-wrap gap-2 mb-4">
+          {suggestedQuestions.map((question, index) => (
+            <Button
+              key={index}
+              variant="outline"
+              className="text-sm"
+              onClick={() => handleSuggestionClick(question)}
+            >
+              {question}
+            </Button>
+          ))}
+        </div>
         <div className="flex items-center gap-2">
           <Input
             type="text"
             value={input}
-            onChange={handleInputChange} // Use handleInputChange from useChat
+            onChange={handleInputChange}
             placeholder="پیام خود را بنویسید..."
             className="flex-grow border-none"
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()} // Call handleSendMessage on Enter
           />
           <Button size="icon" onClick={handleSendMessage}>
-            {" "}
-            {/* Use handleSendMessage */}
             <SendHorizontal className="w-4 h-4 -rotate-180" />
             <span className="sr-only">ارسال</span>
           </Button>
