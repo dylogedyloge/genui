@@ -161,11 +161,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const handleSuggestionClick = async (question: string) => {
-    // Set the input value directly
-    handleInputChange({ target: { value: question } } as any);
+    // Update the input value and then submit
+    handleInputChange({
+      target: { value: question },
+    } as React.ChangeEvent<HTMLInputElement>);
+    await handleSubmit(undefined);
 
-    // Call handleSendMessage without an event
-    await handleSendMessage();
+    // Save AI response to Supabase
+    if (aiMessages[aiMessages.length - 1]) {
+      await supabase.from("messages").insert({
+        chat_id: chatId,
+        content: aiMessages[aiMessages.length - 1].content,
+        role: "assistant",
+      });
+    }
+
+    // Fetch all messages after both operations are complete
+    await fetchMessages();
   };
 
   return (
