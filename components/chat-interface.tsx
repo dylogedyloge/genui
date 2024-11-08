@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, SendHorizontal } from "lucide-react";
+import { ArrowRight, CircleStop, Loader2, SendHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/utils/supabase-client";
 import { useChat } from "ai/react";
@@ -49,6 +49,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     "پروازهای مستقیم به دبی رو می‌خوام",
     "بهترین زمان پرواز به آنتالیا کیه؟",
   ]);
+  const [dots, setDots] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -86,6 +87,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     input,
     handleInputChange,
     handleSubmit,
+    isLoading,
+    stop,
   } = useChat({
     api: "/api/chat",
     body: {
@@ -180,6 +183,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     await fetchMessages();
   };
 
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setDots(d => d.length >= 3 ? '' : d + '.');
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
+
   return (
     <div className="flex flex-col p-4 h-full">
       <Button variant="secondary" className="self-end mb-4" onClick={onBack}>
@@ -203,7 +215,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             }`}
           >
             <div
-              className={`max-w-[70%] p-3 rounded-lg ${
+              className={`max-w-[70%] p-3 rounded-lg relative ${
                 message.isUser
                   ? "bg-secondary text-secondary-foreground"
                   : " bg-primary text-primary-foreground"
@@ -213,11 +225,24 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-500 [&_span]:hover:underline"
                 dangerouslySetInnerHTML={{ __html: message.text }}
               />
-              {mounted && (
-                <p className="text-xs mt-1 opacity-50 text-left">
-                  {formatPersianTime(message.timestamp)}
-                </p>
-              )}
+              <div className="flex justify-between items-center mt-1">
+                {mounted && (
+                  <p className="text-xs opacity-50 text-left ">
+                    {formatPersianTime(message.timestamp)}
+                  </p>
+                )}
+                {!message.isUser && isLoading && index === aiMessages.length - 1 && (
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    className="h-6 w-6 rounded-full ml-2"
+                    onClick={stop}
+                  >
+                    <CircleStop className="h-4 w-4" />
+                    <span className="sr-only">توقف</span>
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         ))}
@@ -230,6 +255,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               variant="outline"
               className="text-sm"
               onClick={() => handleSuggestionClick(question)}
+              disabled={isLoading}
             >
               {question}
             </Button>
@@ -242,9 +268,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             onChange={handleInputChange}
             placeholder="پیام خود را بنویسید..."
             className="flex-grow border-none"
-            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()} // Call handleSendMessage on Enter
+            disabled={isLoading}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !isLoading) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
           />
-          <Button size="icon" onClick={handleSendMessage}>
+          <Button 
+            size="icon" 
+            onClick={() => handleSendMessage()}
+            disabled={isLoading}
+          >
             <SendHorizontal className="w-4 h-4 -rotate-180" />
             <span className="sr-only">ارسال</span>
           </Button>
