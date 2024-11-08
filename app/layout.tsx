@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/utils/supabase-client";
 import Auth from "@/components/auth";
+import { Toaster } from "@/components/ui/toaster"
 
 const vazir = localFont({
   src: "./fonts/Vazir-Light-FD.ttf",
@@ -507,6 +508,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={vazir.className} dir="rtl">
       <body>
+      <Toaster />
         {/* {!session ? (
           <Auth />
         ) : ( */}

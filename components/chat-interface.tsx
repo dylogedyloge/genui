@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CircleStop, Loader2, SendHorizontal, X } from "lucide-react";
+import { ArrowRight, SendHorizontal} from "lucide-react";
+import { FaAd, FaStop } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/utils/supabase-client";
 import { useChat } from "ai/react";
+import { useToast } from "@/hooks/use-toast"
+
 
 // Define a unified message type
 type Message = {
@@ -36,19 +39,46 @@ const formatPersianTime = (date: Date) => {
   return `${persianHours}:${minutes.toString().padStart(2, "0")} ${period}`;
 };
 
+const AGENT_SUGGESTED_QUESTIONS: Record<string, string[]> = {
+  پرواز: [
+    "قیمت بلیط‌های پرواز استانبول چقدره؟",
+    "پروازهای مستقیم به دبی رو می‌خوام",
+    "بهترین زمان پرواز به آنتالیا کیه؟",
+  ],
+  هتل: [
+    "هتل‌های ۵ ستاره استانبول رو می‌خوام",
+    "قیمت هتل‌های کیش برای عید چقدره؟",
+    "بهترین هتل‌های دبی کدومان؟",
+  ],
+  رستوران: [
+    "رستوران‌های ایرانی استانبول کجان؟",
+    "بهترین رستوران‌های دبی کدومان؟",
+    "رستوران‌های حلال در آنتالیا",
+  ],
+  تور: [
+    "تور ارزان استانبول",
+    "تور لحظه آخری کیش",
+    "قیمت تور دبی چنده؟",
+  ],
+  "برنامه سفر": [
+    "برنامه سفر ۳ روزه استانبول",
+    "جاهای دیدنی دبی",
+    "برنامه سفر یک هفته‌ای آنتالیا",
+  ],
+};
+
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
   agentType,
   userId,
   chatId,
   onBack,
 }) => {
+  const { toast } = useToast()
   const [messages, setMessages] = useState<Message[]>([]);
   const [mounted, setMounted] = useState(false);
-  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([
-    "قیمت بلیط‌های پرواز استانبول چقدره؟",
-    "پروازهای مستقیم به دبی رو می‌خوام",
-    "بهترین زمان پرواز به آنتالیا کیه؟",
-  ]);
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>(
+    AGENT_SUGGESTED_QUESTIONS[agentType] || AGENT_SUGGESTED_QUESTIONS["پرواز"]
+  );
   const [dots, setDots] = useState('');
 
   useEffect(() => {
@@ -89,11 +119,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     handleSubmit,
     isLoading,
     stop,
+    error,
+    reload
   } = useChat({
     api: "/api/chat",
     body: {
       agentType,
     },
+    keepLastMessageOnError: true,
     initialMessages: [
       {
         id: "initial",
@@ -192,6 +225,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, [isLoading]);
 
+  useEffect(() => {
+    if (error) {
+      toast( {
+        variant: "destructive",
+        description: "خطایی رخ داد. لطفا دوباره تلاش کنید.",
+        duration: 3000,
+      });
+    }
+  }, [error]);
+
   return (
     <div className="flex flex-col p-4 h-full">
       <Button variant="secondary" className="self-end mb-4" onClick={onBack}>
@@ -234,11 +277,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 {!message.isUser && isLoading && index === aiMessages.length - 1 && (
                   <Button
                     size="icon"
-                    variant="secondary"
+                    variant="default"
                     className="h-6 w-6 rounded-full ml-2"
                     onClick={stop}
                   >
-                    <CircleStop className="h-4 w-4" />
+                    
+                    <FaStop />
                     <span className="sr-only">توقف</span>
                   </Button>
                 )}
@@ -246,6 +290,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </div>
           </div>
         ))}
+        
+        {error && (
+          <div className="flex justify-center">
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={() => reload()}
+              
+            >
+              تلاش مجدد
+            </Button>
+          </div>
+        )}
       </div>
       <div className="p-4">
         <div className="flex flex-wrap gap-2 mb-4">
@@ -268,9 +325,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             onChange={handleInputChange}
             placeholder="پیام خود را بنویسید..."
             className="flex-grow border-none"
-            disabled={isLoading}
+            disabled={isLoading || error != null}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !isLoading) {
+              if (e.key === "Enter" && !isLoading && !error) {
                 e.preventDefault();
                 handleSendMessage();
               }
@@ -279,7 +336,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <Button 
             size="icon" 
             onClick={() => handleSendMessage()}
-            disabled={isLoading}
+            disabled={isLoading || error != null}
           >
             <SendHorizontal className="w-4 h-4 -rotate-180" />
             <span className="sr-only">ارسال</span>
