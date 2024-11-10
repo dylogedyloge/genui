@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, SendHorizontal, User, User2 } from "lucide-react";
+import { ArrowRight, SendHorizontal, User } from "lucide-react";
 import { FaStop } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/utils/supabase-client";
 import { useChat } from "ai/react";
 import { useToast } from "@/hooks/use-toast";
 import { FlightCard } from "./flight-card";
-import { Avatar } from "./ui/avatar";
 import { GiHolosphere } from "react-icons/gi";
+import { Weather } from "./weather";
 
 // Define a unified message type
 type Message = {
@@ -59,11 +59,7 @@ const AGENT_SUGGESTED_QUESTIONS: Record<string, string[]> = {
     "بهترین رستوران‌های دبی کدومان؟",
     "رستوران‌های حلال در آنتالیا",
   ],
-  تور: [
-    "تور ارزان استانبول",
-    "تور لحظه آخری کیش",
-    "قیمت تور دبی چنده؟",
-  ],
+  تور: ["تور ارزان استانبول", "تور لحظه آخری کیش", "قیمت تور دبی چنده؟"],
   "برنامه سفر": [
     "برنامه سفر ۳ روزه استانبول",
     "جاهای دیدنی دبی",
@@ -83,7 +79,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>(
     AGENT_SUGGESTED_QUESTIONS[agentType] || AGENT_SUGGESTED_QUESTIONS["پرواز"]
   );
-  const [dots, setDots] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -134,10 +129,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       },
     ],
   });
-
-  useEffect(() => {
-    console.log("AI Messages:", aiMessages);
-  }, [aiMessages]);
 
   useEffect(() => {
     fetchMessages();
@@ -208,15 +199,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   useEffect(() => {
-    if (isLoading) {
-      const interval = setInterval(() => {
-        setDots(d => d.length >= 3 ? '' : d + '.');
-      }, 500);
-      return () => clearInterval(interval);
-    }
-  }, [isLoading]);
-
-  useEffect(() => {
     if (error) {
       toast({
         variant: "destructive",
@@ -243,72 +225,101 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         ].map((message, index) => (
           <div
             key={index}
-            className={`flex ${message.isUser ? "justify-start" : "justify-end"}`}
+            className={`flex ${
+              message.isUser ? "justify-start" : "justify-end"
+            }`}
           >
-            
-              {message.isUser ? <User /> : <GiHolosphere />}
-            
+            {message.isUser ? (
+              <>
+                <User className="w-6 h-6 ml-4" />
+                <div className="max-w-[70%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
+                  <p
+                    className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline"
+                    dangerouslySetInnerHTML={{ __html: message.text }}
+                  />
+                  <div className="flex justify-between items-center mt-1">
+                    {mounted && (
+                      <p className="text-xs opacity-50 text-left ">
+                        {formatPersianTime(message.timestamp)}
+                      </p>
+                    )}
+                    {!message.isUser &&
+                      isLoading &&
+                      index === aiMessages.length - 1 && (
+                        <Button
+                          size="icon"
+                          variant="default"
+                          className="h-6 w-6 rounded-full ml-2"
+                          onClick={stop}
+                        >
+                          <FaStop />
+                          <span className="sr-only">توقف</span>
+                        </Button>
+                      )}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="max-w-[70%] p-3 rounded-lg bg-primary text-primary-foreground rounded-tl-none">
+                  <p
+                    className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline"
+                    dangerouslySetInnerHTML={{ __html: message.text }}
+                  />
+                  <div className="flex justify-between items-center mt-1">
+                    {mounted && (
+                      <p className="text-xs opacity-50 text-left ">
+                        {formatPersianTime(message.timestamp)}
+                      </p>
+                    )}
+                    {!message.isUser &&
+                      isLoading &&
+                      index === aiMessages.length - 1 && (
+                        <Button
+                          size="icon"
+                          variant="default"
+                          className="h-6 w-6 rounded-full ml-2"
+                          onClick={stop}
+                        >
+                          <FaStop />
+                          <span className="sr-only">توقف</span>
+                        </Button>
+                      )}
+                  </div>
+                </div>
+                <GiHolosphere className="w-6 h-6 mr-4" />
+              </>
+            )}
+            {console.log("Message Object:", message)}
+            {console.log("Tool Invocations:", message.toolInvocations)}
 
-            <div
-              className={`max-w-[70%] p-3 rounded-lg relative ${message.isUser
-                ? "bg-secondary text-secondary-foreground rounded-br-none"
-                : " bg-primary text-primary-foreground rounded-br-none"
-                }`}
-            >
-
-              <p
-                className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-500 [&_span]:hover:underline"
-                dangerouslySetInnerHTML={{ __html: message.text }}
-              />
-              <div className="flex justify-between items-center mt-1">
-                {mounted && (
-                  <p className="text-xs opacity-50 text-left ">
-                    {formatPersianTime(message.timestamp)}
-                  </p>
-                )}
-                {!message.isUser && isLoading && index === aiMessages.length - 1 && (
-                  <Button
-                    size="icon"
-                    variant="default"
-                    className="h-6 w-6 rounded-full ml-2"
-                    onClick={stop}
-                  >
-                    <FaStop />
-                    <span className="sr-only">توقف</span>
-                  </Button>
-                )}
-              </div>
-            </div>
-            {message.toolInvocations?.map(toolInvocation => {
+            {message.toolInvocations?.map((toolInvocation) => {
               const { toolName, toolCallId, state } = toolInvocation;
-              if (state === 'result') {
-                if (toolName === 'displayFlightCard') {
+              if (state === "result") {
+                if (toolName === "displayWeather") {
                   const { result } = toolInvocation;
                   return (
                     <div key={toolCallId}>
-                      <FlightCard {...result} />
+                      <Weather {...result} />
                     </div>
                   );
                 }
               } else {
                 return (
                   <div key={toolCallId}>
-                    {toolName === 'displayFlightCard' ? (
+                    {toolName === "displayFlightCard" ? (
                       <div>Loading flight...</div>
                     ) : null}
                   </div>
                 );
               }
+              return null;
             })}
           </div>
         ))}
         {error && (
           <div className="flex justify-center">
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => reload()}
-            >
+            <Button variant="destructive" size="sm" onClick={() => reload()}>
               تلاش مجدد
             </Button>
           </div>
