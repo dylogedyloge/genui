@@ -36,6 +36,34 @@ const formatPersianTime = (date: Date) => {
   return `${persianHours}:${minutes.toString().padStart(2, "0")} ${period}`;
 };
 
+const agentSuggestedQuestions: Record<string, string[]> = {
+  پرواز: [
+    "قیمت بلیط‌های پرواز استانبول چقدره؟",
+    "پروازهای مستقیم به دبی رو می‌خوام",
+    "بهترین زمان پرواز به آنتالیا کیه؟",
+  ],
+  هتل: [
+    "هتل‌های ۵ ستاره استانبول رو می‌خوام",
+    "قیمت هتل‌های کیش برای عید چقدره؟",
+    "بهترین هتل‌های آنتالیا کدومن؟",
+  ],
+  رستوران: [
+    "رستوران‌های ایرانی دبی رو معرفی کن",
+    "بهترین رستوران‌های استانبول کدومن؟",
+    "رستوران‌های حلال در آنتالیا",
+  ],
+  تور: [
+    "تور ارزان استانبول",
+    "تور لحظه آخری کیش",
+    "قیمت تور آنتالیا در تابستان",
+  ],
+  "برنامه سفر": [
+    "برنامه سفر ۳ روزه به استانبول",
+    "برنامه گشت و گذار در دبی",
+    "جاهای دیدنی آنتالیا",
+  ],
+};
+
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
   agentType,
   userId,
@@ -44,11 +72,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [mounted, setMounted] = useState(false);
-  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([
-    "قیمت بلیط‌های پرواز استانبول چقدره؟",
-    "پروازهای مستقیم به دبی رو می‌خوام",
-    "بهترین زمان پرواز به آنتالیا کیه؟",
-  ]);
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>(
+    agentSuggestedQuestions[agentType] || agentSuggestedQuestions["پرواز"]
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -210,7 +236,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               }`}
             >
               <p
-                className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-500 [&_span]:hover:underline"
+                className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline"
                 dangerouslySetInnerHTML={{ __html: message.text }}
               />
               {mounted && (
