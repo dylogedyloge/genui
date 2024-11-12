@@ -5,18 +5,25 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, SendHorizontal, User } from "lucide-react";
 import { FaStop } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/utils/supabase-client";
+// import { supabase } from "@/utils/supabase-client";
 import { useChat } from "ai/react";
 import { useToast } from "@/hooks/use-toast";
-import { FlightCard } from "./flight-card";
 import { GiHolosphere } from "react-icons/gi";
 import { Weather } from "./weather";
+import { FlightCard } from "./flight-card";
 
-// Define a unified message type
 type Message = {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  toolInvocations?: ToolInvocation[];
+};
+
+type ToolInvocation = {
+  toolName: string;
+  toolCallId: string;
+  state: 'calling' | 'result';
+  result?: any;
 };
 
 // Define a type for Supabase messages
@@ -84,27 +91,27 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (chatId) {
-      fetchMessages();
-    } else {
-      createNewChat();
-    }
-  }, [chatId, userId]);
+  // useEffect(() => {
+  //   if (chatId) {
+  //     fetchMessages();
+  //   } else {
+  //     createNewChat();
+  //   }
+  // }, [chatId, userId]);
 
-  const createNewChat = async () => {
-    const { data, error } = await supabase
-      .from("chats")
-      .insert({ user_id: userId, agent_type: agentType })
-      .select()
-      .single();
+  // const createNewChat = async () => {
+  //   const { data, error } = await supabase
+  //     .from("chats")
+  //     .insert({ user_id: userId, agent_type: agentType })
+  //     .select()
+  //     .single();
 
-    if (error) {
-      console.error("Error creating new chat:", error);
-    } else {
-      console.log("New chat created:", data);
-    }
-  };
+  //   if (error) {
+  //     console.error("Error creating new chat:", error);
+  //   } else {
+  //     console.log("New chat created:", data);
+  //   }
+  // };
 
   const {
     messages: aiMessages,
@@ -130,30 +137,30 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     ],
   });
 
-  useEffect(() => {
-    fetchMessages();
-  }, [chatId]);
+  // useEffect(() => {
+  //   fetchMessages();
+  // }, [chatId]);
 
-  const fetchMessages = async () => {
-    const { data, error } = await supabase
-      .from("messages")
-      .select("*")
-      .eq("chat_id", chatId)
-      .order("createdAt", { ascending: true });
+  // const fetchMessages = async () => {
+  //   const { data, error } = await supabase
+  //     .from("messages")
+  //     .select("*")
+  //     .eq("chat_id", chatId)
+  //     .order("createdAt", { ascending: true });
 
-    if (error) {
-      console.error("Error fetching messages:", error);
-    } else if (data) {
-      const formattedMessages = data.map((msg) => ({
-        text: msg.content,
-        isUser: msg.role === "user",
-        timestamp: new Date(msg.createdAt),
-      }));
+  //   if (error) {
+  //     console.error("Error fetching messages:", error);
+  //   } else if (data) {
+  //     const formattedMessages = data.map((msg) => ({
+  //       text: msg.content,
+  //       isUser: msg.role === "user",
+  //       timestamp: new Date(msg.createdAt),
+  //     }));
 
-      console.log("Formatted User Messages:", formattedMessages);
-      setMessages(formattedMessages);
-    }
-  };
+  //     console.log("Formatted User Messages:", formattedMessages);
+  //     setMessages(formattedMessages);
+  //   }
+  // };
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -165,19 +172,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         role: "user",
       };
 
-      await supabase.from("messages").insert(newMessage);
+      // await supabase.from("messages").insert(newMessage);
 
       await handleSubmit(e);
 
-      if (aiMessages[aiMessages.length - 1]) {
-        await supabase.from("messages").insert({
-          chat_id: chatId,
-          content: aiMessages[aiMessages.length - 1].content,
-          role: "assistant",
-        });
-      }
+      // if (aiMessages[aiMessages.length - 1]) {
+      //   await supabase.from("messages").insert({
+      //     chat_id: chatId,
+      //     content: aiMessages[aiMessages.length - 1].content,
+      //     role: "assistant",
+      //   });
+      // }
 
-      await fetchMessages();
+      // await fetchMessages();
     }
   };
 
@@ -188,14 +195,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     await handleSubmit(undefined);
 
     if (aiMessages[aiMessages.length - 1]) {
-      await supabase.from("messages").insert({
-        chat_id: chatId,
-        content: aiMessages[aiMessages.length - 1].content,
-        role: "assistant",
-      });
+      // await supabase.from("messages").insert({
+      //   chat_id: chatId,
+      //   content: aiMessages[aiMessages.length - 1].content,
+      //   role: "assistant",
+      // });
     }
 
-    await fetchMessages();
+    // await fetchMessages();
   };
 
   useEffect(() => {
@@ -214,7 +221,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <ArrowRight className="w-4 h-4 mr-6" />
         برگشت
       </Button>
-      <div className="flex-grow overflow-auto space-y-4 mb-4">
+      {/* <div className="flex-grow overflow-auto space-y-4 mb-4">
         {[
           ...messages,
           ...aiMessages.map((aiMsg) => ({
@@ -337,6 +344,110 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             {question}
           </Button>
         ))}
+      </div> */}
+      <div className="flex-grow overflow-auto space-y-4 mb-4">
+        {aiMessages.map((message, index) => (
+          <div
+            key={index}
+            className={`flex ${message.role === "user" ? "justify-start" : "justify-end"}`}
+          >
+            {message.role === "user" ? (
+              <>
+                <User className="w-6 h-6 ml-4" />
+                <div className="max-w-[70%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
+                  <p
+                    className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline"
+                    dangerouslySetInnerHTML={{ __html: message.content }}
+                  />
+                  <div className="flex justify-between items-center mt-1">
+                    {mounted && (
+                      <p className="text-xs opacity-50 text-left ">
+                        {formatPersianTime(new Date())}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="max-w-[70%] p-3 rounded-lg bg-primary text-primary-foreground rounded-tl-none">
+                  <p
+                    className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline"
+                    dangerouslySetInnerHTML={{ __html: message.content }}
+                  />
+                  <div className="flex justify-between items-center mt-1">
+                    {mounted && (
+                      <p className="text-xs opacity-50 text-left ">
+                        {formatPersianTime(new Date())}
+                      </p>
+                    )}
+                    {!message.role === "user" && isLoading && index === aiMessages.length - 1 && (
+                      <Button
+                        size="icon"
+                        variant="default"
+                        className="h-6 w-6 rounded-full ml-2"
+                        onClick={stop}
+                      >
+                        <FaStop />
+                        <span className="sr-only">توقف</span>
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Tool Invocations */}
+                  {message.toolInvocations?.map((toolInvocation) => {
+                    const { toolName, toolCallId, state } = toolInvocation;
+
+                    if (state === "result") {
+                      switch (toolName) {
+                        case "displayWeather":
+                          return (
+                            <div key={toolCallId} className="mt-2">
+                              <Weather {...toolInvocation.result} />
+                            </div>
+                          );
+                        case "displayFlightCard":
+                          return (
+                            <div key={toolCallId} className="mt-2">
+                              <FlightCard {...toolInvocation.result} />
+                            </div>
+                          );
+                        default:
+                          return null;
+                      }
+                    } else {
+                      return (
+                        <div key={toolCallId} className="mt-2 p-2 bg-secondary rounded-lg">
+                          {toolName === "displayWeather" && (
+                            <div className="flex items-center gap-2">
+                              <div className="animate-spin">⌛</div>
+                              <div>در حال دریافت اطلاعات آب و هوا...</div>
+                            </div>
+                          )}
+                          {toolName === "displayFlightCard" && (
+                            <div className="flex items-center gap-2">
+                              <div className="animate-spin">⌛</div>
+                              <div>در حال دریافت اطلاعات پرواز...</div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+                  })}
+                </div>
+                <GiHolosphere className="w-6 h-6 mr-4" />
+              </>
+            )}
+          </div>
+        ))}
+
+        {error && (
+          <div className="flex justify-center">
+            <Button variant="destructive" size="sm" onClick={() => reload()}>
+              تلاش مجدد
+            </Button>
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-2">
         <Input
