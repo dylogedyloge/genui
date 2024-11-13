@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { useChat } from "ai/react";
 import { useToast } from "@/hooks/use-toast";
 import { GiHolosphere } from "react-icons/gi";
-import { Weather } from "./weather";
+// import { Weather } from "./weather";
 import { FlightCard } from "./flight-card";
+import { FlightCardSkeleton } from "./flight-card-skeleton";
+import ReactMarkdown from 'react-markdown';
 
 type Message = {
   text: string;
@@ -354,11 +356,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             {message.role === "user" ? (
               <>
                 <User className="w-6 h-6 ml-4" />
-                <div className="max-w-[70%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
-                  <p
-                    className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline"
-                    dangerouslySetInnerHTML={{ __html: message.content }}
-                  />
+                <div className="max-w-[70%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none"> 
+                  <ReactMarkdown className="prose-sm text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline">
+                    {message.content}
+                  </ReactMarkdown>
                   <div className="flex justify-between items-center mt-1">
                     {mounted && (
                       <p className="text-xs opacity-50 text-left ">
@@ -371,10 +372,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             ) : (
               <>
                 <div className="max-w-[70%] p-3 rounded-lg bg-primary text-primary-foreground rounded-tl-none">
-                  <p
-                    className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline"
-                    dangerouslySetInnerHTML={{ __html: message.content }}
-                  />
+                  <ReactMarkdown className="prose-sm text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline">
+                    {message.content}
+                  </ReactMarkdown>
                   <div className="flex justify-between items-center mt-1">
                     {mounted && (
                       <p className="text-xs opacity-50 text-left ">
@@ -403,7 +403,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         case "displayWeather":
                           return (
                             <div key={toolCallId} className="mt-2">
-                              <Weather {...toolInvocation.result} />
+                              {/* <Weather {...toolInvocation.result} /> */}
                             </div>
                           );
                         case "displayFlightCard":
@@ -425,10 +425,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             </div>
                           )}
                           {toolName === "displayFlightCard" && (
-                            <div className="flex items-center gap-2">
-                              <div className="animate-spin">⌛</div>
-                              <div>در حال دریافت اطلاعات پرواز...</div>
-                            </div>
+                            <FlightCardSkeleton />
                           )}
                         </div>
                       );
@@ -448,6 +445,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </Button>
           </div>
         )}
+      </div>
+      <div className="flex flex-wrap gap-2 mb-4">
+        {suggestedQuestions.map((question, index) => (
+          <Button
+            key={index}
+            variant="outline"
+            className="text-sm"
+            onClick={() => handleSuggestionClick(question)}
+            disabled={isLoading}
+          >
+            {question}
+          </Button>
+        ))}
       </div>
       <div className="flex items-center gap-2">
         <Input

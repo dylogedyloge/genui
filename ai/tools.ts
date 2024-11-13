@@ -13,11 +13,11 @@ export const FlightTool = createTool({
       departure,
       arrival,
       airline: 'ایران ایر',
-      flightNumber: "123",
-      departureTime: "23-10-2024",
-      arrivalTime: "24-10-2024",
+      flightNumber: "123 A32",
+      departureTime: "23 خرداد 1403",
+      arrivalTime: "24 خرداد 1403",
       status: "On Time",
-      temperature: 75
+      price: 10400000
     };
   },
 });

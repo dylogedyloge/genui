@@ -668,7 +668,7 @@ export default function RootLayout({
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <CreditCard className="prose" />
-                            <p className="text-sm prose-sm">پرداخت ها</p>
+                            <p className="text-sm prose-sm ">پرداخت ها</p>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Bell className="prose" />
