@@ -12,7 +12,10 @@ import { GiHolosphere } from "react-icons/gi";
 // import { Weather } from "./weather";
 import { FlightCard } from "./flight-card";
 import { FlightCardSkeleton } from "./flight-card-skeleton";
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown from "react-markdown";
+import { HotelCard } from "./hotel-card";
+import RestaurantCard from "./restaurant-card";
+import TourCard from "./tour-card";
 
 type Message = {
   text: string;
@@ -24,7 +27,7 @@ type Message = {
 type ToolInvocation = {
   toolName: string;
   toolCallId: string;
-  state: 'calling' | 'result';
+  state: "calling" | "result";
   result?: any;
 };
 
@@ -351,12 +354,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         {aiMessages.map((message, index) => (
           <div
             key={index}
-            className={`flex ${message.role === "user" ? "justify-start" : "justify-end"}`}
+            className={`flex ${
+              message.role === "user" ? "justify-start" : "justify-end"
+            }`}
           >
             {message.role === "user" ? (
               <>
                 <User className="w-6 h-6 ml-4" />
-                <div className="max-w-[70%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none"> 
+                <div className="max-w-[70%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
                   <ReactMarkdown className="prose-sm text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline">
                     {message.content}
                   </ReactMarkdown>
@@ -381,17 +386,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         {formatPersianTime(new Date())}
                       </p>
                     )}
-                    {!message.role === "user" && isLoading && index === aiMessages.length - 1 && (
-                      <Button
-                        size="icon"
-                        variant="default"
-                        className="h-6 w-6 rounded-full ml-2"
-                        onClick={stop}
-                      >
-                        <FaStop />
-                        <span className="sr-only">توقف</span>
-                      </Button>
-                    )}
+                    {!message.role === "user" &&
+                      isLoading &&
+                      index === aiMessages.length - 1 && (
+                        <Button
+                          size="icon"
+                          variant="default"
+                          className="h-6 w-6 rounded-full ml-2"
+                          onClick={stop}
+                        >
+                          <FaStop />
+                          <span className="sr-only">توقف</span>
+                        </Button>
+                      )}
                   </div>
 
                   {/* Tool Invocations */}
@@ -400,10 +407,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
                     if (state === "result") {
                       switch (toolName) {
-                        case "displayWeather":
+                        case "displayHotelCard":
                           return (
                             <div key={toolCallId} className="mt-2">
-                              {/* <Weather {...toolInvocation.result} /> */}
+                              <HotelCard {...toolInvocation.result} />
                             </div>
                           );
                         case "displayFlightCard":
@@ -412,12 +419,27 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                               <FlightCard {...toolInvocation.result} />
                             </div>
                           );
+                        case "displayRestaurantCard":
+                          return (
+                            <div key={toolCallId} className="mt-2">
+                              <RestaurantCard {...toolInvocation.result} />
+                            </div>
+                          );
+                        case "displayTourCard":
+                          return (
+                            <div key={toolCallId} className="mt-2">
+                              <TourCard {...toolInvocation.result} />
+                            </div>
+                          );
                         default:
                           return null;
                       }
                     } else {
                       return (
-                        <div key={toolCallId} className="mt-2 p-2 bg-secondary rounded-lg">
+                        <div
+                          key={toolCallId}
+                          className="mt-2 p-2 bg-secondary rounded-lg"
+                        >
                           {toolName === "displayWeather" && (
                             <div className="flex items-center gap-2">
                               <div className="animate-spin">⌛</div>

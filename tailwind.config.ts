@@ -16,19 +16,19 @@ const config: Config = {
   ],
   theme: {
     extend: {
-        "animation": {
-          shimmer: "shimmer 2s linear infinite"
+      animation: {
+        shimmer: "shimmer 2s linear infinite",
+      },
+      keyframes: {
+        shimmer: {
+          from: {
+            backgroundPosition: "0 0",
+          },
+          to: {
+            backgroundPosition: "-200% 0",
+          },
         },
-        "keyframes": {
-          shimmer: {
-            from: {
-              "backgroundPosition": "0 0"
-            },
-            to: {
-              "backgroundPosition": "-200% 0"
-            }
-          }
-        },
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -89,7 +89,7 @@ const config: Config = {
     },
   },
 
-  plugins: [require('tailwindcss-motion'),
+  plugins: [
     addVariablesForColors,
     function ({ matchUtilities, theme }: any) {
       matchUtilities(
