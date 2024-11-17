@@ -540,7 +540,7 @@ export default function RootLayout({
                         <SidebarMenuItem>
                           <CollapsibleTrigger asChild>
                             <SidebarMenuButton tooltip={item.title}>
-                              {item.icon && <item.icon className="prose" />}
+                              {item.icon && <item.icon   />}
                               <span>{item.title}</span>
                               <ChevronLeft className="mr-auto transition-transform duration-200 group-data-[state=open]/collapsible:-rotate-90" />
                             </SidebarMenuButton>
@@ -576,7 +576,7 @@ export default function RootLayout({
                       <SidebarMenuItem key={item.name}>
                         <SidebarMenuButton asChild>
                           <Link href={item.url}>
-                            <item.icon className="prose" />
+                            <item.icon   />
                             <span>{item.name}</span>
                           </Link>
                         </SidebarMenuButton>
@@ -654,7 +654,7 @@ export default function RootLayout({
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                           <DropdownMenuItem>
-                            <Sparkles className="prose" />
+                            <Sparkles   />
                             <p className="text-sm prose-sm">
                               ارتقاء حساب کاربری
                             </p>
@@ -663,15 +663,15 @@ export default function RootLayout({
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                           <DropdownMenuItem>
-                            <BadgeCheck className="prose" />
+                            <BadgeCheck   />
                             <p className="text-sm prose-sm"> حساب کاربری</p>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <CreditCard className="prose" />
+                            <CreditCard   />
                             <p className="text-sm prose-sm ">پرداخت ها</p>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Bell className="prose" />
+                            <Bell   />
                             <p className="text-sm prose-sm">پیام ها</p>
                           </DropdownMenuItem>
                         </DropdownMenuGroup>

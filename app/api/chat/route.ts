@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     maxSteps: 5,
     tools,
   });
-  console.log("API Response:", result);
+  
 
   return result.toDataStreamResponse();
 }

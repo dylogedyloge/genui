@@ -1,6 +1,6 @@
 "use client";
 
-import { PlaneTakeoff } from "lucide-react";
+import { FaPlane } from "react-icons/fa";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ export const FlightCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="shadow-md  dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg ">
+      <div className="w-full sm:w-96 shadow-md  dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg ">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xs font-semibold text-primary">{airline}</h2>
@@ -54,8 +54,8 @@ export const FlightCard = ({
               </p>
             </div>
             <div className="flex flex-col items-center px-4">
-              <div className="sm:w-24 w-0 h-px bg-border mb-2" />
-              <PlaneTakeoff className="text-card-foreground w-6 h-6 animate-pulse" />
+              {/* <div className="sm:w-24 w-0 h-px bg-border mb-2" /> */}
+              <FaPlane className="text-card-foreground w-6 h-6   rotate-180" />
             </div>
 
             <div className="text-right flex flex-col items-end">

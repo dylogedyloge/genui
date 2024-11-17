@@ -31,7 +31,7 @@ const BotCard: React.FC<BotCardProps> = ({ title, description, iconName }) => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {IconComponent && <IconComponent className="w-20 h-20 prose" />}
+        {IconComponent && <IconComponent className="w-20 h-20" />}
         <div className="bg-background absolute bottom-0 left-0 right-0 p-4 text-card-foreground">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

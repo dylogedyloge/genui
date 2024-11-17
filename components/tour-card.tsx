@@ -69,7 +69,7 @@ export default function TourCard({
               </div>
               <p className="text-sm font-semibold">{startDate}</p>
             </div>
-            <Bus className="w-6 h-6 text-primary" />
+            <Bus className="text-card-foreground w-6 h-6" />
             <div className="text-right">
               <div className="flex items-center gap-1 mb-1 justify-end">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -98,7 +98,7 @@ export default function TourCard({
                 </p>
               </div>
             </div>
-            <Button className="w-full animate-shimmer items-center justify-center border border-primary bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+            <Button className="w-full animate-shimmer items-center justify-center border border-slate-800 bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground dark:text-card-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
               رزرو تور
             </Button>
           </motion.div>

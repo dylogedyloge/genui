@@ -16,6 +16,9 @@ import ReactMarkdown from "react-markdown";
 import { HotelCard } from "./hotel-card";
 import RestaurantCard from "./restaurant-card";
 import TourCard from "./tour-card";
+import { RestaurantCardSkeleton } from "./restaurant-card-skeleton";
+import { HotelCardSkeleton } from "./hotel-card-skeleton";
+import { TourCardSkeleton } from "./tour-card-skeleton";
 
 type Message = {
   text: string;
@@ -226,130 +229,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <ArrowRight className="w-4 h-4 mr-6" />
         برگشت
       </Button>
-      {/* <div className="flex-grow overflow-auto space-y-4 mb-4">
-        {[
-          ...messages,
-          ...aiMessages.map((aiMsg) => ({
-            text: aiMsg.content,
-            isUser: aiMsg.role === "user",
-            timestamp: new Date(),
-          })),
-        ].map((message, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              message.isUser ? "justify-start" : "justify-end"
-            }`}
-          >
-            {message.isUser ? (
-              <>
-                <User className="w-6 h-6 ml-4" />
-                <div className="max-w-[70%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
-                  <p
-                    className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline"
-                    dangerouslySetInnerHTML={{ __html: message.text }}
-                  />
-                  <div className="flex justify-between items-center mt-1">
-                    {mounted && (
-                      <p className="text-xs opacity-50 text-left ">
-                        {formatPersianTime(message.timestamp)}
-                      </p>
-                    )}
-                    {!message.isUser &&
-                      isLoading &&
-                      index === aiMessages.length - 1 && (
-                        <Button
-                          size="icon"
-                          variant="default"
-                          className="h-6 w-6 rounded-full ml-2"
-                          onClick={stop}
-                        >
-                          <FaStop />
-                          <span className="sr-only">توقف</span>
-                        </Button>
-                      )}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="max-w-[70%] p-3 rounded-lg bg-primary text-primary-foreground rounded-tl-none">
-                  <p
-                    className="text-sm [&_span]:cursor-pointer [&_span]:text-blue-300 [&_span]:hover:underline"
-                    dangerouslySetInnerHTML={{ __html: message.text }}
-                  />
-                  <div className="flex justify-between items-center mt-1">
-                    {mounted && (
-                      <p className="text-xs opacity-50 text-left ">
-                        {formatPersianTime(message.timestamp)}
-                      </p>
-                    )}
-                    {!message.isUser &&
-                      isLoading &&
-                      index === aiMessages.length - 1 && (
-                        <Button
-                          size="icon"
-                          variant="default"
-                          className="h-6 w-6 rounded-full ml-2"
-                          onClick={stop}
-                        >
-                          <FaStop />
-                          <span className="sr-only">توقف</span>
-                        </Button>
-                      )}
-                  </div>
-                </div>
-                <GiHolosphere className="w-6 h-6 mr-4" />
-              </>
-            )}
-            {console.log("Message Object:", message)}
-            {console.log("Tool Invocations:", message.toolInvocations)}
-
-            {message.toolInvocations?.map((toolInvocation) => {
-              const { toolName, toolCallId, state } = toolInvocation;
-              if (state === "result") {
-                if (toolName === "displayWeather") {
-                  const { result } = toolInvocation;
-                  return (
-                    <div key={toolCallId}>
-                      <Weather {...result} />
-                    </div>
-                  );
-                }
-              } else {
-                return (
-                  <div key={toolCallId}>
-                    {toolName === "displayFlightCard" ? (
-                      <div>Loading flight...</div>
-                    ) : null}
-                  </div>
-                );
-              }
-              return null;
-            })}
-          </div>
-        ))}
-        {error && (
-          <div className="flex justify-center">
-            <Button variant="destructive" size="sm" onClick={() => reload()}>
-              تلاش مجدد
-            </Button>
-          </div>
-        )}
-      </div>
-      <div className="flex flex-wrap gap-2 mb-4">
-        {suggestedQuestions.map((question, index) => (
-          <Button
-            key={index}
-            variant="outline"
-            className="text-sm"
-            onClick={() => handleSuggestionClick(question)}
-            disabled={isLoading}
-          >
-            {question}
-          </Button>
-        ))}
-      </div> */}
       <div className="flex-grow overflow-auto space-y-4 mb-4">
         {aiMessages.map((message, index) => (
           <div
@@ -367,7 +246,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   </ReactMarkdown>
                   <div className="flex justify-between items-center mt-1">
                     {mounted && (
-                      <p className="text-xs opacity-50 text-left ">
+                      <p className="text-xs opacity-50 text-left">
                         {formatPersianTime(new Date())}
                       </p>
                     )}
@@ -406,17 +285,37 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     const { toolName, toolCallId, state } = toolInvocation;
 
                     if (state === "result") {
+                      if (toolName === "displayFlightCard") {
+                        // Log result for debugging
+                        console.log(
+                          "Flight tool result:",
+                          toolInvocation.result
+                        );
+                        return (
+                          <div
+                            key={toolCallId}
+                            className="mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                          >
+                            {toolInvocation.result &&
+                            Array.isArray(toolInvocation.result) ? (
+                              toolInvocation.result.map(
+                                (flight: any, flightIndex: number) => (
+                                  <FlightCard key={flightIndex} {...flight} />
+                                )
+                              )
+                            ) : (
+                              <div>No flight data available</div>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      // Handle other tools similarly
                       switch (toolName) {
                         case "displayHotelCard":
                           return (
                             <div key={toolCallId} className="mt-2">
                               <HotelCard {...toolInvocation.result} />
-                            </div>
-                          );
-                        case "displayFlightCard":
-                          return (
-                            <div key={toolCallId} className="mt-2">
-                              <FlightCard {...toolInvocation.result} />
                             </div>
                           );
                         case "displayRestaurantCard":
@@ -440,14 +339,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                           key={toolCallId}
                           className="mt-2 p-2 bg-secondary rounded-lg"
                         >
-                          {toolName === "displayWeather" && (
-                            <div className="flex items-center gap-2">
-                              <div className="animate-spin">⌛</div>
-                              <div>در حال دریافت اطلاعات آب و هوا...</div>
+                          {toolName === "displayFlightCard" && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                              {/* Render skeletons for each card */}
+                              {[...Array(4)].map((_, i) => (
+                                <FlightCardSkeleton key={i} />
+                              ))}
                             </div>
                           )}
-                          {toolName === "displayFlightCard" && (
-                            <FlightCardSkeleton />
+                          {toolName === "displayRestaurantCard" && (
+                            <RestaurantCardSkeleton />
+                          )}
+                          {toolName === "displayHotelCard" && (
+                            <HotelCardSkeleton />
+                          )}
+                          {toolName === "displayTourCard" && (
+                            <TourCardSkeleton />
                           )}
                         </div>
                       );

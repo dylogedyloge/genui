@@ -17,9 +17,14 @@ const config: Config = {
   theme: {
     extend: {
       animation: {
+        'takeoff-rtl': 'takeoffRightToLeft 2s linear infinite',
         shimmer: "shimmer 2s linear infinite",
       },
       keyframes: {
+        takeoffRightToLeft: {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
         shimmer: {
           from: {
             backgroundPosition: "0 0",
