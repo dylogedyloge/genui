@@ -30,8 +30,9 @@ export const FlightCard = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
+      className="w-full"
     >
-      <div className="w-full sm:w-96 shadow-md  dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg ">
+      <div className="w-full sm:w-auto shadow-md  dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg ">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xs font-semibold text-primary">{airline}</h2>
