@@ -1,5 +1,4 @@
-// components/chat/SuggestedQuestions.tsx
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shadcn/button";
 
 interface SuggestedQuestionsProps {
   questions: string[];

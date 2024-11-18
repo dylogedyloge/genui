@@ -1,9 +1,9 @@
 "use client";
 
 import { FaPlane } from "react-icons/fa";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/shadcn/badge";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shadcn/button";
 
 type FlightProps = {
   departure: string;
@@ -16,7 +16,7 @@ type FlightProps = {
   price: number;
 };
 
-export const FlightCard = ({
+const FlightCard = ({
   airline,
   flightNumber,
   departure,
@@ -89,3 +89,4 @@ export const FlightCard = ({
     </motion.div>
   );
 };
+export default FlightCard

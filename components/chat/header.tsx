@@ -1,5 +1,4 @@
-// components/chat/Header.tsx
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shadcn/button";
 import { ArrowRight } from "lucide-react";
 
 interface HeaderProps {

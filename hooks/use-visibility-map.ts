@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-// hooks/useVisibilityMap.ts
 export const useVisibilityMap = (initialValue = 2) => {
   const [visibilityMap, setVisibilityMap] = useState<{
     [messageIndex: number]: { [invocationIndex: number]: number };

@@ -1,9 +1,8 @@
-// types/chat.ts
-type Message = {
+export type Message = {
   role: string;
   content?: string;
   text?: string;
-  timestamp: Date | string | number; // Ensure this is a valid date field
+  timestamp: Date | string | number; 
   toolInvocations?: ToolInvocation[];
 };
 

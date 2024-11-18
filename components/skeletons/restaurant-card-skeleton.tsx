@@ -1,30 +1,9 @@
-"use client";
-
+import { Skeleton } from "@/components/shadcn/skeleton";
 import { MapPin, Clock, Utensils, Star } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/shadcn/card";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 
-type RestaurantProps = {
-  name: string;
-  cuisine: string;
-  location: string;
-  openingTime: string;
-  closingTime: string;
-  rating: number;
-  priceRange: string;
-};
-
-export default function RestaurantCard({
-  name,
-  cuisine,
-  location,
-  openingTime,
-  closingTime,
-  rating,
-  priceRange,
-}: RestaurantProps) {
+const RestaurantCardSkeleton = () => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -33,12 +12,13 @@ export default function RestaurantCard({
     >
       <Card className="w-full sm:w-96 shadow-sm">
         <CardContent className="p-4">
+          {/* Restaurant name and rating */}
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-primary">{name}</h2>
-            <Badge variant="secondary" className="text-xs font-medium">
-              ★ {rating.toFixed(1)}
-            </Badge>
+            <Skeleton className="w-32 h-4" />
+            <Skeleton className="w-10 h-4" />
           </div>
+
+          {/* Cuisine and Price Range */}
           <motion.div
             className="flex items-center justify-between mb-4"
             initial={{ opacity: 0, x: 10 }}
@@ -47,13 +27,12 @@ export default function RestaurantCard({
           >
             <div className="flex items-center gap-2">
               <Utensils className="w-4 h-4 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{cuisine}</p>
+              <Skeleton className="w-20 h-4" />
             </div>
-            <Badge variant="outline" className="text-xs">
-              بازه قیمتی:
-              {priceRange}
-            </Badge>
+            <Skeleton className="w-16 h-4" />
           </motion.div>
+
+          {/* Opening and Closing Times */}
           <motion.div
             className="flex items-center justify-between mb-4"
             initial={{ opacity: 0, x: 10 }}
@@ -63,19 +42,21 @@ export default function RestaurantCard({
             <div className="text-right">
               <div className="flex items-center gap-1 mb-1">
                 <Clock className="w-4 h-4 text-muted-foreground" />
-                <p className="text-xs text-muted-foreground">ساعت باز شدن</p>
+                <Skeleton className="w-16 h-4" />
               </div>
-              <p className="text-sm font-semibold">{openingTime}</p>
+              <Skeleton className="w-12 h-4" />
             </div>
             <Utensils className="w-6 h-6 text-primary" />
             <div className="text-left">
               <div className="flex items-center gap-1 mb-1 justify-end">
                 <Clock className="w-4 h-4 text-muted-foreground" />
-                <p className="text-xs text-muted-foreground">ساعت بسته شدن</p>
+                <Skeleton className="w-16 h-4" />
               </div>
-              <p className="text-sm font-semibold">{closingTime}</p>
+              <Skeleton className="w-12 h-4" />
             </div>
           </motion.div>
+
+          {/* Location and Button */}
           <motion.div
             className="flex flex-col gap-2"
             initial={{ opacity: 0, y: 10 }}
@@ -84,14 +65,13 @@ export default function RestaurantCard({
           >
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{location}</p>
+              <Skeleton className="w-48 h-4" />
             </div>
-            <Button className="w-full animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
-              رزرو رستوران
-            </Button>
+            <Skeleton className="w-full h-8" />
           </motion.div>
         </CardContent>
       </Card>
     </motion.div>
   );
-}
+};
+export default RestaurantCardSkeleton

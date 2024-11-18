@@ -1,5 +1,3 @@
-// utils/timeHelpers.ts
-
 /**
  * Formats a JavaScript Date object or timestamp into a Persian time format.
  * Example output: 3:45 بعدازظهر

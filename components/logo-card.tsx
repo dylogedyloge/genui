@@ -42,7 +42,7 @@
 "use client";
 
 import { GiHolosphere } from "react-icons/gi";
-import { Button } from "./ui/button";
+import { Button } from "./shadcn/button";
 import { useTheme } from "next-themes";
 import React, { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";

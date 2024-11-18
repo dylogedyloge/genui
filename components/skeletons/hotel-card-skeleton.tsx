@@ -1,9 +1,9 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Calendar, Clock, Bus, Tag, Users } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/shadcn/skeleton";
+import { Bed, Calendar, EarOff, MapPin } from "lucide-react";
+import { Card, CardContent } from "@/components/shadcn/card";
 import { motion } from "framer-motion";
 
-export const TourCardSkeleton = () => {
+const HotelCardSkeleton = () => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -12,13 +12,13 @@ export const TourCardSkeleton = () => {
     >
       <Card className="w-full sm:w-96 shadow-sm">
         <CardContent className="p-4">
-          {/* Tour name and category */}
+          {/* Hotel name and rating */}
           <div className="flex items-center justify-between mb-4">
             <Skeleton className="w-32 h-4" />
-            <Skeleton className="w-16 h-4" />
+            <Skeleton className="w-10 h-4" />
           </div>
 
-          {/* Destination and Duration */}
+          {/* Location and Room Type */}
           <motion.div
             className="flex items-center justify-between mb-4"
             initial={{ opacity: 0, x: 10 }}
@@ -29,13 +29,10 @@ export const TourCardSkeleton = () => {
               <MapPin className="w-4 h-4 text-muted-foreground" />
               <Skeleton className="w-24 h-4" />
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-muted-foreground" />
-              <Skeleton className="w-16 h-4" />
-            </div>
+            <Skeleton className="w-16 h-4" />
           </motion.div>
 
-          {/* Start Date and End Date */}
+          {/* Check-in and Check-out */}
           <motion.div
             className="flex items-center justify-between mb-4"
             initial={{ opacity: 0, x: 10 }}
@@ -45,41 +42,33 @@ export const TourCardSkeleton = () => {
             <div className="text-left">
               <div className="flex items-center gap-1 mb-1">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
-                <Skeleton className="w-16 h-4" />
+                <Skeleton className="w-12 h-4" />
               </div>
-              <Skeleton className="w-20 h-4" />
+              <Skeleton className="w-16 h-4" />
             </div>
-            <Bus className="text-card-foreground w-6 h-6" />
+            <Bed className="text-card-foreground w-6 h-6 animate-pulse" />
             <div className="text-right">
               <div className="flex items-center gap-1 mb-1 justify-end">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
-                <Skeleton className="w-16 h-4" />
+                <Skeleton className="w-12 h-4" />
               </div>
-              <Skeleton className="w-20 h-4" />
-            </div>
-          </motion.div>
-
-          {/* Group Size and Price */}
-          <motion.div
-            className="flex items-center justify-between mb-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.3 }}
-          >
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-muted-foreground" />
-              <Skeleton className="w-24 h-4" />
-            </div>
-            <div className="flex items-center gap-2">
-              <Tag className="w-4 h-4 text-muted-foreground" />
               <Skeleton className="w-16 h-4" />
             </div>
           </motion.div>
 
-          {/* Reserve Button */}
-          <Skeleton className="w-full h-8" />
+          {/* Price and Button */}
+          <motion.div
+            className="flex items-center justify-between"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.3 }}
+          >
+            <Skeleton className="w-24 h-6" />
+            <Skeleton className="w-24 h-8" />
+          </motion.div>
         </CardContent>
       </Card>
     </motion.div>
   );
 };
+export default HotelCardSkeleton

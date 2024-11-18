@@ -1,26 +1,25 @@
-// components/chat/MessageList.tsx
 import ReactMarkdown from "react-markdown";
 import { User } from "lucide-react";
 import { GiHolosphere } from "react-icons/gi";
 
-import { FlightCard } from "@/components/flight-card";
-import { HotelCard } from "@/components/hotel-card";
-import RestaurantCard from "@/components/restaurant-card";
-import TourCard from "@/components/tour-card";
+import  FlightCard  from "@/components/cards/flight-card";
+import  HotelCard  from "@/components/cards/hotel-card";
+import RestaurantCard from "@/components/cards/restaurant-card";
+import TourCard from "@/components/cards/tour-card";
 
-import { FlightCardSkeleton } from "@/components/flight-card-skeleton";
-import { HotelCardSkeleton } from "@/components/hotel-card-skeleton";
-import { RestaurantCardSkeleton } from "@/components/restaurant-card-skeleton";
-import { TourCardSkeleton } from "@/components/tour-card-skeleton";
+import  FlightCardSkeleton  from "@/components/skeletons/flight-card-skeleton";
+import  HotelCardSkeleton  from "@/components/skeletons/hotel-card-skeleton";
+import  RestaurantCardSkeleton  from "@/components/skeletons/restaurant-card-skeleton";
+import  TourCardSkeleton  from "@/components/skeletons/tour-card-skeleton";
 
 import { formatPersianTime } from "@/utils/time-helpers";
 import { Message, ToolInvocation } from "@/types/chat";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shadcn/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 interface MessageListProps {
-  messages: Message[]; // Ensure Message type is structured as expected (with content)
+  messages: Message[];
   isLoading: boolean;
   stop: () => void;
   error: Error | null;
@@ -43,10 +42,8 @@ const MessageList: React.FC<MessageListProps> = ({
   mounted,
   visibilityControls,
 }) => {
-    // Add a ref to the input for focusing
-    const inputRef = useRef<HTMLInputElement>(null);
 
-    // Focus the input whenever messages change (new message arrives)
+    const inputRef = useRef<HTMLInputElement>(null);
     useEffect(() => {
       if (inputRef.current) {
         inputRef.current.focus();
@@ -65,7 +62,7 @@ const MessageList: React.FC<MessageListProps> = ({
             <>
               <User className="w-6 h-6 ml-4" />
               <div className="max-w-[70%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
-                {/* Ensure 'content' or 'text' is used correctly */}
+               
                 <ReactMarkdown className="prose-sm text-sm">
                   {message.content || message.text}
                 </ReactMarkdown>
@@ -97,28 +94,28 @@ const MessageList: React.FC<MessageListProps> = ({
                       switch (toolName) {
                         case "displayFlightCard":
                           return renderFlightCards(
-                            result,
+                            result as any[],
                             messageIndex,
                             invocationIndex,
                             visibilityControls.flights
                           );
                         case "displayHotelCard":
                           return renderHotelCards(
-                            result,
+                            result as any[],
                             messageIndex,
                             invocationIndex,
                             visibilityControls.hotels
                           );
                         case "displayRestaurantCard":
                           return renderRestaurantCards(
-                            result,
+                            result as any[],
                             messageIndex,
                             invocationIndex,
                             visibilityControls.restaurants
                           );
                         case "displayTourCard":
                           return renderTourCards(
-                            result,
+                            result as any[],
                             messageIndex,
                             invocationIndex,
                             visibilityControls.tours

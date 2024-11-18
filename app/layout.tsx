@@ -5,7 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/utils/supabase-client";
 import Auth from "@/components/auth";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/shadcn/toaster"
 
 const vazir = localFont({
   src: "./fonts/Vazir-Light-FD.ttf",
@@ -296,12 +296,12 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/shadcn/avatar";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from "@/components/shadcn/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -310,8 +310,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
+} from "@/components/shadcn/dropdown-menu";
+import { Separator } from "@/components/shadcn/separator";
 import {
   Sidebar,
   SidebarContent,
@@ -329,7 +329,7 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
-} from "@/components/ui/sidebar";
+} from "@/components/shadcn/sidebar";
 import LogoCard from "@/components/logo-card";
 // import Chat from "@/components/chat";
 import Image from "next/image";

@@ -143,8 +143,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card } from "./ui/card";
+import { Button } from "@/components/shadcn/button";
+import { Card } from "./shadcn/card";
 import { FcGoogle } from "react-icons/fc";
 import { supabase } from "@/utils/supabase-client";
 import Image from "next/image";

@@ -1,8 +1,8 @@
 'use client'
 
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/shadcn/card"
 import { motion } from "framer-motion"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/shadcn/skeleton"
 
 const FlightCardSkeleton = () => {
   return (

@@ -1,10 +1,10 @@
 "use client";
 
 import { MapPin, Calendar, Clock, Bus, Tag, Users } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/shadcn/card";
+import { Badge } from "@/components/shadcn/badge";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shadcn/button";
 
 type TourProps = {
   name: string;
@@ -17,7 +17,7 @@ type TourProps = {
   category: string;
 };
 
-export default function TourCard({
+const TourCard=({
   name,
   destination,
   duration,
@@ -26,7 +26,7 @@ export default function TourCard({
   groupSize,
   price,
   category,
-}: TourProps) {
+}: TourProps)=> {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -107,3 +107,5 @@ export default function TourCard({
     </motion.div>
   );
 }
+
+export default TourCard
