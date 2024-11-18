@@ -1,58 +1,93 @@
 // utils/timeHelpers.ts
 
 /**
- * Formats a JavaScript Date object into a Persian time format.
+ * Formats a JavaScript Date object or timestamp into a Persian time format.
  * Example output: 3:45 بعدازظهر
- *
- * @param date - The JavaScript Date object to format
+ * 
+ * @param dateInput - The JavaScript Date object, timestamp, or date string to format
  * @returns A string representing the time in Persian format
  */
-export const formatPersianTime = (date: Date): string => {
-  const persianMonths = [
-    "فروردین",
-    "اردیبهشت",
-    "خرداد",
-    "تیر",
-    "مرداد",
-    "شهریور",
-    "مهر",
-    "آبان",
-    "آذر",
-    "دی",
-    "بهمن",
-    "اسفند",
-  ];
+export const formatPersianTime = (dateInput?: Date | string | number): string => {
+  try {
+    // Check for undefined or invalid dateInput
+    if (!dateInput) {
+      return "";
+    }
 
-  // Get hours and minutes
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
+    // Convert input to Date object, regardless of whether it's a string, number, or Date
+    const date = typeof dateInput === 'string' || typeof dateInput === 'number'
+      ? new Date(dateInput)
+      : dateInput;
 
-  // Determine if the time is AM or PM in Persian
-  const period = hours >= 12 ? "بعدازظهر" : "صبح";
+    // Ensure the Date object is valid
+    if (isNaN(date.getTime())) {
+      console.error("Invalid Date:", dateInput);
+      return "";
+    }
 
-  // Convert to 12-hour format
-  const persianHours = hours % 12 || 12;
+    // Extract hours and minutes
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
 
-  // Pad minutes with leading 0 if needed
-  const paddedMinutes = minutes.toString().padStart(2, "0");
+    // Determine AM or PM in Persian
+    const period = hours >= 12 ? "بعدازظهر" : "صبح";
 
-  // Return formatted time
-  return `${persianHours}:${paddedMinutes} ${period}`;
+    // Convert to 12-hour format and pad minutes with leading zero
+    const persianHours = hours % 12 || 12;
+    const paddedMinutes = minutes.toString().padStart(2, "0");
+
+    // Return formatted time
+    return `${persianHours}:${paddedMinutes} ${period}`;
+  } catch (error) {
+    console.error('Error formatting Persian time:', error);
+    return "";
+  }
 };
 
 /**
  * Converts a Date object to a Persian date string (year/month/day).
  * Example output: 1401/6/10
- *
- * @param date - The JavaScript Date object to format
+ * 
+ * @param dateInput - The JavaScript Date object, timestamp, or date string to format
  * @returns A string representing the date in Persian format
  */
-export const formatPersianDate = (date: Date): string => {
-  const persianDate = new Intl.DateTimeFormat("fa-IR", {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  }).format(date);
+export const formatPersianDate = (dateInput?: Date | string | number): string => {
+  try {
+    // Handle undefined or null
+    if (!dateInput) {
+      return "";
+    }
 
-  return persianDate;
+    // Convert input to Date object
+    const date = new Date(dateInput);
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      console.error("Invalid Date:", dateInput);
+      return "";
+    }
+
+    const persianDate = new Intl.DateTimeFormat("fa-IR", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    }).format(date);
+
+    return persianDate;
+  } catch (error) {
+    console.error("Error formatting Persian date:", error);
+    return "";
+  }
+};
+
+/**
+ * Checks if the input is a valid date
+ * 
+ * @param date - The value to check
+ * @returns boolean indicating if the input is a valid date
+ */
+export const isValidDate = (date: any): boolean => {
+  if (!date) return false;
+  const d = new Date(date);
+  return !isNaN(d.getTime());
 };

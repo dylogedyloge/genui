@@ -17,9 +17,10 @@ import { formatPersianTime } from "@/utils/time-helpers";
 import { Message, ToolInvocation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 interface MessageListProps {
-  messages: Message[];
+  messages: Message[]; // Ensure Message type is structured as expected (with content)
   isLoading: boolean;
   stop: () => void;
   error: Error | null;
@@ -42,23 +43,35 @@ const MessageList: React.FC<MessageListProps> = ({
   mounted,
   visibilityControls,
 }) => {
+    // Add a ref to the input for focusing
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // Focus the input whenever messages change (new message arrives)
+    useEffect(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, [messages]);
   return (
     <div className="flex-grow overflow-auto space-y-4 mb-4">
       {messages.map((message, messageIndex) => (
         <div
           key={messageIndex}
-          className={`flex ${message.isUser ? "justify-start" : "justify-end"}`}
+          className={`flex ${
+            message.role === "user" ? "justify-start" : "justify-end"
+          }`}
         >
-          {message.isUser ? (
+          {message.role === "user" ? (
             <>
               <User className="w-6 h-6 ml-4" />
               <div className="max-w-[70%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
+                {/* Ensure 'content' or 'text' is used correctly */}
                 <ReactMarkdown className="prose-sm text-sm">
-                  {message.text}
+                  {message.content || message.text}
                 </ReactMarkdown>
                 {mounted && (
-                  <p className="text-xs opacity-50 text-left mt-1">
-                    {formatPersianTime(message.timestamp)}
+                  <p className="text-xs text-muted-foreground text-left my-1">
+                    {formatPersianTime(new Date())}
                   </p>
                 )}
               </div>
@@ -67,11 +80,11 @@ const MessageList: React.FC<MessageListProps> = ({
             <>
               <div className="max-w-full md:max-w-[70%] p-3 rounded-lg bg-primary text-primary-foreground rounded-tl-none">
                 <ReactMarkdown className="prose-sm text-sm">
-                  {message.text}
+                  {message.content || message.text}
                 </ReactMarkdown>
                 {mounted && (
-                  <p className="text-xs opacity-50 text-left mt-1">
-                    {formatPersianTime(message.timestamp)}
+                  <p className="text-xs text-muted-foreground prose-sm text-left my-1">
+                    {formatPersianTime(new Date())}
                   </p>
                 )}
 
@@ -81,7 +94,6 @@ const MessageList: React.FC<MessageListProps> = ({
                     const { toolName, state, result } = toolInvocation;
 
                     if (state === "result") {
-                      // Handle different tool cards (flights, hotels, restaurants, tours)
                       switch (toolName) {
                         case "displayFlightCard":
                           return renderFlightCards(
@@ -115,10 +127,9 @@ const MessageList: React.FC<MessageListProps> = ({
                           return null;
                       }
                     } else {
-                      // Show skeleton while loading
                       return (
                         <div key={toolInvocation.toolCallId} className="mt-2">
-                          {getSkeletonForTool(toolName)}
+                          {renderSkeletonsForTool(toolName)}
                         </div>
                       );
                     }
@@ -274,18 +285,42 @@ const renderVisibilityButtons = (
 );
 
 /**
- * Return skeleton components based on tool type
+ * Return 2 skeleton components based on tool type
  */
-const getSkeletonForTool = (toolName: string) => {
+const renderSkeletonsForTool = (toolName: string) => {
   switch (toolName) {
     case "displayFlightCard":
-      return <FlightCardSkeleton />;
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(2)].map((_, i) => (
+            <FlightCardSkeleton key={i} />
+          ))}
+        </div>
+      );
     case "displayHotelCard":
-      return <HotelCardSkeleton />;
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(2)].map((_, i) => (
+            <HotelCardSkeleton key={i} />
+          ))}
+        </div>
+      );
     case "displayRestaurantCard":
-      return <RestaurantCardSkeleton />;
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(2)].map((_, i) => (
+            <RestaurantCardSkeleton key={i} />
+          ))}
+        </div>
+      );
     case "displayTourCard":
-      return <TourCardSkeleton />;
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(2)].map((_, i) => (
+            <TourCardSkeleton key={i} />
+          ))}
+        </div>
+      );
     default:
       return null;
   }
