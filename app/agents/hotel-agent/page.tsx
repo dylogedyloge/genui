@@ -4,10 +4,23 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import ChatInterface from "@/components/chat-interface";
 
-const HotelAgent = () => {
-  const router = useRouter();
+interface HotelAgentChatPageProps {
+  params: {
+    chatId: string;
+  };
+}
 
-  return <ChatInterface agentType="هتل" onBack={() => router.push("/")} />;
+const HotelAgent: React.FC<HotelAgentChatPageProps> = ({ params }) => {
+  const router = useRouter();
+  const { chatId } = params;
+
+  return (
+    <ChatInterface
+      chatId={chatId}
+      agentType="هتل"
+      onBack={() => router.push("/")}
+    />
+  );
 };
 
 export default HotelAgent;

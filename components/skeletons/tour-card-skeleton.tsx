@@ -10,7 +10,7 @@ const TourCardSkeleton = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="w-full sm:w-96 shadow-sm">
+      <Card className="min-w-60 sm:w-96 shadow-sm">
         <CardContent className="p-4">
           {/* Tour name and category */}
           <div className="flex items-center justify-between mb-4">
@@ -83,4 +83,4 @@ const TourCardSkeleton = () => {
     </motion.div>
   );
 };
-export default TourCardSkeleton
+export default TourCardSkeleton;

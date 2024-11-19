@@ -2,21 +2,56 @@ import ReactMarkdown from "react-markdown";
 import { User } from "lucide-react";
 import { GiHolosphere } from "react-icons/gi";
 
-import  FlightCard  from "@/components/cards/flight-card";
-import  HotelCard  from "@/components/cards/hotel-card";
+import FlightCard from "@/components/cards/flight-card";
+import HotelCard from "@/components/cards/hotel-card";
 import RestaurantCard from "@/components/cards/restaurant-card";
 import TourCard from "@/components/cards/tour-card";
 
-import  FlightCardSkeleton  from "@/components/skeletons/flight-card-skeleton";
-import  HotelCardSkeleton  from "@/components/skeletons/hotel-card-skeleton";
-import  RestaurantCardSkeleton  from "@/components/skeletons/restaurant-card-skeleton";
-import  TourCardSkeleton  from "@/components/skeletons/tour-card-skeleton";
+import FlightCardSkeleton from "@/components/skeletons/flight-card-skeleton";
+import HotelCardSkeleton from "@/components/skeletons/hotel-card-skeleton";
+import RestaurantCardSkeleton from "@/components/skeletons/restaurant-card-skeleton";
+import TourCardSkeleton from "@/components/skeletons/tour-card-skeleton";
 
 import { formatPersianTime } from "@/utils/time-helpers";
-import { Message, ToolInvocation } from "@/types/chat";
 import { Button } from "@/components/shadcn/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useRef } from "react";
+import {
+  Flight,
+  Hotel,
+  Restaurant,
+  Tour,
+  ToolInvocation,
+  Message,
+  VisibilityControl,
+} from "@/types/chat";
+
+/**
+ * Type Guards to check the type of `result` based on the toolName
+ */
+const isFlightArray = (
+  result: Flight[] | Hotel[] | Restaurant[] | Tour[] | undefined
+): result is Flight[] => {
+  return !!result && (result as Flight[])[0]?.departure !== undefined;
+};
+
+const isHotelArray = (
+  result: Flight[] | Hotel[] | Restaurant[] | Tour[] | undefined
+): result is Hotel[] => {
+  return !!result && (result as Hotel[])[0]?.hotelName !== undefined;
+};
+
+const isRestaurantArray = (
+  result: Flight[] | Hotel[] | Restaurant[] | Tour[] | undefined
+): result is Restaurant[] => {
+  return !!result && (result as Restaurant[])[0]?.cuisine !== undefined;
+};
+
+const isTourArray = (
+  result: Flight[] | Hotel[] | Restaurant[] | Tour[] | undefined
+): result is Tour[] => {
+  return !!result && (result as Tour[])[0]?.destination !== undefined;
+};
 
 interface MessageListProps {
   messages: Message[];
@@ -26,29 +61,26 @@ interface MessageListProps {
   reload: () => void;
   mounted: boolean;
   visibilityControls: {
-    flights: { map: any; showMore: Function; showLess: Function };
-    hotels: { map: any; showMore: Function; showLess: Function };
-    restaurants: { map: any; showMore: Function; showLess: Function };
-    tours: { map: any; showMore: Function; showLess: Function };
+    flights: VisibilityControl;
+    hotels: VisibilityControl;
+    restaurants: VisibilityControl;
+    tours: VisibilityControl;
   };
 }
 
 const MessageList: React.FC<MessageListProps> = ({
   messages,
-  isLoading,
-  stop,
   error,
   reload,
   mounted,
   visibilityControls,
 }) => {
-
-    const inputRef = useRef<HTMLInputElement>(null);
-    useEffect(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, [messages]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [messages]);
   return (
     <div className="flex-grow overflow-auto space-y-4 mb-4">
       {messages.map((message, messageIndex) => (
@@ -61,8 +93,7 @@ const MessageList: React.FC<MessageListProps> = ({
           {message.role === "user" ? (
             <>
               <User className="w-6 h-6 ml-4" />
-              <div className="max-w-[70%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
-               
+              <div className="max-w-[80%] p-3  bg-secondary text-secondary-foreground">
                 <ReactMarkdown className="prose-sm text-sm">
                   {message.content || message.text}
                 </ReactMarkdown>
@@ -75,7 +106,7 @@ const MessageList: React.FC<MessageListProps> = ({
             </>
           ) : (
             <>
-              <div className="max-w-full md:max-w-[70%] p-3 rounded-lg bg-primary text-primary-foreground rounded-tl-none">
+              <div className="max-w-[80%] p-2 bg-primary text-primary-foreground">
                 <ReactMarkdown className="prose-sm text-sm">
                   {message.content || message.text}
                 </ReactMarkdown>
@@ -91,35 +122,52 @@ const MessageList: React.FC<MessageListProps> = ({
                     const { toolName, state, result } = toolInvocation;
 
                     if (state === "result") {
+                      // Use type guards to determine the type of `result`
                       switch (toolName) {
                         case "displayFlightCard":
-                          return renderFlightCards(
-                            result as any[],
-                            messageIndex,
-                            invocationIndex,
-                            visibilityControls.flights
-                          );
+                          if (isFlightArray(result)) {
+                            return renderFlightCards(
+                              result,
+                              messageIndex,
+                              invocationIndex,
+                              visibilityControls.flights
+                            );
+                          }
+                          break;
+
                         case "displayHotelCard":
-                          return renderHotelCards(
-                            result as any[],
-                            messageIndex,
-                            invocationIndex,
-                            visibilityControls.hotels
-                          );
+                          if (isHotelArray(result)) {
+                            return renderHotelCards(
+                              result,
+                              messageIndex,
+                              invocationIndex,
+                              visibilityControls.hotels
+                            );
+                          }
+                          break;
+
                         case "displayRestaurantCard":
-                          return renderRestaurantCards(
-                            result as any[],
-                            messageIndex,
-                            invocationIndex,
-                            visibilityControls.restaurants
-                          );
+                          if (isRestaurantArray(result)) {
+                            return renderRestaurantCards(
+                              result,
+                              messageIndex,
+                              invocationIndex,
+                              visibilityControls.restaurants
+                            );
+                          }
+                          break;
+
                         case "displayTourCard":
-                          return renderTourCards(
-                            result as any[],
-                            messageIndex,
-                            invocationIndex,
-                            visibilityControls.tours
-                          );
+                          if (isTourArray(result)) {
+                            return renderTourCards(
+                              result,
+                              messageIndex,
+                              invocationIndex,
+                              visibilityControls.tours
+                            );
+                          }
+                          break;
+
                         default:
                           return null;
                       }
@@ -133,7 +181,7 @@ const MessageList: React.FC<MessageListProps> = ({
                   }
                 )}
               </div>
-              <GiHolosphere className="w-6 h-6 mr-4" />
+              <GiHolosphere className="w-6 h-6 mr-4 " />
             </>
           )}
         </div>
@@ -154,17 +202,17 @@ const MessageList: React.FC<MessageListProps> = ({
  * Helper functions for rendering tool responses
  */
 const renderFlightCards = (
-  flights: any[],
+  flights: Flight[],
   messageIndex: number,
   invocationIndex: number,
-  visibilityControl: { map: any; showMore: Function; showLess: Function }
+  visibilityControl: VisibilityControl
 ) => {
   return (
     <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
       {flights
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
-        .map((flight: any, flightIndex: number) => (
-          <FlightCard key={flightIndex} {...flight} />
+        .map((flight: Flight) => (
+          <FlightCard key={flight.id} {...flight} />
         ))}
       {renderVisibilityButtons(
         flights.length,
@@ -177,17 +225,17 @@ const renderFlightCards = (
 };
 
 const renderHotelCards = (
-  hotels: any[],
+  hotels: Hotel[],
   messageIndex: number,
   invocationIndex: number,
-  visibilityControl: { map: any; showMore: Function; showLess: Function }
+  visibilityControl: VisibilityControl
 ) => {
   return (
     <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
       {hotels
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
-        .map((hotel: any, hotelIndex: number) => (
-          <HotelCard key={hotelIndex} {...hotel} />
+        .map((hotel: Hotel) => (
+          <HotelCard key={hotel.id} {...hotel} />
         ))}
       {renderVisibilityButtons(
         hotels.length,
@@ -200,17 +248,17 @@ const renderHotelCards = (
 };
 
 const renderRestaurantCards = (
-  restaurants: any[],
+  restaurants: Restaurant[],
   messageIndex: number,
   invocationIndex: number,
-  visibilityControl: { map: any; showMore: Function; showLess: Function }
+  visibilityControl: VisibilityControl
 ) => {
   return (
     <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
       {restaurants
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
-        .map((restaurant: any, restaurantIndex: number) => (
-          <RestaurantCard key={restaurantIndex} {...restaurant} />
+        .map((restaurant: Restaurant) => (
+          <RestaurantCard key={restaurant.id} {...restaurant} />
         ))}
       {renderVisibilityButtons(
         restaurants.length,
@@ -223,17 +271,17 @@ const renderRestaurantCards = (
 };
 
 const renderTourCards = (
-  tours: any[],
+  tours: Tour[],
   messageIndex: number,
   invocationIndex: number,
-  visibilityControl: { map: any; showMore: Function; showLess: Function }
+  visibilityControl: VisibilityControl
 ) => {
   return (
     <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
       {tours
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
-        .map((tour: any, tourIndex: number) => (
-          <TourCard key={tourIndex} {...tour} />
+        .map((tour: Tour) => (
+          <TourCard key={tour.id} {...tour} />
         ))}
       {renderVisibilityButtons(
         tours.length,
@@ -244,15 +292,15 @@ const renderTourCards = (
     </div>
   );
 };
-
 /**
  * Render "Show More" and "Show Less" buttons
  */
+
 const renderVisibilityButtons = (
   itemsLength: number,
   messageIndex: number,
   invocationIndex: number,
-  visibilityControl: { map: any; showMore: Function; showLess: Function }
+  visibilityControl: VisibilityControl
 ) => (
   <div className="col-span-full flex justify-center mt-4 gap-2">
     {(visibilityControl.map[messageIndex]?.[invocationIndex] || 2) <

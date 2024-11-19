@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Clock, Utensils, Star } from "lucide-react";
+import { MapPin, Clock, Utensils } from "lucide-react";
 import { Card, CardContent } from "@/components/shadcn/card";
 import { Badge } from "@/components/shadcn/badge";
 import { motion } from "framer-motion";
@@ -16,22 +16,21 @@ type RestaurantProps = {
   priceRange: string;
 };
 
-const RestaurantCard= ({
+const RestaurantCard = ({
   name,
   cuisine,
   location,
   openingTime,
   closingTime,
   rating,
-  priceRange,
-}: RestaurantProps)=> {
+}: RestaurantProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="w-full sm:w-96 shadow-sm">
+      <Card className="min-w-60 sm:w-96 shadow-sm">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-primary">{name}</h2>
@@ -44,16 +43,7 @@ const RestaurantCard= ({
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1, duration: 0.3 }}
-          >
-            <div className="flex items-center gap-2">
-              <Utensils className="w-4 h-4 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{cuisine}</p>
-            </div>
-            <Badge variant="outline" className="text-xs">
-              بازه قیمتی:
-              {priceRange}
-            </Badge>
-          </motion.div>
+          ></motion.div>
           <motion.div
             className="flex items-center justify-between mb-4"
             initial={{ opacity: 0, x: 10 }}
@@ -63,7 +53,7 @@ const RestaurantCard= ({
             <div className="text-right">
               <div className="flex items-center gap-1 mb-1">
                 <Clock className="w-4 h-4 text-muted-foreground" />
-                <p className="text-xs text-muted-foreground">ساعت باز شدن</p>
+                <p className="text-xs text-muted-foreground"> باز </p>
               </div>
               <p className="text-sm font-semibold">{openingTime}</p>
             </div>
@@ -71,13 +61,13 @@ const RestaurantCard= ({
             <div className="text-left">
               <div className="flex items-center gap-1 mb-1 justify-end">
                 <Clock className="w-4 h-4 text-muted-foreground" />
-                <p className="text-xs text-muted-foreground">ساعت بسته شدن</p>
+                <p className="text-xs text-muted-foreground"> بسته </p>
               </div>
               <p className="text-sm font-semibold">{closingTime}</p>
             </div>
           </motion.div>
           <motion.div
-            className="flex flex-col gap-2"
+            className="flex justify-between gap-2 mb-4"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.3 }}
@@ -86,14 +76,18 @@ const RestaurantCard= ({
               <MapPin className="w-4 h-4 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">{location}</p>
             </div>
-            <Button className="w-full animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
-              رزرو رستوران
-            </Button>
+            <div className="flex items-center gap-2">
+              <Utensils className="w-4 h-4 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">{cuisine}</p>
+            </div>
           </motion.div>
+          <Button className="w-full animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+            رزرو رستوران
+          </Button>
         </CardContent>
       </Card>
     </motion.div>
   );
-}
+};
 
-export default RestaurantCard
+export default RestaurantCard;

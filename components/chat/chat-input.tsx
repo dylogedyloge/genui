@@ -33,14 +33,14 @@ const ChatInput: React.FC<ChatInputProps> = ({
     if (e) e.preventDefault();
     await onSubmit();
     if (inputRef.current) {
-      inputRef.current.focus(); // Refocus input after submission
+      inputRef.current.focus();
     }
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 bg-background sticky bottom-0 ">
       <Input
-        ref={inputRef}  // Attach the ref to the input element
+        ref={inputRef}
         type="text"
         value={input}
         onChange={onChange}
@@ -56,7 +56,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
       />
       <Button
         size="icon"
-        onClick={() => handleSubmit()}  // Call the custom handleSubmit
+        onClick={() => handleSubmit()} // Call the custom handleSubmit
         disabled={isLoading || error != null}
       >
         <SendHorizontal className="w-4 h-4 -rotate-180" />

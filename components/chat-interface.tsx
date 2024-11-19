@@ -15,21 +15,15 @@ import { AGENT_SUGGESTED_QUESTIONS } from "@/constants/suggestedQuestions";
 
 // Types
 import { ChatInterfaceProps } from "@/types/chat";
+import { Message } from "@/types/chat";
 
 // Custom Hooks
 import { useVisibilityMap } from "@/hooks/use-visibility-map";
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({
-  agentType,
-  userId,
-  chatId,
-  onBack,
-}) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentType, onBack }) => {
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
-  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>(
-    AGENT_SUGGESTED_QUESTIONS[agentType] || AGENT_SUGGESTED_QUESTIONS["پرواز"]
-  );
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
 
   // Visibility maps for different card types
   const {
@@ -83,6 +77,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, []);
 
   useEffect(() => {
+    setSuggestedQuestions(
+      AGENT_SUGGESTED_QUESTIONS[agentType] || AGENT_SUGGESTED_QUESTIONS["پرواز"]
+    );
+  }, [agentType]);
+
+  useEffect(() => {
     if (error) {
       toast({
         variant: "destructive",
@@ -125,15 +125,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     tours: { map: toursMap, showMore: showMoreTours, showLess: showLessTours },
   };
 
+  const mappedMessages = aiMessages.map((message) => ({
+    ...message,
+    timestamp: new Date().toISOString(),
+  })) as (Message & { timestamp: string })[];
+
   return (
     <div className="flex flex-col p-4 h-full">
       <Header onBack={onBack} />
 
       <MessageList
-        messages={aiMessages}
+        messages={mappedMessages}
         isLoading={isLoading}
         stop={stop}
-        error={error}
+        error={error || null}
         reload={reload}
         mounted={mounted}
         visibilityControls={visibilityControls}
@@ -150,7 +155,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         onChange={handleInputChange}
         onSubmit={handleSendMessage}
         isLoading={isLoading}
-        error={error}
+        error={error ?? null}
       />
     </div>
   );

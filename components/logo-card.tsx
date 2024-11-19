@@ -14,7 +14,7 @@
 //   };
 //   return (
 //     <div className="flex justify-center items-center" dir="rtl">
-//       <div className=" rounded-lg max-w-sm w-full">
+//       <div className="  max-w-sm w-full">
 //         <div className="flex items-center space-x-reverse space-x-4">
 //           <div className="flex-shrink-0">
 //             <GiHolosphere size={40} />
@@ -47,7 +47,7 @@ import { useTheme } from "next-themes";
 import React, { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
 
 export default function LogoCard() {
   const { theme, setTheme } = useTheme();
@@ -64,7 +64,7 @@ export default function LogoCard() {
   if (!mounted) {
     return (
       <div className="flex justify-center items-center" dir="rtl">
-        <div className="rounded-lg max-w-sm w-full">
+        <div className=" max-w-sm w-full">
           <div className="flex items-center space-x-reverse space-x-4">
             <div className="flex-shrink-0">
               <GiHolosphere size={40} />
@@ -82,20 +82,18 @@ export default function LogoCard() {
 
   return (
     <div className="flex justify-center items-center" dir="rtl">
-      <div className="rounded-lg max-w-sm w-full">
-        <div className="flex items-center space-x-reverse space-x-4">
-          {/* <div className="flex-shrink-0"> */}
-          <Link href="/" className="flex-shrink-0">
-            <GiHolosphere size={40} />
-            {/* <Image src="/logo.png" width={30} height={30} alt="dyloge" /> */}
-          </Link>
-          {/* </div> */}
-          {/* <div className="text-right"> */}
-          <Link href="/" className="text-right">
-            <h4 className="text-md font-bold prose-lg">دیلاگ</h4>
-            <p className="text-xs prose-base">چت بات هوش مصنوعی</p>
-          </Link>
-          {/* </div> */}
+      <div className=" max-w-sm w-full">
+        <div className="flex items-center space-x-reverse justify-between">
+          <div className="flex gap-1">
+            <Link href="/" className="flex-shrink-0">
+              <GiHolosphere size={40} />
+            </Link>
+            <Link href="/" className="text-right">
+              <h4 className="text-md font-bold prose-lg">دیلاگ</h4>
+              <p className="text-xs prose-base">چت بات هوش مصنوعی</p>
+            </Link>
+          </div>
+
           <Button
             variant="ghost"
             size="icon"

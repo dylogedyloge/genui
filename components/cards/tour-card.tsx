@@ -17,7 +17,7 @@ type TourProps = {
   category: string;
 };
 
-const TourCard=({
+const TourCard = ({
   name,
   destination,
   duration,
@@ -26,14 +26,14 @@ const TourCard=({
   groupSize,
   price,
   category,
-}: TourProps)=> {
+}: TourProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="w-full sm:w-96 shadow-sm">
+      <Card className="min-w-60 sm:w-96 shadow-sm">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-primary">{name}</h2>
@@ -98,7 +98,7 @@ const TourCard=({
                 </p>
               </div>
             </div>
-            <Button className="w-full animate-shimmer items-center justify-center border border-slate-800 bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground dark:text-card-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+            <Button className="w-full animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
               رزرو تور
             </Button>
           </motion.div>
@@ -106,6 +106,6 @@ const TourCard=({
       </Card>
     </motion.div>
   );
-}
+};
 
-export default TourCard
+export default TourCard;

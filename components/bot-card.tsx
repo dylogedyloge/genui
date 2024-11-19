@@ -25,7 +25,9 @@ const BotCard: React.FC<BotCardProps> = ({ title, description, iconName }) => {
   return (
     <div className=" w-full dark:bg-black bg-white dark:bg-grid-small-white/[0.2] bg-grid-small-black/[0.2] relative flex items-center justify-center">
       <motion.div
-        className="overflow-hidden border pt-4 relative rounded-lg shadow-lg cursor-pointer w-full h-56 flex justify-center items-start"
+        className={`overflow-hidden border pt-4 relative shadow-lg cursor-pointer w-full h-56 flex justify-center items-start ${
+          isHovered ? "hovered-class" : ""
+        }`}
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.3 }}
         onMouseEnter={() => setIsHovered(true)}

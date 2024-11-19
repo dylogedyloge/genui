@@ -4,8 +4,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/utils/supabase-client";
-import Auth from "@/components/auth";
-import { Toaster } from "@/components/shadcn/toaster"
+// import Auth from "@/components/auth";
+import { Toaster } from "@/components/shadcn/toaster";
 
 const vazir = localFont({
   src: "./fonts/Vazir-Light-FD.ttf",
@@ -207,7 +207,7 @@ const vazir = localFont({
 //                     }`}
 //                   >
 //                     <div
-//                       className={`max-w-[70%] p-3 rounded-lg ${
+//                       className={`max-w-[70%] p-3  ${
 //                         message.isUser
 //                           ? "bg-primary text-primary-foreground"
 //                           : "bg-secondary text-secondary-foreground"
@@ -289,7 +289,6 @@ import {
   CreditCard,
   House,
   LogOut,
-  NotebookPen,
   Plane,
   Sparkles,
   Utensils,
@@ -383,29 +382,29 @@ const data = {
         },
       ],
     },
-    {
-      title: "برنامه سفر",
-      url: "#",
-      icon: NotebookPen,
-      items: [
-        {
-          title: "می‌تونم معرفی برنامه رو ببینم؟",
-          url: "#",
-        },
-        {
-          title: "از کجا شروع کنم برای سفرم؟",
-          url: "#",
-        },
-        {
-          title: "آموزش‌های جدیدی دارین؟",
-          url: "#",
-        },
-        {
-          title: "تغییرات برنامه‌ها رو چک کنم؟",
-          url: "#",
-        },
-      ],
-    },
+    // {
+    //   title: "برنامه سفر",
+    //   url: "#",
+    //   icon: NotebookPen,
+    //   items: [
+    //     {
+    //       title: "می‌تونم معرفی برنامه رو ببینم؟",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "از کجا شروع کنم برای سفرم؟",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "آموزش‌های جدیدی دارین؟",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "تغییرات برنامه‌ها رو چک کنم؟",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
     {
       title: "تور",
       url: "#",
@@ -430,7 +429,7 @@ const data = {
       ],
     },
     {
-      title: "غذا",
+      title: "رستوران",
       url: "#",
       icon: UtensilsCrossed,
       items: [
@@ -455,17 +454,17 @@ const data = {
   ],
   projects: [
     {
-      name: "بلیط هواپیما",
+      name: "پرواز",
       url: "/orders/flight-orders",
       icon: Plane,
     },
     {
-      name: "رزرو هتل",
+      name: "هتل",
       url: "/orders/hotel-orders",
       icon: House,
     },
     {
-      name: "غذا",
+      name: "رستوران",
       url: "/orders/restaurant-orders",
       icon: Utensils,
     },
@@ -482,25 +481,25 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [session, setSession] = React.useState(null);
+  // const [session, setSession] = React.useState(null);
   const router = useRouter();
 
-  React.useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
+  // React.useEffect(() => {
+  //   supabase.auth.getSession().then(({ data: { session } }) => {
+  //     setSession(session);
+  //   });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
+  //   supabase.auth.onAuthStateChange((_event, session) => {
+  //     setSession(session);
+  //   });
+  // }, []);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Error signing out:", error.message);
     } else {
-      setSession(null);
+      // setSession(null);
       router.push("/"); // Redirect to home page after logout
     }
   };
@@ -508,7 +507,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={vazir.className} dir="rtl">
       <body>
-      <Toaster />
+        <Toaster />
         {/* {!session ? (
           <Auth />
         ) : ( */}
@@ -518,7 +517,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SidebarProvider>
-            <Sidebar collapsible="offcanvas" variant="inset" side="right">
+            <Sidebar collapsible="icon" variant="inset" side="right">
               <SidebarHeader>
                 <LogoCard />
                 <Separator orientation="horizontal" />
@@ -540,7 +539,7 @@ export default function RootLayout({
                         <SidebarMenuItem>
                           <CollapsibleTrigger asChild>
                             <SidebarMenuButton tooltip={item.title}>
-                              {item.icon && <item.icon   />}
+                              {item.icon && <item.icon />}
                               <span>{item.title}</span>
                               <ChevronLeft className="mr-auto transition-transform duration-200 group-data-[state=open]/collapsible:-rotate-90" />
                             </SidebarMenuButton>
@@ -576,7 +575,7 @@ export default function RootLayout({
                       <SidebarMenuItem key={item.name}>
                         <SidebarMenuButton asChild>
                           <Link href={item.url}>
-                            <item.icon   />
+                            <item.icon />
                             <span>{item.name}</span>
                           </Link>
                         </SidebarMenuButton>
@@ -595,7 +594,7 @@ export default function RootLayout({
                           size="lg"
                           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                          <Avatar className="h-8 w-8 rounded-lg">
+                          <Avatar className="h-8 w-8 ">
                             <AvatarImage
                               src={data.user.avatar}
                               alt={data.user.name}
@@ -603,7 +602,7 @@ export default function RootLayout({
 
                             <Image
                               src="/sample.jpg"
-                              className="rounded-lg"
+                              className=""
                               width={100}
                               height={100}
                               alt="avatar"
@@ -621,21 +620,21 @@ export default function RootLayout({
                         </SidebarMenuButton>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
-                        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 "
                         side="bottom"
                         align="end"
                         sideOffset={4}
                       >
                         <DropdownMenuLabel className="p-0 font-normal">
                           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                            <Avatar className="h-8 w-8 rounded-lg">
+                            <Avatar className="h-8 w-8 ">
                               <AvatarImage
                                 src={data.user.avatar}
                                 alt={data.user.name}
                               />
                               <Image
                                 src="/sample.jpg"
-                                className="rounded-lg"
+                                className=""
                                 width={100}
                                 height={100}
                                 alt="avatar"
@@ -654,7 +653,7 @@ export default function RootLayout({
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                           <DropdownMenuItem>
-                            <Sparkles   />
+                            <Sparkles />
                             <p className="text-sm prose-sm">
                               ارتقاء حساب کاربری
                             </p>
@@ -663,15 +662,15 @@ export default function RootLayout({
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                           <DropdownMenuItem>
-                            <BadgeCheck   />
+                            <BadgeCheck />
                             <p className="text-sm prose-sm"> حساب کاربری</p>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <CreditCard   />
+                            <CreditCard />
                             <p className="text-sm prose-sm ">پرداخت ها</p>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Bell   />
+                            <Bell />
                             <p className="text-sm prose-sm">پیام ها</p>
                           </DropdownMenuItem>
                         </DropdownMenuGroup>

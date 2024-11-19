@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/shadcn/skeleton";
-import { Bed, Calendar, EarOff, MapPin } from "lucide-react";
+import { Bed, Calendar, MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/shadcn/card";
 import { motion } from "framer-motion";
 
@@ -10,7 +10,7 @@ const HotelCardSkeleton = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="w-full sm:w-96 shadow-sm">
+      <Card className="min-w-60 sm:w-96 shadow-sm">
         <CardContent className="p-4">
           {/* Hotel name and rating */}
           <div className="flex items-center justify-between mb-4">
@@ -71,4 +71,4 @@ const HotelCardSkeleton = () => {
     </motion.div>
   );
 };
-export default HotelCardSkeleton
+export default HotelCardSkeleton;

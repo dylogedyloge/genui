@@ -32,7 +32,7 @@ const FlightCard = ({
       transition={{ duration: 0.3 }}
       className="w-full"
     >
-      <div className="w-full sm:w-auto shadow-md  dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg ">
+      <div className="min-w-60 sm:w-96 shadow-md  dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1]  ">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xs font-semibold text-primary">{airline}</h2>
@@ -80,7 +80,7 @@ const FlightCard = ({
                 {price} تومان
               </p>
             </div>
-            <Button className=" inline-flex  animate-shimmer items-center justify-center border border-slate-800 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%]  font-medium dark:text-card-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
+            <Button className="animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
               رزرو بلیط
             </Button>
           </motion.div>
@@ -89,4 +89,4 @@ const FlightCard = ({
     </motion.div>
   );
 };
-export default FlightCard
+export default FlightCard;
