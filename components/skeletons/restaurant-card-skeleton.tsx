@@ -10,7 +10,7 @@ const RestaurantCardSkeleton = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="min-w-60 sm:w-96 shadow-sm">
+      <Card className="min-w-60 sm:w-96 shadow-md  dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg">
         <CardContent className="p-4">
           {/* Restaurant name and rating */}
           <div className="flex items-center justify-between mb-4">

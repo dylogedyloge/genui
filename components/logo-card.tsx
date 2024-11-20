@@ -90,7 +90,7 @@ export default function LogoCard() {
             </Link>
             <Link href="/" className="text-right">
               <h4 className="text-md font-bold prose-lg">دیلاگ</h4>
-              <p className="text-xs prose-base">چت بات هوش مصنوعی</p>
+              <p className="text-xs prose-base">دستیار هوشمند سفر</p>
             </Link>
           </div>
 

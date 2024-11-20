@@ -93,7 +93,7 @@ const MessageList: React.FC<MessageListProps> = ({
           {message.role === "user" ? (
             <>
               <User className="w-6 h-6 ml-4" />
-              <div className="max-w-[80%] p-3  bg-secondary text-secondary-foreground">
+              <div className="max-w-[80%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
                 <ReactMarkdown className="prose-sm text-sm">
                   {message.content || message.text}
                 </ReactMarkdown>
@@ -106,7 +106,7 @@ const MessageList: React.FC<MessageListProps> = ({
             </>
           ) : (
             <>
-              <div className="max-w-[80%] p-2 bg-primary text-primary-foreground">
+              <div className="max-w-[80%] p-2 rounded-lg bg-primary text-primary-foreground rounded-tl-none">
                 <ReactMarkdown className="prose-sm text-sm">
                   {message.content || message.text}
                 </ReactMarkdown>

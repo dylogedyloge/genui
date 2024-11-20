@@ -31,8 +31,8 @@ const HotelCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="min-w-60 sm:w-96 shadow-sm">
-        <CardContent className="p-4">
+      <div className="min-w-60 sm:w-96 shadow-md  dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg ">
+        <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-primary">{hotelName}</h2>
             <Badge variant="secondary" className="text-xs font-medium">
@@ -64,15 +64,19 @@ const HotelCard = ({
                 <Calendar className="w-4 h-4 text-muted-foreground" />
                 <p className="text-xs text-muted-foreground">ورود</p>
               </div>
-              <p className="text-sm font-semibold">{checkIn}</p>
+              <p className="text-xs prose-sm text-muted-foreground">
+                {checkIn}
+              </p>
             </div>
-            <Bed className="text-card-foreground w-6 h-6 animate-pulse" />
+            <Bed className="text-card-foreground w-6 h-6" />
             <div className="text-right">
               <div className="flex items-center gap-1 mb-1 justify-end">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
                 <p className="text-xs text-muted-foreground">خروج</p>
               </div>
-              <p className="text-sm font-semibold">{checkOut}</p>
+              <p className="text-xs prose-sm text-muted-foreground">
+                {checkOut}
+              </p>
             </div>
           </motion.div>
           <motion.div
@@ -89,8 +93,8 @@ const HotelCard = ({
               رزرو هتل
             </Button>
           </motion.div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 };

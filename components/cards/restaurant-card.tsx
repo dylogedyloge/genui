@@ -30,8 +30,8 @@ const RestaurantCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="min-w-60 sm:w-96 shadow-sm">
-        <CardContent className="p-4">
+      <div className="min-w-60 sm:w-96 shadow-md  dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg">
+        <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-primary">{name}</h2>
             <Badge variant="secondary" className="text-xs font-medium">
@@ -55,7 +55,9 @@ const RestaurantCard = ({
                 <Clock className="w-4 h-4 text-muted-foreground" />
                 <p className="text-xs text-muted-foreground"> باز </p>
               </div>
-              <p className="text-sm font-semibold">{openingTime}</p>
+              <p className="text-xs prose-sm text-muted-foreground">
+                {openingTime}
+              </p>
             </div>
             <Utensils className="w-6 h-6 text-primary" />
             <div className="text-left">
@@ -63,7 +65,9 @@ const RestaurantCard = ({
                 <Clock className="w-4 h-4 text-muted-foreground" />
                 <p className="text-xs text-muted-foreground"> بسته </p>
               </div>
-              <p className="text-sm font-semibold">{closingTime}</p>
+              <p className="text-xs prose-sm text-muted-foreground">
+                {closingTime}
+              </p>
             </div>
           </motion.div>
           <motion.div
@@ -84,8 +88,8 @@ const RestaurantCard = ({
           <Button className="w-full animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
             رزرو رستوران
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 };

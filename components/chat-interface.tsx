@@ -5,13 +5,13 @@ import { useChat } from "ai/react";
 import { useToast } from "@/hooks/use-toast";
 
 // Components
-import Header from "./chat/header";
+// import Header from "./chat/header";
 import MessageList from "./chat/message-list";
-import SuggestedQuestions from "./chat/suggested-questions";
+// import SuggestedQuestions from "./chat/suggested-questions";
 import ChatInput from "./chat/chat-input";
 
 // Constants
-import { AGENT_SUGGESTED_QUESTIONS } from "@/constants/suggestedQuestions";
+// import { AGENT_SUGGESTED_QUESTIONS } from "@/constants/suggestedQuestions";
 
 // Types
 import { ChatInterfaceProps } from "@/types/chat";
@@ -20,10 +20,10 @@ import { Message } from "@/types/chat";
 // Custom Hooks
 import { useVisibilityMap } from "@/hooks/use-visibility-map";
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentType, onBack }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentType }) => {
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
-  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
+  // const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
 
   // Visibility maps for different card types
   const {
@@ -76,11 +76,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentType, onBack }) => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    setSuggestedQuestions(
-      AGENT_SUGGESTED_QUESTIONS[agentType] || AGENT_SUGGESTED_QUESTIONS["پرواز"]
-    );
-  }, [agentType]);
+  // useEffect(() => {
+  //   setSuggestedQuestions(
+  //     AGENT_SUGGESTED_QUESTIONS[agentType] || AGENT_SUGGESTED_QUESTIONS["پرواز"]
+  //   );
+  // }, [agentType]);
 
   useEffect(() => {
     if (error) {
@@ -99,12 +99,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentType, onBack }) => {
     }
   };
 
-  const handleSuggestionClick = async (question: string) => {
-    handleInputChange({
-      target: { value: question },
-    } as React.ChangeEvent<HTMLInputElement>);
-    await handleSubmit(undefined);
-  };
+  // const handleSuggestionClick = async (question: string) => {
+  //   handleInputChange({
+  //     target: { value: question },
+  //   } as React.ChangeEvent<HTMLInputElement>);
+  //   await handleSubmit(undefined);
+  // };
 
   const visibilityControls = {
     flights: {
@@ -132,7 +132,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentType, onBack }) => {
 
   return (
     <div className="flex flex-col p-4 h-full">
-      <Header onBack={onBack} />
+      {/* <Header onBack={onBack} /> */}
 
       <MessageList
         messages={mappedMessages}
@@ -144,11 +144,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentType, onBack }) => {
         visibilityControls={visibilityControls}
       />
 
-      <SuggestedQuestions
+      {/* <SuggestedQuestions
         questions={suggestedQuestions}
         isLoading={isLoading}
         onQuestionClick={handleSuggestionClick}
-      />
+      /> */}
 
       <ChatInput
         input={input}

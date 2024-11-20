@@ -290,6 +290,7 @@ import {
   House,
   LogOut,
   Plane,
+  Plus,
   Sparkles,
   Utensils,
   UtensilsCrossed,
@@ -334,6 +335,7 @@ import LogoCard from "@/components/logo-card";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/shadcn/button";
 
 //  This is sample data.
 const data = {
@@ -526,61 +528,42 @@ export default function RootLayout({
                 </SidebarMenu>
               </SidebarHeader>
               <SidebarContent>
+                <Button className="flex justify-center gap-6 mx-4">
+                  <Plus />
+                  <div> گفتگوی جدید</div>
+                </Button>
                 <SidebarGroup>
-                  <SidebarGroupLabel>تاریخچه گفتگو</SidebarGroupLabel>
                   <SidebarMenu>
-                    {data.navMain.map((item) => (
-                      <Collapsible
-                        key={item.title}
-                        asChild
-                        defaultOpen={item.isActive}
-                        className="group/collapsible"
-                      >
-                        <SidebarMenuItem>
-                          <CollapsibleTrigger asChild>
-                            <SidebarMenuButton tooltip={item.title}>
-                              {item.icon && <item.icon />}
-                              <span>{item.title}</span>
-                              <ChevronLeft className="mr-auto transition-transform duration-200 group-data-[state=open]/collapsible:-rotate-90" />
-                            </SidebarMenuButton>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <SidebarMenuSub>
-                              {item.items?.map((subItem) => (
-                                <SidebarMenuSubItem key={subItem.title}>
-                                  <SidebarMenuSubButton asChild>
-                                    <a
-                                      href={subItem.url}
-                                      className="flex justify-between"
-                                    >
-                                      <span className="text-xs text-muted-foreground">
-                                        {subItem.title}
-                                      </span>
-                                    </a>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              ))}
-                            </SidebarMenuSub>
-                          </CollapsibleContent>
-                        </SidebarMenuItem>
-                      </Collapsible>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroup>
-                <Separator orientation="horizontal" />
-                <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-                  <SidebarGroupLabel>خریدها</SidebarGroupLabel>
-                  <SidebarMenu>
-                    {data.projects.map((item) => (
-                      <SidebarMenuItem key={item.name}>
-                        <SidebarMenuButton asChild>
-                          <Link href={item.url}>
-                            <item.icon />
-                            <span>{item.name}</span>
-                          </Link>
-                        </SidebarMenuButton>
+                    <Collapsible asChild className="group/collapsible">
+                      <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton>
+                            <span>تاریخچه گفتگو</span>
+                            <ChevronLeft className="mr-auto transition-transform duration-200 group-data-[state=open]/collapsible:-rotate-90" />
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub></SidebarMenuSub>
+                        </CollapsibleContent>
                       </SidebarMenuItem>
-                    ))}
+                    </Collapsible>
+                  </SidebarMenu>
+                  <Separator orientation="horizontal" />
+
+                  <SidebarMenu>
+                    <Collapsible asChild className="group/collapsible">
+                      <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton>
+                            <span> خریدها</span>
+                            <ChevronLeft className="mr-auto transition-transform duration-200 group-data-[state=open]/collapsible:-rotate-90" />
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub></SidebarMenuSub>
+                        </CollapsibleContent>
+                      </SidebarMenuItem>
+                    </Collapsible>
                   </SidebarMenu>
                 </SidebarGroup>
               </SidebarContent>
