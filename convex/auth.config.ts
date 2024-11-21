@@ -1,8 +1,8 @@
 export default {
   providers: [
     {
-      domain: "https://saving-dingo-13.clerk.accounts.dev",
+      domain: "https://big-redfish-30.clerk.accounts.dev",
       applicationID: "convex",
     },
-  ],
+  ]
 };
