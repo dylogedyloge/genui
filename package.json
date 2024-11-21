@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.68",
+    "@clerk/clerk-react": "^5.16.1",
+    "@clerk/nextjs": "^6.4.0",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-collapsible": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.2",
@@ -27,6 +29,7 @@
     "ai": "^3.4.18",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "convex": "^1.17.0",
     "framer-motion": "^11.11.10",
     "lucide-react": "^0.452.0",
     "mini-svg-data-uri": "^1.4.4",

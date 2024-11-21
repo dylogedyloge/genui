@@ -1,5 +1,4 @@
 export interface ChatInterfaceProps {
-  agentType: string;
   chatId: string;
   onBack: () => void;
 }
