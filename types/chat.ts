@@ -1,9 +1,5 @@
 export interface ChatInterfaceProps {
-  agentType: string;
-  chatId: string;
-  onBack: () => void;
 }
-// types/chat.ts
 
 // Define the structure of the Flight, Hotel, Restaurant, and Tour
 export interface Flight {
