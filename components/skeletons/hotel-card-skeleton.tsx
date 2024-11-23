@@ -10,8 +10,8 @@ const HotelCardSkeleton = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="min-w-60 sm:w-96 shadow-md  dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg">
-        <CardContent className="p-4">
+      <div className="min-w-60 sm:w-96 shadow-md  dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg">
+        <div className="p-6">
           {/* Hotel name and rating */}
           <div className="flex items-center justify-between mb-4">
             <Skeleton className="w-32 h-4" />
@@ -66,8 +66,8 @@ const HotelCardSkeleton = () => {
             <Skeleton className="w-24 h-6" />
             <Skeleton className="w-24 h-8" />
           </motion.div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 };
