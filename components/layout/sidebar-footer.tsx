@@ -9,7 +9,7 @@ const data = {
   user: {
     name: "امیر نجفی",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "/sample.jpg",
   },
 };
 export function SidebarFooter() {

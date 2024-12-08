@@ -4,19 +4,13 @@ import { RealtimeClient } from "@openai/realtime-api-beta";
 import { ItemType } from "@openai/realtime-api-beta/dist/lib/client.js";
 import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index";
 import { WavRenderer } from "@/utils/wav_renderer";
-import { User, Brain, Mic, MicOff, Edit2, Send } from "lucide-react";
+import { User, Brain, Mic, MicOff } from "lucide-react";
+import { Button } from "./shadcn/button";
 
 const USE_LOCAL_RELAY_SERVER_URL: string | undefined = void 0;
 
 const VoiceChat = () => {
-  const apiKey = USE_LOCAL_RELAY_SERVER_URL
-    ? ""
-    : localStorage.getItem("tmp::voice_api_key") ||
-      prompt("OpenAI API Key") ||
-      "";
-  if (apiKey !== "") {
-    localStorage.setItem("tmp::voice_api_key", apiKey);
-  }
+  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || "";
 
   const instructions = `SYSTEM SETTINGS:
 ------
@@ -47,9 +41,9 @@ INSTRUCTIONS:
       USE_LOCAL_RELAY_SERVER_URL
         ? { url: USE_LOCAL_RELAY_SERVER_URL }
         : {
-            apiKey: apiKey,
-            dangerouslyAllowAPIKeyInBrowser: true,
-          }
+          apiKey: apiKey,
+          dangerouslyAllowAPIKeyInBrowser: true,
+        }
     )
   );
 
@@ -60,15 +54,6 @@ INSTRUCTIONS:
   const [items, setItems] = useState<ItemType[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [inputText, setInputText] = useState("");
-
-  const resetAPIKey = useCallback(() => {
-    const apiKey = prompt("OpenAI API Key");
-    if (apiKey !== null) {
-      localStorage.clear();
-      localStorage.setItem("tmp::voice_api_key", apiKey);
-      window.location.reload();
-    }
-  }, []);
 
   const connectConversation = useCallback(async () => {
     const client = clientRef.current;
@@ -242,29 +227,12 @@ INSTRUCTIONS:
   return (
     <div
       data-component="VoiceChat"
-      className="flex flex-col bg-gray-100 h-screen overflow-hidden"
+
       dir="rtl"
     >
-      {/* Top Section */}
-      <div className="flex items-center justify-between p-4 bg-white shadow-md">
-        <h2 className="text-lg font-semibold text-gray-800">
-          هوش مصنوعی دیلاگ
-        </h2>
-        {!USE_LOCAL_RELAY_SERVER_URL && (
-          <button
-            onClick={() => resetAPIKey()}
-            className="flex items-center  hover:underline"
-          >
-            <Edit2 size={16} className="ml-2" />
-            api key: {apiKey.slice(0, 3)}...
-          </button>
-        )}
-      </div>
-
       {/* Main Content */}
 
-      <div className="flex-1 p-4 overflow-y-hidden h-full">
-        {/* Conversation Section */}
+      {/* <div className="flex-1 p-4 overflow-y-hidden h-full">
         <div className="space-y-4">
           {items.slice(1).map((conversationItem) => (
             <div
@@ -275,7 +243,6 @@ INSTRUCTIONS:
                   : "justify-start"
               }`}
             >
-              {/* Icon and Bubble Container */}
               <div
                 className={`flex items-start ${
                   conversationItem.role === "user"
@@ -283,7 +250,6 @@ INSTRUCTIONS:
                     : "flex-row"
                 }`}
               >
-                {/* Icon */}
                 <div
                   className={`flex-shrink-0 w-8 h-8 flex items-center justify-center ${
                     conversationItem.role === "user" ? "ml-2" : "mr-2"
@@ -295,7 +261,6 @@ INSTRUCTIONS:
                     <Brain size={16} className="text-gray-500" />
                   )}
                 </div>
-                {/* Chat Bubble */}
                 <div
                   className={`p-3 rounded-lg shadow-md max-w-xs ${
                     conversationItem.role === "user"
@@ -323,38 +288,22 @@ INSTRUCTIONS:
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Actions Section */}
-      <div className=" flex items-center justify-center gap-2 p-4">
-        <button
+      <div className=" flex items-center justify-center gap-2 ">
+        <Button
+          variant="default"
+          size="icon"
           onClick={isConnected ? disconnectConversation : connectConversation}
-          className={`w-14   h-10  rounded-full ${
-            isConnected
-              ? "bg-red-500 text-white hover:bg-red-600"
-              : "bg-blue-500 text-white hover:bg-blue-600"
-          } ${isConnected ? "animate-pulse" : ""}`}
+          className={`rounded-full ${isConnected ? "animate-pulse" : ""}`}
         >
           {isConnected ? (
-            <>
-              <MicOff size={16} className="place-self-center" />
-            </>
+            <MicOff />
           ) : (
-            <>
-              <Mic size={16} className="place-self-center" />
-            </>
+            <Mic />
           )}
-        </button>
-        <input
-          type="text"
-          placeholder="پیامتان را بنویسید..."
-          className="w-full px-4 py-2 border border-stone-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-stone-900"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-        />
-        <button className="w-14 h-10  rounded-lg bg-stone-700 hover:bg-stone-900 text-white">
-          <Send size={16} className="place-self-center" />
-        </button>
+        </Button>
       </div>
     </div>
   );
