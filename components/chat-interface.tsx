@@ -7,7 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 // Components
 import MessageList from "./chat/message-list";
 import ChatInput from "./chat/chat-input";
-
+import VoiceChat from "./voice.chat";
+import { Switch } from "@/components/shadcn/switch";
 
 // Types
 import { ChatInterfaceProps } from "@/types/chat";
@@ -19,6 +20,7 @@ import { useVisibilityMap } from "@/hooks/use-visibility-map";
 const ChatInterface: React.FC<ChatInterfaceProps> = () => {
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
+  const [isVoiceChat, setIsVoiceChat] = useState(false);
 
   // Visibility maps for different card types
   const {
@@ -56,7 +58,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
     reload,
   } = useChat({
     api: "/api/chat",
-   
+
     keepLastMessageOnError: true,
     initialMessages: [
       {
@@ -70,7 +72,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
   useEffect(() => {
     setMounted(true);
   }, []);
-
 
   useEffect(() => {
     if (error) {
@@ -115,7 +116,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
 
   return (
     <div className="flex flex-col p-4 h-full">
-
       <MessageList
         messages={mappedMessages}
         isLoading={isLoading}
@@ -126,13 +126,31 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
         visibilityControls={visibilityControls}
       />
 
-      <ChatInput
+      <Switch
+        checked={isVoiceChat}
+        onCheckedChange={(checked) => setIsVoiceChat(checked)}
+        className="m-2"
+      />
+      {/* <ChatInput
         input={input}
         onChange={handleInputChange}
         onSubmit={handleSendMessage}
         isLoading={isLoading}
         error={error ?? null}
-      />
+      /> */}
+      {isVoiceChat ? (
+        <VoiceChat />
+      ) : (
+        <>
+          <ChatInput
+            input={input}
+            onChange={handleInputChange}
+            onSubmit={handleSendMessage}
+            isLoading={isLoading}
+            error={error ?? null}
+          />
+        </>
+      )}
     </div>
   );
 };
