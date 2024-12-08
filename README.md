@@ -34,3 +34,32 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+# For https on development mode
+
+-Install mkcert
+For Windows
+Download the mkcert executable:
+Visit the mkcert GitHub releases page.
+Download the latest release for Windows (e.g., mkcert-vX.X.X-windows-amd64.exe).
+Rename the downloaded file to mkcert.exe and place it in a folder included in your system's PATH (e.g., C:\Windows\System32).
+
+-Verify the installation by running in CMD:
+mkcert -version
+
+-mkcert -install in Project directory
+-Generate the SSL certificate for localhost in Project directory:
+mkcert localhost
+
+This will generate:
+
+localhost.pem (certificate)
+localhost-key.pem (private key)
+Place these files in your project directory if not already placed
+
+-local-ssl-proxy --source 3443 --target 3000 --cert localhost.pem --key localhost-key.pem in Project directory
+
+-npm run dev
+
+-In different terminal "local-ssl-proxy --source 3443 --target 3000 --cert localhost.pem --key localhost-key.pem"
+-Access your app at https://localhost:3443
