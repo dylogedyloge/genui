@@ -38,7 +38,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   return (
-    <div className="flex items-center gap-2 bg-background sticky bottom-0 ">
+    <div className="flex items-center gap-2 bg-background sticky bottom-0 m-4 ">
       <Input
         ref={inputRef}
         type="text"

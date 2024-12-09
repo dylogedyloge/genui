@@ -16,6 +16,7 @@ const VoiceChat = () => {
 ------
 INSTRUCTIONS:
 - به زبان فارسی صحبت کنید
+- فقط به سوالات در مورد سفر پاسخ دهید
 - لطفاً پاسخ‌های خود را به صورت صوتی و مفید ارائه دهید.
 - پاسخ‌ها باید کوتاه و مفید باشند و حداکثر ۲۰۰ کاراکتر داشته باشند.
 - می‌توانید از کاربر سؤال بپرسید.
@@ -41,9 +42,9 @@ INSTRUCTIONS:
       USE_LOCAL_RELAY_SERVER_URL
         ? { url: USE_LOCAL_RELAY_SERVER_URL }
         : {
-          apiKey: apiKey,
-          dangerouslyAllowAPIKeyInBrowser: true,
-        }
+            apiKey: apiKey,
+            dangerouslyAllowAPIKeyInBrowser: true,
+          }
     )
   );
 
@@ -191,7 +192,7 @@ INSTRUCTIONS:
 
     client.updateSession({ instructions: instructions });
     client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
-    client.updateSession({ voice: "shimmer" });
+    client.updateSession({ voice: "coral" });
 
     client.on("error", (event: any) => console.error(event));
     client.on("conversation.interrupted", async () => {
@@ -225,14 +226,10 @@ INSTRUCTIONS:
   }, []);
 
   return (
-    <div
-      data-component="VoiceChat"
-
-      dir="rtl"
-    >
+    <div data-component="VoiceChat" dir="rtl">
       {/* Main Content */}
 
-      {/* <div className="flex-1 p-4 overflow-y-hidden h-full">
+      <div className="flex-1 p-4 overflow-y-hidden h-full">
         <div className="space-y-4">
           {items.slice(1).map((conversationItem) => (
             <div
@@ -288,21 +285,19 @@ INSTRUCTIONS:
             </div>
           ))}
         </div>
-      </div> */}
+      </div>
 
       {/* Actions Section */}
-      <div className=" flex items-center justify-center gap-2 ">
+      <div className=" flex items-center justify-center gap-2 m-1 ">
         <Button
           variant="default"
           size="icon"
           onClick={isConnected ? disconnectConversation : connectConversation}
-          className={`rounded-full ${isConnected ? "animate-pulse" : ""}`}
+          className={`w-16 h-16 rounded-full ${
+            isConnected ? "animate-pulse" : ""
+          }`}
         >
-          {isConnected ? (
-            <MicOff />
-          ) : (
-            <Mic />
-          )}
+          {isConnected ? <MicOff /> : <Mic />}
         </Button>
       </div>
     </div>
