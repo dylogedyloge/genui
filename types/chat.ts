@@ -63,6 +63,7 @@ export interface Message {
   text?: string;
   timestamp: Date | string | number;
   toolInvocations?: ToolInvocation[];
+  isVoice:boolean
 }
 
 // Visibility control for showing more/less items
