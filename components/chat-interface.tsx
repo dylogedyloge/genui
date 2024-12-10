@@ -24,7 +24,6 @@ import { useVisibilityMap } from "@/hooks/use-visibility-map";
 import { AudioLines } from "lucide-react";
 
 
-type MessageWithTimestamp = Message & { timestamp: string };
 
 const ChatInterface: React.FC<ChatInterfaceProps> = () => {
   const { toast } = useToast();
