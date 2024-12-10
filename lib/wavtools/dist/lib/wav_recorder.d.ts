@@ -29,6 +29,7 @@ export class WavRecorder {
         outputToSpeakers?: boolean;
         debug?: boolean;
     });
+    
     scriptSrc: any;
     sampleRate: number;
     outputToSpeakers: boolean;

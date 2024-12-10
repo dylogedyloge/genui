@@ -1,7 +1,6 @@
 "use client";
 
 import { MapPin, Clock, Utensils } from "lucide-react";
-import { Card, CardContent } from "@/components/shadcn/card";
 import { Badge } from "@/components/shadcn/badge";
 import { motion } from "framer-motion";
 import { Button } from "@/components/shadcn/button";

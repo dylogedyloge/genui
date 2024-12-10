@@ -1,6 +1,5 @@
 import { Skeleton } from "@/components/shadcn/skeleton";
 import { MapPin, Calendar, Clock, Bus, Tag, Users } from "lucide-react";
-import { Card, CardContent } from "@/components/shadcn/card";
 import { motion } from "framer-motion";
 
 const TourCardSkeleton = () => {

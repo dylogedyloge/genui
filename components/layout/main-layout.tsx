@@ -5,13 +5,14 @@ import { TopHeader } from "./top-header";
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Sidebar collapsible="icon" variant="inset" side="right">
+      <Sidebar collapsible="offcanvas" variant="inset" side="right">
         <MainSidebar />
       </Sidebar>
       <SidebarInset>
         <TopHeader />
         {children}
       </SidebarInset>
+      
     </>
   );
 }

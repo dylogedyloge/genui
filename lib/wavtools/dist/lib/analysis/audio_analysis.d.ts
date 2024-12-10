@@ -29,11 +29,16 @@ export class AudioAnalysis {
      * @returns {AudioAnalysis}
      */
     constructor(audioElement: HTMLAudioElement, audioBuffer?: AudioBuffer | null);
+     
     fftResults: any[];
     audio: HTMLAudioElement;
+    
     context: any;
+    
     analyser: any;
+    
     sampleRate: any;
+    
     audioBuffer: any;
     /**
      * Gets the current frequency domain data from the playing audio track

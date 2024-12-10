@@ -14,8 +14,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/shadcn/collapsible";
-import { Separator } from "@/components/shadcn/separator";
-import { useRouter } from "next/navigation";
 
 export function SidebarContent() {
   return (
@@ -28,8 +26,6 @@ export function SidebarContent() {
       </Button>
       <SidebarGroup>
         <CollapsibleSection title="تاریخچه گفتگو" />
-        <Separator orientation="horizontal" />
-        <CollapsibleSection title="خریدها" />
       </SidebarGroup>
     </Content>
   );
@@ -40,7 +36,6 @@ function CollapsibleSection({
     title: string;
     notes?: { _id: string; title: string }[];
   }) {
-    const router = useRouter();
     return (
       <SidebarMenu>
         <Collapsible asChild className="group/collapsible">

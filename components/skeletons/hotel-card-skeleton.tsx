@@ -1,6 +1,5 @@
 import { Skeleton } from "@/components/shadcn/skeleton";
 import { Bed, Calendar, MapPin } from "lucide-react";
-import { Card, CardContent } from "@/components/shadcn/card";
 import { motion } from "framer-motion";
 
 const HotelCardSkeleton = () => {
