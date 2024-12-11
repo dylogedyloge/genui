@@ -25,6 +25,7 @@ import {
   Message,
   VisibilityControl,
 } from "@/types/chat";
+import Image from "next/image";
 
 /**
  * Type Guards to check the type of `result` based on the toolName
@@ -92,7 +93,7 @@ const MessageList: React.FC<MessageListProps> = ({
         >
           {message.role === "user" ? (
             <>
-              <User className="w-6 h-6 ml-4" />
+              {/* <User className="w-6 h-6 ml-4" /> */}
               <div className="max-w-[80%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
                 <ReactMarkdown className="prose-sm text-sm">
                   {message.content || message.text}
@@ -181,7 +182,14 @@ const MessageList: React.FC<MessageListProps> = ({
                   }
                 )}
               </div>
-              <GiHolosphere className="w-6 h-6 mr-4 " />
+              {/* <GiHolosphere className="w-6 h-6 mr-4 " /> */}
+              <Image
+                src="/logo1.png"
+                width={100}
+                height={100}
+                alt="logo"
+                className="w-6 h-8 mr-4 "
+              />
             </>
           )}
         </div>

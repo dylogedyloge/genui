@@ -57,7 +57,7 @@ localhost.pem (certificate)
 localhost-key.pem (private key)
 Place these files in your project directory if not already placed
 
--local-ssl-proxy --source 3443 --target 3000 --cert localhost.pem --key localhost-key.pem in Project directory
+- Now "local-ssl-proxy --source 3443 --target 3000 --cert localhost.pem --key localhost-key.pem" in Project directory
 
 -npm run dev
 

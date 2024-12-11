@@ -6,13 +6,12 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Sidebar collapsible="offcanvas" variant="inset" side="right">
-        <MainSidebar />
+        {/* <MainSidebar /> */}
       </Sidebar>
       <SidebarInset>
         <TopHeader />
         {children}
       </SidebarInset>
-      
     </>
   );
 }
