@@ -6,6 +6,7 @@ import { Toaster } from "@/components/shadcn/toaster";
 import { MainLayout } from "@/components/layout/main-layout";
 import { Providers } from "@/components/providers/providers";
 
+// Persian font
 const vazir = localFont({
   src: "./fonts/Vazir-Light-FD.ttf",
   display: "swap",
