@@ -4,67 +4,63 @@ import { z } from "zod";
 export const FlightTool = createTool({
   description: "Display a grid of flight cards",
   parameters: z.object({
-    departure: z.string(),
-    arrival: z.string(),
+    departureCity: z.string(), // Name of the departure city
+    destinationCity: z.string(), // Name of the destination city
+    date: z.string(), // Date of departure
   }),
-  execute: async function ({ departure, arrival }) {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+  execute: async function ({ departureCity, destinationCity, date }) {
+    // Fetch the ID for the departure city
+    const departureResponse = await fetch(
+      `https://api.atripa.ir/api/v2/basic/cities?search=${departureCity}`
+    );
+    if (!departureResponse.ok) {
+      throw new Error("Failed to fetch departure city data");
+    }
+    const departureData = await departureResponse.json();
+    const departureId = departureData.data.results[0]?.id; // Get the first result's ID
 
-    // Ensure the tool is returning an array of flight data
-    return [
-      {
-        departure,
-        arrival,
-        airline: "امیر ایر",
-        flightNumber: "123123 A32",
-        departureTime: "13 مهر 1403",
-        arrivalTime: "24 مهر 1403",
-        status: "On Time",
-        price: 400000,
-      },
-      {
-        departure,
-        arrival,
-        airline: "ایران ایر",
-        flightNumber: "123 A32",
-        departureTime: "23 خرداد 1403",
-        arrivalTime: "24 خرداد 1403",
-        status: "On Time",
-        price: 10400000,
-      },
-      {
-        departure,
-        arrival,
-        airline: "ماهان ایر",
-        flightNumber: "456 B78",
-        departureTime: "22 خرداد 1403",
-        arrivalTime: "22 خرداد 1403",
-        status: "On Time",
-        price: 9800000,
-      },
-      {
-        departure,
-        arrival,
-        airline: "کیش ایر",
-        flightNumber: "789 C54",
-        departureTime: "21 خرداد 1403",
-        arrivalTime: "21 خرداد 1403",
-        status: "Delayed",
-        price: 12000000,
-      },
-      {
-        departure,
-        arrival,
-        airline: "تابان ایر",
-        flightNumber: "101 D23",
-        departureTime: "20 خرداد 1403",
-        arrivalTime: "21 خرداد 1403",
-        status: "Cancelled",
-        price: 8500000,
-      },
-    ];
+    // Fetch the ID for the destination city
+    const destinationResponse = await fetch(
+      `https://api.atripa.ir/api/v2/basic/cities?search=${destinationCity}`
+    );
+    if (!destinationResponse.ok) {
+      throw new Error("Failed to fetch destination city data");
+    }
+    const destinationData = await destinationResponse.json();
+    const destinationId = destinationData.data.results[0]?.id; // Get the first result's ID
+
+    // Check if we have valid IDs for both cities
+    if (!departureId || !destinationId) {
+      throw new Error("Invalid city names provided");
+    }
+
+    // Now fetch flight data using the obtained IDs
+    const flightResponse = await fetch(
+      `https://api.atripa.ir/api/v2/reserve/flight/list/?departure=${departureId}&destination=${destinationId}&round_trip=false&date=${date}`
+    );
+
+    if (!flightResponse.ok) {
+      throw new Error("Failed to fetch flight data");
+    }
+
+    const flightData = await flightResponse.json();
+
+    // Assuming flightData.data.list is an array of flight objects
+    return flightData.data.list.map((flight) => ({
+      airline: flight.airline_persian,
+      flightNumber: flight.flight_number,
+      departureTime: `${flight.departure_date} ${flight.departure_time}`,
+      arrivalTime: `${flight.arrival_date} ${flight.destination_time}`, // Adjust as necessary if destination_time is not available
+      price: flight.adult_price,
+      departure: flight.departure_name,
+      destination: flight.destination_name,
+      aircraft: flight.aircraft,
+      baggage: flight.baggage,
+      airlineLogo: flight.airline_logo,
+    }));
   },
 });
+
 export const HotelTool = createTool({
   description: "Display the hotel card for a hotel",
   parameters: z.object({

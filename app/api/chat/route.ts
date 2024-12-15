@@ -4,7 +4,6 @@ import { tools } from "@/ai/tools";
 
 export async function POST(request: Request) {
   const { messages } = await request.json();
-
   const result = await streamText({
     model: openai("gpt-4o"),
     system: `
