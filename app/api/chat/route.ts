@@ -4,6 +4,9 @@ import { tools } from "@/ai/tools";
 
 export async function POST(request: Request) {
   const { messages } = await request.json();
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date();
+    const currentDate = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
   const result = await streamText({
     model: openai("gpt-4o"),
     system: `
@@ -14,8 +17,9 @@ export async function POST(request: Request) {
    - Hotels → Use 'displayHotelCard' tool
    - Restaurants → Use 'displayRestaurantCard' tool
    - Tours → Use 'displayTourCard' tool
+2. The current date is ${currentDate}. Use this date to interpret any relative dates mentioned by users.
 
-2. Important Rules:
+3. Important Rules:
    - NEVER list travel details in the regular text response
    - ALL responses MUST be in Persian language
    - ALWAYS use the appropriate card display tool
@@ -26,7 +30,7 @@ Instead of saying 'من می توانم به شما در این مورد کمک 
 Instead of 'سلام من دستیار هوش مصنوعی شما هستم چه کمکی می توانم به شما بکنم', say 'سلام من دستیار هوش مصنوعی شما هستم. چه کمکی از دستم برمیاد؟'
 Keep the tone casual, friendly, and similar to everyday speech.
 
-3. Your response structure should be:
+4. Your response structure should be:
    - Friendly Persian greeting/acknowledgment
    - Brief contextual response in Persian without listing flight, hotel, restaurants, and tour details
    - Relevant card displays

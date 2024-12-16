@@ -96,6 +96,8 @@ import { FaPlane } from "react-icons/fa";
 import { Badge } from "@/components/shadcn/badge";
 import { motion } from "framer-motion";
 import { Button } from "@/components/shadcn/button";
+import { Avatar } from "../shadcn/avatar";
+import Image from "next/image";
 
 type FlightProps = {
   departure: string; // Departure city name
@@ -104,7 +106,8 @@ type FlightProps = {
   flightNumber: string; // Flight number
   departureTime: string; // Departure time (formatted)
   arrivalTime: string; // Arrival time (formatted)
-  price: number; // Price in Toman
+  price: number; // Price in Rial
+  airlineLogo: string
 };
 
 const FlightCard = ({
@@ -115,6 +118,7 @@ const FlightCard = ({
   departureTime,
   arrivalTime,
   price,
+  airlineLogo
 }: FlightProps) => {
   return (
     <motion.div
@@ -126,7 +130,12 @@ const FlightCard = ({
       <div className="min-w-60 sm:w-96 shadow-md dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xs font-semibold text-primary">{airline}</h2>
+            <div className="flex items-center gap-1"><Avatar>
+              <Image width={50} height={50} src={airlineLogo} alt={`${airline} logo`}  />
+            </Avatar>
+              <h2 className="text-sm font-semibold text-primary">{airline}</h2></div>
+
+
             <Badge variant="secondary" className="text-xs font-medium">
               {flightNumber}
             </Badge>
@@ -141,7 +150,7 @@ const FlightCard = ({
               <p className="text-md text-card-foreground font-bold mb-2">
                 {departure} {/* Departure city name */}
               </p>
-              <p className="text-xs prose-sm text-muted-foreground">
+              <p className="text-xs prose-sm text-muted-foreground ">
                 {departureTime} {/* Departure time */}
               </p>
             </div>

@@ -1,6 +1,7 @@
 import { tool as createTool } from "ai";
 import { z } from "zod";
 
+
 export const FlightTool = createTool({
   description: "Display a grid of flight cards",
   parameters: z.object({
@@ -45,12 +46,38 @@ export const FlightTool = createTool({
 
     const flightData = await flightResponse.json();
 
+
+    // Handle various error cases based on API response
+    if (flightData.message === "Error acquired" && flightData.errors) {
+      let errorMessage = "متاسفم، مشکلی پیش آمده: ";
+      
+      // Check for specific error messages
+      if (flightData.errors.date) {
+        errorMessage += flightData.errors.date.join(", ");
+      } else {
+        errorMessage += "لطفاً اطلاعات ورودی را بررسی کنید.";
+      }
+
+      return {
+        message: errorMessage,
+        flights: [],
+      };
+    }
+    // Check if there are any flights available
+    if (flightData.data.list.length === 0) {
+      return {
+        message: `متاسفم، پروازی برای ${departureCity} به ${destinationCity} در تاریخ ${date} پیدا نشد. لطفاً تاریخ یا مقصد دیگری را امتحان کنید.`,
+        flights: [], // Return an empty array for flights
+      };
+    }
+
+
     // Assuming flightData.data.list is an array of flight objects
-    return flightData.data.list.map((flight) => ({
+    return flightData.data.list.map((flight: { airline_persian: any; flight_number: any; departure_date: any; departure_time: any; arrival_date: any; destination_time: any; adult_price: any; departure_name: any; destination_name: any; aircraft: any; baggage: any; airline_logo: any; }) => ({
       airline: flight.airline_persian,
       flightNumber: flight.flight_number,
-      departureTime: `${flight.departure_date} ${flight.departure_time}`,
-      arrivalTime: `${flight.arrival_date} ${flight.destination_time}`, // Adjust as necessary if destination_time is not available
+      departureTime: `${flight.departure_date}- ${flight.departure_time}`,
+      arrivalTime: `${flight.arrival_date}- ${flight.destination_time}`, // Adjust as necessary if destination_time is not available
       price: flight.adult_price,
       departure: flight.departure_name,
       destination: flight.destination_name,
