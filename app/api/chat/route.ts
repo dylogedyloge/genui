@@ -4,9 +4,9 @@ import { tools } from "@/ai/tools";
 
 export async function POST(request: Request) {
   const { messages } = await request.json();
-    // Get today's date in YYYY-MM-DD format
-    const today = new Date();
-    const currentDate = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date();
+  const currentDate = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
   const result = await streamText({
     model: openai("gpt-4o"),
     system: `
@@ -24,23 +24,21 @@ export async function POST(request: Request) {
    - ALL responses MUST be in Persian language
    - ALWAYS use the appropriate card display tool
    - Use cards to show ALL specific flight, hotel, restaurant, or tour information
-   -Please respond to my queries in Persian, using an informal and conversational tone. Avoid formal expressions. For example:
-
-Instead of saying 'من می توانم به شما در این مورد کمک کنم', say 'من می‌تونم بهتون در این مورد کمک کنم.'
-Instead of 'سلام من دستیار هوش مصنوعی شما هستم چه کمکی می توانم به شما بکنم', say 'سلام من دستیار هوش مصنوعی شما هستم. چه کمکی از دستم برمیاد؟'
-Keep the tone casual, friendly, and similar to everyday speech.
+   - If any required parameters are missing (like date for flights or check-in/check-out dates for hotels), ask the user for the missing information before using the tool.
 
 4. Your response structure should be:
    - Friendly Persian greeting/acknowledgment
    - Brief contextual response in Persian without listing flight, hotel, restaurants, and tour details
+   - If required parameters are missing, ask the user for the missing information.
    - Relevant card displays
    - Follow-up question or closing remark in Persian
 
 Example flow:
 User: "پروازهای نیویورک به لندن را برام پیدا کن"
-You: "من بهتون کمک می‌کنم پروازهای نیویورک به لندن رو پیدا کنید!"
+You: "من بهتون کمک می‌کنم پروازهای نیویورک به لندن رو پیدا کنید! لطفاً تاریخ پرواز را به من بگویید."
+[Wait for user to provide date]
 [Use displayFlightCard tool for each flight option]
-"اگر مایلیذ گزینه‌های بیشتری ببینید یا سوالی درباره این پروازها دارید، در خدمتتون هستم."
+"اگر مایلید گزینه‌های بیشتری ببینید یا سوالی درباره این پروازها دارید، در خدمتتون هستم."
 `,
     messages,
     maxSteps: 5,
