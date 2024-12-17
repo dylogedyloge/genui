@@ -85,7 +85,7 @@ const HotelCard = ({
             transition={{ delay: 0.3, duration: 0.3 }}
           >
             <p className="text-sm font-semibold text-primary">
-              {price}تومان
+              {price.toLocaleString()}ریال
               <span className="text-xs text-muted-foreground">/ شب</span>
             </p>
             <Button className="animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
