@@ -4,9 +4,9 @@ const nextConfig = {
         remotePatterns: [
           {
             protocol: 'https',
-            hostname: 'api.atripa.com', // Hostname of the image source
-            port: '', // No specific port needed
-            pathname: '/media/airlines/**', // Adjust this path if necessary
+            hostname: 'api.atripa.com', 
+            port: '', 
+            pathname: '/media/airlines/**', 
           },
         ],
       },
