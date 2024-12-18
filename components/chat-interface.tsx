@@ -23,8 +23,6 @@ import { Message } from "@/types/chat";
 import { useVisibilityMap } from "@/hooks/use-visibility-map";
 import { AudioLines } from "lucide-react";
 
-
-
 const ChatInterface: React.FC<ChatInterfaceProps> = () => {
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
@@ -120,7 +118,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
     ...message,
     timestamp: new Date().toISOString(),
   })) as (Message & { timestamp: string })[];
- 
+
   return (
     <div className="flex flex-col p-4 h-full">
       <MessageList

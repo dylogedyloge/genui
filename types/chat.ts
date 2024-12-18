@@ -1,8 +1,10 @@
-export interface ChatInterfaceProps {
-}
+import { ReactNode } from "react";
+
+export interface ChatInterfaceProps {}
 
 // Define the structure of the Flight, Hotel, Restaurant, and Tour
 export interface Flight {
+  destination: ReactNode;
   id: string; // Unique identifier for the flight
   departure: string; // Departure city or airport name
   arrival: string; // Arrival city or airport name
@@ -63,7 +65,7 @@ export interface Message {
   text?: string;
   timestamp: Date | string | number;
   toolInvocations?: ToolInvocation[];
- 
+  flightDetails?: Flight;
 }
 
 // Visibility control for showing more/less items

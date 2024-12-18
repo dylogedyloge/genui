@@ -6,6 +6,8 @@
 // import { Button } from "@/components/shadcn/button";
 // import { Avatar } from "../shadcn/avatar";
 // import Image from "next/image";
+// import moment from "moment-jalaali";
+// import { useRouter } from "next/navigation";
 
 // type FlightProps = {
 //   departure: string; // Departure city name
@@ -28,12 +30,48 @@
 //   price,
 //   airlineLogo,
 // }: FlightProps) => {
+//   const router = useRouter(); // Initialize Next.js router
+
+//   // Function to handle card click
+//   const handleCardClick = () => {
+//     const flightInfo = {
+//       airline,
+//       flightNumber,
+//       departure,
+//       destination,
+//       departureTime: jalaliDepartureTime,
+//       arrivalTime: jalaliArrivalTime,
+//       price,
+//       airlineLogo,
+//     };
+//     console.log("Flight Information:", flightInfo);
+//     // Save the flight details to session storage
+//     sessionStorage.setItem("selectedFlight", JSON.stringify(flightInfo));
+//     // Navigate to the new route
+//     router.push("/flight-details");
+//   };
+
+//   // Convert Gregorian dates to Jalali dates
+//   const convertToJalali = (dateTime: string) => {
+//     // Split the date and time
+//     const [date, time] = dateTime.split("-");
+//     // Parse the Gregorian date
+//     const jalaliDate = moment(date, "YYYY-MM-DD").format("jYYYY/jMM/jDD");
+//     // Return the Jalali date and time
+//     return `${jalaliDate} - ${time.trim()}`;
+//   };
+
+//   // Convert departure and arrival times to Jalali
+//   const jalaliDepartureTime = convertToJalali(departureTime);
+//   const jalaliArrivalTime = convertToJalali(arrivalTime);
+
 //   return (
 //     <motion.div
 //       initial={{ opacity: 0, y: 10 }}
 //       animate={{ opacity: 1, y: 0 }}
 //       transition={{ duration: 0.3 }}
 //       className="w-full"
+//       onClick={handleCardClick}
 //     >
 //       <div className="min-w-60 sm:w-96 shadow-md dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg">
 //         <div className="p-6">
@@ -65,7 +103,7 @@
 //                 {departure} {/* Departure city name */}
 //               </p>
 //               <p className="text-xs prose-sm text-muted-foreground ">
-//                 {departureTime} {/* Departure time */}
+//                 {jalaliDepartureTime} {/* Jalali Departure time */}
 //               </p>
 //             </div>
 //             <div className="flex flex-col items-center px-4">
@@ -77,7 +115,7 @@
 //                 {destination} {/* Destination city name */}
 //               </p>
 //               <p className="text-xs prose-sm text-muted-foreground">
-//                 {arrivalTime} {/* Arrival time */}
+//                 {jalaliArrivalTime} {/* Jalali Arrival time */}
 //               </p>
 //             </div>
 //           </motion.div>
@@ -122,6 +160,7 @@ type FlightProps = {
   arrivalTime: string; // Arrival time (formatted)
   price: number; // Price in Rial
   airlineLogo: string;
+  onCardClick: (flightInfo: any) => void; // Callback function
 };
 
 const FlightCard = ({
@@ -133,6 +172,7 @@ const FlightCard = ({
   arrivalTime,
   price,
   airlineLogo,
+  onCardClick, // Add callback function
 }: FlightProps) => {
   // Convert Gregorian dates to Jalali dates
   const convertToJalali = (dateTime: string) => {
@@ -148,12 +188,28 @@ const FlightCard = ({
   const jalaliDepartureTime = convertToJalali(departureTime);
   const jalaliArrivalTime = convertToJalali(arrivalTime);
 
+  // Function to handle card click
+  const handleCardClick = () => {
+    const flightInfo = {
+      airline,
+      flightNumber,
+      departure,
+      destination,
+      departureTime: jalaliDepartureTime,
+      arrivalTime: jalaliArrivalTime,
+      price,
+      airlineLogo,
+    };
+
+    // Call the callback function to pass flight details to the parent
+    onCardClick(flightInfo);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="w-full"
     >
       <div className="min-w-60 sm:w-96 shadow-md dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg">
         <div className="p-6">
@@ -212,8 +268,11 @@ const FlightCard = ({
                 {price.toLocaleString()} ریال{/* Price formatted */}
               </p>
             </div>
-            <Button className="animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
-              رزرو بلیط {/* Reserve Ticket */}
+            <Button
+              onClick={handleCardClick}
+              className="animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+            >
+              دیدن جزِئیات
             </Button>
           </motion.div>
         </div>
