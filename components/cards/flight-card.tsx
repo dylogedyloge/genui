@@ -6,18 +6,19 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/shadcn/button";
 import { Avatar } from "../shadcn/avatar";
 import Image from "next/image";
-import moment from "moment-jalaali"; 
+import moment from "moment-jalaali";
+import { useRouter } from "next/navigation";
 
 type FlightProps = {
-  departure: string; 
-  destination: string; 
-  airline: string; 
-  flightNumber: string; 
-  departureTime: string; 
-  arrivalTime: string; 
-  price: number; 
+  departure: string;
+  destination: string;
+  airline: string;
+  flightNumber: string;
+  departureTime: string;
+  arrivalTime: string;
+  price: number;
   airlineLogo: string;
-  onFlightCardClick: (flightInfo: any) => void; 
+  onFlightCardClick: (flightInfo: any) => void;
 };
 
 const FlightCard = ({
@@ -29,7 +30,7 @@ const FlightCard = ({
   arrivalTime,
   price,
   airlineLogo,
-  onFlightCardClick, 
+  onFlightCardClick,
 }: FlightProps) => {
   // Convert Gregorian dates to Jalali dates
   const convertToJalali = (dateTime: string) => {
@@ -45,6 +46,8 @@ const FlightCard = ({
   const jalaliDepartureTime = convertToJalali(departureTime);
   const jalaliArrivalTime = convertToJalali(arrivalTime);
 
+  const router = useRouter();
+
   // Function to handle card click
   const handleFlightCardClick = () => {
     const flightInfo = {
@@ -57,9 +60,16 @@ const FlightCard = ({
       price,
       airlineLogo,
     };
+    // Navigate User to a route in react app (src/page/flight-details) and send the flight details and save the flight details in the session storage
+    // // Call the callback function to pass flight details to the parent
+    // onFlightCardClick(flightInfo);
+    // Convert the flight details to a JSON string and encode it
+    const flightInfoString = encodeURIComponent(JSON.stringify(flightInfo));
 
-    // Call the callback function to pass flight details to the parent
-    onFlightCardClick(flightInfo);
+    // Navigate to the desired route with the encoded JSON string as a query parameter
+    router.push(
+      `https://atripa.ir/fa/flight-passengers?flightInfo=${flightInfoString}`
+    );
   };
 
   return (
@@ -95,10 +105,10 @@ const FlightCard = ({
           >
             <div className="text-left flex flex-col items-start">
               <p className="text-md text-card-foreground font-bold mb-2">
-                {departure} 
+                {departure}
               </p>
               <p className="text-xs prose-sm text-muted-foreground ">
-                {jalaliDepartureTime} 
+                {jalaliDepartureTime}
               </p>
             </div>
             <div className="flex flex-col items-center px-4">
@@ -107,10 +117,10 @@ const FlightCard = ({
 
             <div className="text-right flex flex-col items-end">
               <p className="text-md text-card-foreground font-bold mb-2">
-                {destination} 
+                {destination}
               </p>
               <p className="text-xs prose-sm text-muted-foreground">
-                {jalaliArrivalTime} 
+                {jalaliArrivalTime}
               </p>
             </div>
           </motion.div>

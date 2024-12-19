@@ -10,7 +10,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
     >
       {/* <ConvexClientProvider> */}
-        <SidebarProvider>{children}</SidebarProvider>
+      <SidebarProvider>{children}</SidebarProvider>
       {/* </ConvexClientProvider> */}
     </ThemeProvider>
   );

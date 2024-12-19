@@ -27,10 +27,7 @@ import {
   VisibilityControl,
 } from "@/types/chat";
 import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "../shadcn/card";
-import { Badge } from "../shadcn/badge";
-import SelectedFlightDetails from "../selected-card-details/selected-flight-details";
-import SelectedHotelDetails from "../selected-card-details/selected-hotel-details";
+import SelectedFlightAndHotelDetails from "../selected-card-details/selected-flight-and-hotel-details";
 
 /**
  * Type Guards to check the type of `result` based on the toolName
@@ -93,12 +90,12 @@ const MessageList: React.FC<MessageListProps> = ({
 
   // Callback function to handle flight card click
   const handleFlightCardClick = (flightInfo: Flight) => {
-    setSelectedFlight(flightInfo); 
+    setSelectedFlight(flightInfo);
   };
-    // Callback function to handle hotel card click
-    const handleHotelCardClick = (hotelInfo: Hotel) => {
-      setSelectedHotel(hotelInfo); 
-    };
+  // Callback function to handle hotel card click
+  const handleHotelCardClick = (hotelInfo: Hotel) => {
+    setSelectedHotel(hotelInfo);
+  };
 
   return (
     <div className="flex-grow overflow-auto space-y-4 mb-4">
@@ -149,7 +146,7 @@ const MessageList: React.FC<MessageListProps> = ({
                               messageIndex,
                               invocationIndex,
                               visibilityControls.flights,
-                              handleFlightCardClick 
+                              handleFlightCardClick
                             );
                           }
                           break;
@@ -215,14 +212,13 @@ const MessageList: React.FC<MessageListProps> = ({
 
       {/* Conditionally render the selected flight details with text transition animation */}
       <AnimatePresence>
-        {selectedFlight && (
-          <SelectedFlightDetails selectedFlight={selectedFlight} />
-        )}
-        {selectedHotel && (
-          <SelectedHotelDetails selectedHotel={selectedHotel} />
+        {(selectedFlight || selectedHotel) && (
+          <SelectedFlightAndHotelDetails
+            selectedFlight={selectedFlight}
+            selectedHotel={selectedHotel}
+          />
         )}
       </AnimatePresence>
-
       {error && (
         <div className="flex justify-center">
           <Button variant="destructive" size="sm" onClick={() => reload()}>
@@ -242,7 +238,7 @@ const renderFlightCards = (
   messageIndex: number,
   invocationIndex: number,
   visibilityControl: VisibilityControl,
-  onFlightCardClick: (flightInfo: Flight) => void 
+  onFlightCardClick: (flightInfo: Flight) => void
 ) => {
   return (
     <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
@@ -250,8 +246,7 @@ const renderFlightCards = (
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((flight: Flight) => (
           <FlightCard
-            airlineLogo={""}
-            onFlightCardClick={onFlightCardClick} 
+            onFlightCardClick={onFlightCardClick}
             key={flight.id}
             {...flight}
           />
@@ -278,7 +273,11 @@ const renderHotelCards = (
       {hotels
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((hotel: Hotel) => (
-          <HotelCard key={hotel.id} onHotelCardClick={onHotelCardClick} {...hotel} />
+          <HotelCard
+            key={hotel.id}
+            onHotelCardClick={onHotelCardClick}
+            {...hotel}
+          />
         ))}
       {renderVisibilityButtons(
         hotels.length,

@@ -4,7 +4,7 @@ export interface ChatInterfaceProps {}
 
 // Define the structure of the Flight, Hotel, Restaurant, and Tour
 export interface Flight {
-  destination: ReactNode;
+  destination: string; // Change from ReactNode to string
   id: string; // Unique identifier for the flight
   departure: string; // Departure city or airport name
   arrival: string; // Arrival city or airport name
@@ -14,6 +14,7 @@ export interface Flight {
   arrivalTime: string; // Time of arrival
   status: "On Time" | "Delayed" | "Cancelled"; // Status of the flight
   price: number; // Price in local currency (e.g., Toman)
+  airlineLogo: string;
 }
 
 export interface Hotel {
