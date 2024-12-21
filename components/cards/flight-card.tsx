@@ -38,6 +38,8 @@ type FlightProps = {
   with_tour: boolean | null;
   tag: string;
   onFlightCardClick: (flightInfo: any) => void;
+  departureCityData: any; // Add this
+  destinationCityData: any; // Add this
 };
 
 const FlightCard = ({
@@ -69,6 +71,8 @@ const FlightCard = ({
   with_tour,
   tag,
   onFlightCardClick,
+  departureCityData,
+  destinationCityData
 }: FlightProps) => {
   // Convert Gregorian dates to Jalali dates
   const convertToJalali = (dateTime: string) => {
@@ -347,44 +351,48 @@ const FlightCard = ({
 
     // Dynamic data for ticketInformation
     const ticketInformation = {
-      departure: {
-        id: departureCityData.id,
-        name: departureCityData.name,
-        english_name: departureCityData.english_name,
-        iata: departureCityData.iata,
-        latitude: departureCityData.latitude,
-        longitude: departureCityData.longitude,
-        description: departureCityData.description,
-        is_province_capital: departureCityData.is_province_capital,
-        is_country_capital: departureCityData.is_country_capital,
-        usage_flight: departureCityData.usage_flight,
-        usage_accommodation: departureCityData.usage_accommodation,
-        country: departureCityData.country,
-        province: departureCityData.province,
-        flight: departureCityData.flight,
-        accommodation: departureCityData.accommodation,
-        has_plan: departureCityData.has_plan,
-        parto_id: departureCityData.parto_id,
-      },
-      destination: {
-        id: destinationCityData.id,
-        name: destinationCityData.name,
-        english_name: destinationCityData.english_name,
-        iata: destinationCityData.iata,
-        latitude: destinationCityData.latitude,
-        longitude: destinationCityData.longitude,
-        description: destinationCityData.description,
-        is_province_capital: destinationCityData.is_province_capital,
-        is_country_capital: destinationCityData.is_country_capital,
-        usage_flight: destinationCityData.usage_flight,
-        usage_accommodation: destinationCityData.usage_accommodation,
-        country: destinationCityData.country,
-        province: destinationCityData.province,
-        flight: destinationCityData.flight,
-        accommodation: destinationCityData.accommodation,
-        has_plan: destinationCityData.has_plan,
-        parto_id: destinationCityData.parto_id,
-      },
+      departure: departureCityData
+        ? {
+            id: departureCityData.id,
+            name: departureCityData.name,
+            english_name: departureCityData.english_name,
+            iata: departureCityData.iata,
+            latitude: departureCityData.latitude,
+            longitude: departureCityData.longitude,
+            description: departureCityData.description,
+            is_province_capital: departureCityData.is_province_capital,
+            is_country_capital: departureCityData.is_country_capital,
+            usage_flight: departureCityData.usage_flight,
+            usage_accommodation: departureCityData.usage_accommodation,
+            country: departureCityData.country,
+            province: departureCityData.province,
+            flight: departureCityData.flight,
+            accommodation: departureCityData.accommodation,
+            has_plan: departureCityData.has_plan,
+            parto_id: departureCityData.parto_id,
+          }
+        : null,
+      destination: destinationCityData
+        ? {
+            id: destinationCityData.id,
+            name: destinationCityData.name,
+            english_name: destinationCityData.english_name,
+            iata: destinationCityData.iata,
+            latitude: destinationCityData.latitude,
+            longitude: destinationCityData.longitude,
+            description: destinationCityData.description,
+            is_province_capital: destinationCityData.is_province_capital,
+            is_country_capital: destinationCityData.is_country_capital,
+            usage_flight: destinationCityData.usage_flight,
+            usage_accommodation: destinationCityData.usage_accommodation,
+            country: destinationCityData.country,
+            province: destinationCityData.province,
+            flight: destinationCityData.flight,
+            accommodation: destinationCityData.accommodation,
+            has_plan: destinationCityData.has_plan,
+            parto_id: destinationCityData.parto_id,
+          }
+        : null,
       departureDate: "2024-12-29", // Replace with actual departure date
       returnDate: null,
       personCounter: {
