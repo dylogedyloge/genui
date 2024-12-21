@@ -144,16 +144,133 @@ const FlightCard = ({
       tag: "zm", // Default value
     };
 
+    // Static data for generalInformation
+    const generalInformation = {
+      ticket: true,
+      accommodation: false,
+      itinerary: false,
+      isInternational: false,
+    };
+
+    // Static data for ticketInformation
+    const ticketInformation = {
+      departure: {
+        id: 303,
+        name: "تهران",
+        english_name: "Tehran",
+        iata: "THR",
+        latitude: "35.700618",
+        longitude: "51.401378",
+        description: null,
+        is_province_capital: true,
+        is_country_capital: true,
+        usage_flight: 86880,
+        usage_accommodation: 1503,
+        country: {
+          id: 1,
+          name: "ایران",
+          english_name: "Iran",
+          iata: "IRN",
+          parto_iata: "IR",
+          description: null,
+          nationality: "IRN",
+          continental: "آسیا",
+        },
+        province: {
+          id: 8,
+          name: "تهران",
+          english_name: "Tehran",
+          description: null,
+          country: {
+            id: 1,
+            name: "ایران",
+            english_name: "Iran",
+            iata: "IRN",
+            parto_iata: "IR",
+            description: null,
+            nationality: "IRN",
+            continental: "آسیا",
+          },
+        },
+        flight: true,
+        accommodation: true,
+        has_plan: false,
+        parto_id: 0,
+        color: "#1E1E1E",
+        value: 303,
+        label: "تهران - THR",
+      },
+      destination: {
+        id: 445,
+        name: "مشهد",
+        english_name: "Mashhad",
+        iata: "MHD",
+        latitude: "36.297498",
+        longitude: "59.605939",
+        description: null,
+        is_province_capital: true,
+        is_country_capital: false,
+        usage_flight: 112303,
+        usage_accommodation: 6624,
+        country: {
+          id: 1,
+          name: "ایران",
+          english_name: "Iran",
+          iata: "IRN",
+          parto_iata: "IR",
+          description: null,
+          nationality: "IRN",
+          continental: "آسیا",
+        },
+        province: {
+          id: 11,
+          name: "خراسان رضوی",
+          english_name: "Razavi Khorasan",
+          description: null,
+          country: {
+            id: 1,
+            name: "ایران",
+            english_name: "Iran",
+            iata: "IRN",
+            parto_iata: "IR",
+            description: null,
+            nationality: "IRN",
+            continental: "آسیا",
+          },
+        },
+        flight: true,
+        accommodation: true,
+        has_plan: true,
+        parto_id: 0,
+        color: "#006363",
+        value: 445,
+        label: "مشهد - MHD",
+      },
+      departureDate: "2024-12-29",
+      returnDate: null,
+      personCounter: {
+        adult: 1,
+        child: 0,
+        infant: 0,
+        totalPersons: 1,
+      },
+      secondTicket: false,
+    };
+
     console.log(
       "Sending transformed flight details to parent:",
       transformedFlightInfo
     ); // Debugging
 
-    // Send the transformed flight details to the parent React app using postMessage
+    // Send the transformed flight details, generalInformation, and ticketInformation to the parent React app using postMessage
     window.parent.postMessage(
       {
         type: "SELECTED_FLIGHT",
-        payload: transformedFlightInfo,
+        payload: {
+          selectedDepartureFlight: transformedFlightInfo,
+          generalInformation,
+          ticketInformation,
+        },
       },
       "http://localhost:3000" // Target origin (React app's origin)
     );
