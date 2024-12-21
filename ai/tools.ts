@@ -273,7 +273,6 @@ export const FlightTool = createTool({
           departure_name: any;
           destination_name: any;
           aircraft: any;
-          baggage: any;
           airline_logo: any;
           type: any;
           capacity: any;
