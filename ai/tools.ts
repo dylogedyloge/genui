@@ -212,8 +212,6 @@ import { z } from "zod";
 //     }
 //   },
 // });
-import { tool as createTool } from "ai";
-import { z } from "zod";
 
 export const FlightTool = createTool({
   description: "Display a grid of flight cards",
