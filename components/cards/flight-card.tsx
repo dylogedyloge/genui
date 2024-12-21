@@ -83,13 +83,15 @@ const FlightCard = ({
       airlineLogo,
     };
 
+    console.log("Sending flight details to parent:", flightInfo); // Debugging
+
     // Send the flight details to the parent React app using postMessage
     window.parent.postMessage(
       {
         type: "SELECTED_FLIGHT",
         payload: flightInfo,
       },
-      "http://localhost:3000/fa" // Target origin (React app's origin)
+      "http://localhost:3000" // Target origin (React app's origin)
     );
   };
 
