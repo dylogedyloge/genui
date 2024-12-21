@@ -71,6 +71,29 @@ const FlightCard = ({
   //     `https://atripa.ir/fa/flight-passengers?flightInfo=${flightInfoString}`
   //   );
   // };
+  // const handleFlightCardClick = () => {
+  //   const flightInfo = {
+  //     airline,
+  //     flightNumber,
+  //     departure,
+  //     destination,
+  //     departureTime: jalaliDepartureTime,
+  //     arrivalTime: jalaliArrivalTime,
+  //     price,
+  //     airlineLogo,
+  //   };
+
+  //   console.log("Sending flight details to parent:", flightInfo); // Debugging
+
+  //   // Send the flight details to the parent React app using postMessage
+  //   window.parent.postMessage(
+  //     {
+  //       type: "SELECTED_FLIGHT",
+  //       payload: flightInfo,
+  //     },
+  //     "http://localhost:3000" // Target origin (React app's origin)
+  //   );
+  // };
   const handleFlightCardClick = () => {
     const flightInfo = {
       airline,
@@ -83,13 +106,54 @@ const FlightCard = ({
       airlineLogo,
     };
 
-    console.log("Sending flight details to parent:", flightInfo); // Debugging
+    // Transform the flightInfo object to match the required structure
+    const transformedFlightInfo = {
+      type: "charter", // Default value
+      capacity: 5, // Default value
+      airline: flightInfo.airline.toLowerCase(), // Convert to lowercase
+      sellingType: "All", // Default value
+      id: 699, // Default value
+      aircraft: "Boeing MD", // Default value
+      class: "", // Default value
+      cobin: "Economy", // Default value
+      persian_type: "چارتر", // Default value
+      refundable: null, // Default value
+      adult_price: flightInfo.price, // Use the price from chatbot
+      child_price: flightInfo.price, // Use the price from chatbot
+      infant_price: flightInfo.price, // Use the price from chatbot
+      airline_persian: flightInfo.airline, // Use the airline from chatbot
+      airline_logo: flightInfo.airlineLogo, // Use the airline logo from chatbot
+      flight_number: flightInfo.flightNumber.toUpperCase(), // Convert to uppercase
+      departure: "THR", // Default value
+      departure_name: flightInfo.departure, // Use the departure from chatbot
+      english_departure_name: "Tehran", // Default value
+      departure_date: "2024-12-29", // Default value
+      departure_time: flightInfo.departureTime.split(" - ")[1], // Extract time
+      baggage: "0", // Default value
+      departure_terminal: "", // Default value
+      refund_rules: [], // Default value
+      destination: "MHD", // Default value
+      destination_name: flightInfo.destination, // Use the destination from chatbot
+      english_destination_name: "Mashhad", // Default value
+      destination_time: "", // Default value
+      destination_terminal: "", // Default value
+      flight_duration: "", // Default value
+      arrival_date: "2024-12-29", // Default value
+      cobin_persian: "اکونومی", // Default value
+      with_tour: null, // Default value
+      tag: "zm", // Default value
+    };
 
-    // Send the flight details to the parent React app using postMessage
+    console.log(
+      "Sending transformed flight details to parent:",
+      transformedFlightInfo
+    ); // Debugging
+
+    // Send the transformed flight details to the parent React app using postMessage
     window.parent.postMessage(
       {
         type: "SELECTED_FLIGHT",
-        payload: flightInfo,
+        payload: transformedFlightInfo,
       },
       "http://localhost:3000" // Target origin (React app's origin)
     );
