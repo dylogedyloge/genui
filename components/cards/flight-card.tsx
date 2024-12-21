@@ -18,6 +18,25 @@ type FlightProps = {
   arrivalTime: string;
   price: number;
   airlineLogo: string;
+  type: string;
+  capacity: number;
+  sellingType: string;
+  id: number;
+  aircraft: string;
+  baggage: string;
+  flightClass: string;
+  cobin: string;
+  persian_type: string;
+  refundable: boolean | null;
+  child_price: number;
+  infant_price: number;
+  departure_terminal: string;
+  refund_rules: [];
+  destination_terminal: string;
+  flight_duration: string;
+  cobin_persian: string;
+  with_tour: boolean | null;
+  tag: string;
   onFlightCardClick: (flightInfo: any) => void;
 };
 
@@ -30,6 +49,25 @@ const FlightCard = ({
   arrivalTime,
   price,
   airlineLogo,
+  type,
+  capacity,
+  sellingType,
+  id,
+  aircraft,
+  baggage,
+  flightClass,
+  cobin,
+  persian_type,
+  refundable,
+  child_price,
+  infant_price,
+  departure_terminal,
+  refund_rules,
+  destination_terminal,
+  flight_duration,
+  cobin_persian,
+  with_tour,
+  tag,
   onFlightCardClick,
 }: FlightProps) => {
   // Convert Gregorian dates to Jalali dates
@@ -60,36 +98,172 @@ const FlightCard = ({
   //     price,
   //     airlineLogo,
   //   };
-  //   // Navigate User to a route in react app (src/page/flight-details) and send the flight details and save the flight details in the session storage
-  //   // // Call the callback function to pass flight details to the parent
-  //   // onFlightCardClick(flightInfo);
-  //   // Convert the flight details to a JSON string and encode it
-  //   const flightInfoString = encodeURIComponent(JSON.stringify(flightInfo));
 
-  //   // Navigate to the desired route with the encoded JSON string as a query parameter
-  //   router.push(
-  //     `https://atripa.ir/fa/flight-passengers?flightInfo=${flightInfoString}`
-  //   );
-  // };
-  // const handleFlightCardClick = () => {
-  //   const flightInfo = {
-  //     airline,
-  //     flightNumber,
-  //     departure,
-  //     destination,
-  //     departureTime: jalaliDepartureTime,
-  //     arrivalTime: jalaliArrivalTime,
-  //     price,
-  //     airlineLogo,
+  //   // Transform the flightInfo object to match the required structure
+  //   const transformedFlightInfo = {
+  //     type: "charter", // Default value
+  //     capacity: 5, // Default value
+  //     airline: flightInfo.airline.toLowerCase(), // Convert to lowercase
+  //     sellingType: "All", // Default value
+  //     id: 699, // Default value
+  //     aircraft: "Boeing MD", // Default value
+  //     class: "", // Default value
+  //     cobin: "Economy", // Default value
+  //     persian_type: "چارتر", // Default value
+  //     refundable: null, // Default value
+  //     adult_price: flightInfo.price, // Use the price from chatbot
+  //     child_price: flightInfo.price, // Use the price from chatbot
+  //     infant_price: flightInfo.price, // Use the price from chatbot
+  //     airline_persian: flightInfo.airline, // Use the airline from chatbot
+  //     airline_logo: flightInfo.airlineLogo, // Use the airline logo from chatbot
+  //     flight_number: flightInfo.flightNumber.toUpperCase(), // Convert to uppercase
+  //     departure: "THR", // Default value
+  //     departure_name: flightInfo.departure, // Use the departure from chatbot
+  //     english_departure_name: "Tehran", // Default value
+  //     departure_date: "2024-12-29", // Default value
+  //     departure_time: flightInfo.departureTime.split(" - ")[1], // Extract time
+  //     baggage: "0", // Default value
+  //     departure_terminal: "", // Default value
+  //     refund_rules: [], // Default value
+  //     destination: "MHD", // Default value
+  //     destination_name: flightInfo.destination, // Use the destination from chatbot
+  //     english_destination_name: "Mashhad", // Default value
+  //     destination_time: "", // Default value
+  //     destination_terminal: "", // Default value
+  //     flight_duration: "", // Default value
+  //     arrival_date: "2024-12-29", // Default value
+  //     cobin_persian: "اکونومی", // Default value
+  //     with_tour: null, // Default value
+  //     tag: "zm", // Default value
   //   };
 
-  //   console.log("Sending flight details to parent:", flightInfo); // Debugging
+  //   // Static data for generalInformation
+  //   const generalInformation = {
+  //     ticket: true,
+  //     accommodation: false,
+  //     itinerary: false,
+  //     isInternational: false,
+  //   };
 
-  //   // Send the flight details to the parent React app using postMessage
+  //   // Static data for ticketInformation
+  //   const ticketInformation = {
+  //     departure: {
+  //       id: 303,
+  //       name: "تهران",
+  //       english_name: "Tehran",
+  //       iata: "THR",
+  //       latitude: "35.700618",
+  //       longitude: "51.401378",
+  //       description: null,
+  //       is_province_capital: true,
+  //       is_country_capital: true,
+  //       usage_flight: 86880,
+  //       usage_accommodation: 1503,
+  //       country: {
+  //         id: 1,
+  //         name: "ایران",
+  //         english_name: "Iran",
+  //         iata: "IRN",
+  //         parto_iata: "IR",
+  //         description: null,
+  //         nationality: "IRN",
+  //         continental: "آسیا",
+  //       },
+  //       province: {
+  //         id: 8,
+  //         name: "تهران",
+  //         english_name: "Tehran",
+  //         description: null,
+  //         country: {
+  //           id: 1,
+  //           name: "ایران",
+  //           english_name: "Iran",
+  //           iata: "IRN",
+  //           parto_iata: "IR",
+  //           description: null,
+  //           nationality: "IRN",
+  //           continental: "آسیا",
+  //         },
+  //       },
+  //       flight: true,
+  //       accommodation: true,
+  //       has_plan: false,
+  //       parto_id: 0,
+  //       color: "#1E1E1E",
+  //       value: 303,
+  //       label: "تهران - THR",
+  //     },
+  //     destination: {
+  //       id: 445,
+  //       name: "مشهد",
+  //       english_name: "Mashhad",
+  //       iata: "MHD",
+  //       latitude: "36.297498",
+  //       longitude: "59.605939",
+  //       description: null,
+  //       is_province_capital: true,
+  //       is_country_capital: false,
+  //       usage_flight: 112303,
+  //       usage_accommodation: 6624,
+  //       country: {
+  //         id: 1,
+  //         name: "ایران",
+  //         english_name: "Iran",
+  //         iata: "IRN",
+  //         parto_iata: "IR",
+  //         description: null,
+  //         nationality: "IRN",
+  //         continental: "آسیا",
+  //       },
+  //       province: {
+  //         id: 11,
+  //         name: "خراسان رضوی",
+  //         english_name: "Razavi Khorasan",
+  //         description: null,
+  //         country: {
+  //           id: 1,
+  //           name: "ایران",
+  //           english_name: "Iran",
+  //           iata: "IRN",
+  //           parto_iata: "IR",
+  //           description: null,
+  //           nationality: "IRN",
+  //           continental: "آسیا",
+  //         },
+  //       },
+  //       flight: true,
+  //       accommodation: true,
+  //       has_plan: true,
+  //       parto_id: 0,
+  //       color: "#006363",
+  //       value: 445,
+  //       label: "مشهد - MHD",
+  //     },
+  //     departureDate: "2024-12-29",
+  //     returnDate: null,
+  //     personCounter: {
+  //       adult: 1,
+  //       child: 0,
+  //       infant: 0,
+  //       totalPersons: 1,
+  //     },
+  //     secondTicket: false,
+  //   };
+
+  //   console.log(
+  //     "Sending transformed flight details to parent:",
+  //     transformedFlightInfo
+  //   ); // Debugging
+
+  //   // Send the transformed flight details, generalInformation, and ticketInformation to the parent React app using postMessage
   //   window.parent.postMessage(
   //     {
   //       type: "SELECTED_FLIGHT",
-  //       payload: flightInfo,
+  //       payload: {
+  //         selectedDepartureFlight: transformedFlightInfo,
+  //         generalInformation,
+  //         ticketInformation,
+  //       },
   //     },
   //     "http://localhost:3000" // Target origin (React app's origin)
   //   );
@@ -104,44 +278,63 @@ const FlightCard = ({
       arrivalTime: jalaliArrivalTime,
       price,
       airlineLogo,
+      type,
+      capacity,
+      sellingType,
+      id,
+      aircraft,
+      baggage,
+      flightClass,
+      cobin,
+      persian_type,
+      refundable,
+      child_price,
+      infant_price,
+      departure_terminal,
+      refund_rules,
+      destination_terminal,
+      flight_duration,
+      cobin_persian,
+      with_tour,
+      tag,
     };
 
     // Transform the flightInfo object to match the required structure
     const transformedFlightInfo = {
-      type: "charter", // Default value
-      capacity: 5, // Default value
-      airline: flightInfo.airline.toLowerCase(), // Convert to lowercase
-      sellingType: "All", // Default value
-      id: 699, // Default value
-      aircraft: "Boeing MD", // Default value
-      class: "", // Default value
-      cobin: "Economy", // Default value
-      persian_type: "چارتر", // Default value
-      refundable: null, // Default value
-      adult_price: flightInfo.price, // Use the price from chatbot
-      child_price: flightInfo.price, // Use the price from chatbot
-      infant_price: flightInfo.price, // Use the price from chatbot
-      airline_persian: flightInfo.airline, // Use the airline from chatbot
-      airline_logo: flightInfo.airlineLogo, // Use the airline logo from chatbot
-      flight_number: flightInfo.flightNumber.toUpperCase(), // Convert to uppercase
-      departure: "THR", // Default value
-      departure_name: flightInfo.departure, // Use the departure from chatbot
+      type: flightInfo.type,
+      capacity: flightInfo.capacity,
+      airline: flightInfo.airline.toLowerCase(),
+      sellingType: flightInfo.sellingType,
+      id: flightInfo.id,
+      aircraft: flightInfo.aircraft,
+      calss: flightInfo.flightClass,
+      cobin: flightInfo.cobin,
+      persian_type: flightInfo.persian_type,
+      refundable: flightInfo.refundable,
+      adult_price: flightInfo.price,
+      child_price: flightInfo.child_price,
+      infant_price: flightInfo.infant_price,
+      airline_persian: flightInfo.airline,
+      airline_logo: flightInfo.airlineLogo,
+      flight_number: flightInfo.flightNumber.toUpperCase(),
+      departure: flightInfo.departure,
+      departure_name: flightInfo.departure,
       english_departure_name: "Tehran", // Default value
-      departure_date: "2024-12-29", // Default value
-      departure_time: flightInfo.departureTime.split(" - ")[1], // Extract time
-      baggage: "0", // Default value
-      departure_terminal: "", // Default value
-      refund_rules: [], // Default value
-      destination: "MHD", // Default value
-      destination_name: flightInfo.destination, // Use the destination from chatbot
+      departure_date: flightInfo.departureTime.split(" - ")[0],
+      departure_time: flightInfo.departureTime.split(" - ")[1],
+      baggage: flightInfo.baggage,
+      departure_terminal: flightInfo.departure_terminal,
+      refund_rules: flightInfo.refund_rules,
+      destination: flightInfo.destination,
+      destination_name: flightInfo.destination,
       english_destination_name: "Mashhad", // Default value
-      destination_time: "", // Default value
-      destination_terminal: "", // Default value
-      flight_duration: "", // Default value
-      arrival_date: "2024-12-29", // Default value
-      cobin_persian: "اکونومی", // Default value
-      with_tour: null, // Default value
-      tag: "zm", // Default value
+      destination_time: flightInfo.arrivalTime.split(" - ")[1],
+      destination_terminal: flightInfo.destination_terminal,
+      flight_duration: flightInfo.flight_duration,
+      arrival_date: flightInfo.arrivalTime.split(" - ")[0],
+      cobin_persian: flightInfo.cobin_persian,
+      with_tour: flightInfo.with_tour,
+      tag: flightInfo.tag,
     };
 
     // Static data for generalInformation
@@ -275,7 +468,6 @@ const FlightCard = ({
       "http://localhost:3000" // Target origin (React app's origin)
     );
   };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
