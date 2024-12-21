@@ -49,6 +49,28 @@ const FlightCard = ({
   const router = useRouter();
 
   // Function to handle card click
+  // const handleFlightCardClick = () => {
+  //   const flightInfo = {
+  //     airline,
+  //     flightNumber,
+  //     departure,
+  //     destination,
+  //     departureTime: jalaliDepartureTime,
+  //     arrivalTime: jalaliArrivalTime,
+  //     price,
+  //     airlineLogo,
+  //   };
+  //   // Navigate User to a route in react app (src/page/flight-details) and send the flight details and save the flight details in the session storage
+  //   // // Call the callback function to pass flight details to the parent
+  //   // onFlightCardClick(flightInfo);
+  //   // Convert the flight details to a JSON string and encode it
+  //   const flightInfoString = encodeURIComponent(JSON.stringify(flightInfo));
+
+  //   // Navigate to the desired route with the encoded JSON string as a query parameter
+  //   router.push(
+  //     `https://atripa.ir/fa/flight-passengers?flightInfo=${flightInfoString}`
+  //   );
+  // };
   const handleFlightCardClick = () => {
     const flightInfo = {
       airline,
@@ -60,15 +82,14 @@ const FlightCard = ({
       price,
       airlineLogo,
     };
-    // Navigate User to a route in react app (src/page/flight-details) and send the flight details and save the flight details in the session storage
-    // // Call the callback function to pass flight details to the parent
-    // onFlightCardClick(flightInfo);
-    // Convert the flight details to a JSON string and encode it
-    const flightInfoString = encodeURIComponent(JSON.stringify(flightInfo));
 
-    // Navigate to the desired route with the encoded JSON string as a query parameter
-    router.push(
-      `https://atripa.ir/fa/flight-passengers?flightInfo=${flightInfoString}`
+    // Send the flight details to the parent React app using postMessage
+    window.parent.postMessage(
+      {
+        type: "SELECTED_FLIGHT",
+        payload: flightInfo,
+      },
+      "http://localhost:3000" // Target origin (React app's origin)
     );
   };
 
