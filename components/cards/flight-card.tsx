@@ -31,7 +31,7 @@ type FlightProps = {
   child_price: number;
   infant_price: number;
   departure_terminal: string;
-  refund_rules: [];
+  refund_rules: string[];
   destination_terminal: string;
   flight_duration: string;
   cobin_persian: string;
