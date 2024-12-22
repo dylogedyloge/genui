@@ -1,7 +1,5 @@
 import ReactMarkdown from "react-markdown";
-import { User } from "lucide-react";
-import { GiHolosphere } from "react-icons/gi";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 
 import FlightCard from "@/components/cards/flight-card";
 import HotelCard from "@/components/cards/hotel-card";
@@ -25,6 +23,7 @@ import {
   ToolInvocation,
   Message,
   VisibilityControl,
+  CityData,
 } from "@/types/chat";
 import Image from "next/image";
 import SelectedFlightAndHotelDetails from "../selected-card-details/selected-flight-and-hotel-details";
@@ -32,16 +31,27 @@ import SelectedFlightAndHotelDetails from "../selected-card-details/selected-fli
 /**
  * Type Guards to check the type of `result` based on the toolName
  */
-const isFlightArray = (
-  result: any | undefined
-): result is { flights: Flight[] } => {
-  console.log("Type Guard Check:", {
-    result,
-    isDefined: !!result,
-    hasFlights: result && Array.isArray(result.flights),
-  });
-  return !!result && Array.isArray(result.flights);
-};
+// 1. Update type guard interface
+interface FlightResult {
+  flights: Flight[];
+  departureCityData: CityData;
+  destinationCityData: CityData;
+}
+
+// 2. Update type guard function
+function isFlightArray(result: any): result is FlightResult {
+  return (
+    result &&
+    Array.isArray(result.flights) &&
+    result.departureCityData &&
+    result.destinationCityData
+  );
+}
+// const isFlightArray = (
+//   result: any | undefined
+// ): result is { flights: Flight[] } => {
+//   return !!result && Array.isArray(result.flights);
+// };
 
 const isHotelArray = (
   result: Flight[] | Hotel[] | Restaurant[] | Tour[] | undefined
@@ -147,7 +157,7 @@ const MessageList: React.FC<MessageListProps> = ({
                         case "displayFlightCard":
                           if (isFlightArray(result)) {
                             return renderFlightCards(
-                              result.flights,
+                              result,
                               messageIndex,
                               invocationIndex,
                               visibilityControls.flights,
@@ -239,7 +249,12 @@ const MessageList: React.FC<MessageListProps> = ({
  * Helper functions for rendering tool responses
  */
 const renderFlightCards = (
-  flights: Flight[],
+  // flights: Flight[],
+  flights: {
+    flights: Flight[];
+    departureCityData: CityData;
+    destinationCityData: CityData;
+  },
   messageIndex: number,
   invocationIndex: number,
   visibilityControl: VisibilityControl,
@@ -247,17 +262,19 @@ const renderFlightCards = (
 ) => {
   return (
     <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
-      {flights
+      {flights.flights
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((flight: Flight) => (
           <FlightCard
-            onFlightCardClick={onFlightCardClick}
             key={flight.id}
             {...flight}
+            onFlightCardClick={onFlightCardClick}
+            departureCityData={flights.departureCityData}
+            destinationCityData={flights.destinationCityData}
           />
         ))}
       {renderVisibilityButtons(
-        flights.length,
+        flights.flights.length,
         messageIndex,
         invocationIndex,
         visibilityControl

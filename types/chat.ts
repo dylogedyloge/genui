@@ -1,5 +1,3 @@
-import { ReactNode } from "react";
-
 export interface ChatInterfaceProps {}
 
 // Define the structure of the Flight, Hotel, Restaurant, and Tour
