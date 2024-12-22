@@ -468,7 +468,7 @@ const FlightCard = ({
         payload: {
           selectedDepartureFlight: transformedFlightInfo,
           generalInformation,
-          // ticketInformation,
+          ticketInformation,
         },
       },
       "http://localhost:3000" // Target origin (React app's origin)
