@@ -170,6 +170,12 @@ const FlightCard = ({
       itinerary: false,
       isInternational: false,
     };
+    const personCounter = {
+      adult: 1,
+      child: 0,
+      infant: 0,
+      totalPersons: 1,
+    };
 
     // Dynamic data for ticketInformation
     // const ticketInformation = {
@@ -324,6 +330,7 @@ const FlightCard = ({
           selectedDepartureFlight: transformedFlightInfo,
           generalInformation,
           ticketInformation,
+          personCounter,
         },
       },
       "http://localhost:3000" // Target origin (React app's origin)
