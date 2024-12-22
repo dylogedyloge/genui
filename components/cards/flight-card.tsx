@@ -170,12 +170,6 @@ const FlightCard = ({
       itinerary: false,
       isInternational: false,
     };
-    const personCounter = {
-      adult: 1,
-      child: 0,
-      infant: 0,
-      totalPersons: 1,
-    };
 
     // Dynamic data for ticketInformation
     // const ticketInformation = {
@@ -320,6 +314,12 @@ const FlightCard = ({
         has_plan: destinationCityData.has_plan,
         parto_id: destinationCityData.parto_id,
       },
+      personCounter: {
+        adult: 1,
+        child: 0,
+        infant: 0,
+        totalPersons: 1,
+      },
     };
 
     // Send the transformed flight details, generalInformation, and ticketInformation to the parent React app using postMessage
@@ -330,7 +330,6 @@ const FlightCard = ({
           selectedDepartureFlight: transformedFlightInfo,
           generalInformation,
           ticketInformation,
-          personCounter,
         },
       },
       "http://localhost:3000" // Target origin (React app's origin)
