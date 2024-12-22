@@ -33,9 +33,14 @@ import SelectedFlightAndHotelDetails from "../selected-card-details/selected-fli
  * Type Guards to check the type of `result` based on the toolName
  */
 const isFlightArray = (
-  result: Flight[] | Hotel[] | Restaurant[] | Tour[] | undefined
-): result is Flight[] => {
-  return !!result && (result as Flight[])[0]?.departure !== undefined;
+  result: any | undefined
+): result is { flights: Flight[] } => {
+  console.log("Type Guard Check:", {
+    result,
+    isDefined: !!result,
+    hasFlights: result && Array.isArray(result.flights),
+  });
+  return !!result && Array.isArray(result.flights);
 };
 
 const isHotelArray = (
@@ -142,7 +147,7 @@ const MessageList: React.FC<MessageListProps> = ({
                         case "displayFlightCard":
                           if (isFlightArray(result)) {
                             return renderFlightCards(
-                              result,
+                              result.flights,
                               messageIndex,
                               invocationIndex,
                               visibilityControls.flights,
@@ -246,9 +251,9 @@ const renderFlightCards = (
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((flight: Flight) => (
           <FlightCard
-            onFlightCardClick={onFlightCardClick}
             key={flight.id}
             {...flight}
+            onFlightCardClick={() => onFlightCardClick(flight)}
           />
         ))}
       {renderVisibilityButtons(

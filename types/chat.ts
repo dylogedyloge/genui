@@ -4,17 +4,58 @@ export interface ChatInterfaceProps {}
 
 // Define the structure of the Flight, Hotel, Restaurant, and Tour
 export interface Flight {
-  destination: string; // Change from ReactNode to string
-  id: string; // Unique identifier for the flight
-  departure: string; // Departure city or airport name
-  arrival: string; // Arrival city or airport name
-  airline: string; // Airline name
-  flightNumber: string; // Flight number
-  departureTime: string; // Time of departure
-  arrivalTime: string; // Time of arrival
-  status: "On Time" | "Delayed" | "Cancelled"; // Status of the flight
-  price: number; // Price in local currency (e.g., Toman)
-  airlineLogo: string;
+  id: number; // Unique identifier
+  airline: string; // Airline name (e.g. "هواپیمایی ماهان")
+  flightNumber: string; // Flight number (e.g. "W5-1080")
+  departure: string; // Departure city name
+  destination: string; // Destination city name
+  departureTime: string; // Departure date and time
+  arrivalTime: string; // Arrival date and time
+  price: number; // Price in Rials
+  airlineLogo: string; // URL to airline logo image
+
+  // Additional properties found in codebase
+  type: string; // Flight type (e.g. "charter")
+  capacity: number; // Available seats
+  sellingType: string; // Selling type (e.g. "All")
+  aircraft: string; // Aircraft type
+  baggage: string; // Baggage allowance
+  flightClass: string; // Flight class
+  cobin: string; // Cabin class (e.g. "Economy")
+  persian_type: string; // Persian flight type
+  refundable: boolean | null; // Whether flight is refundable
+  child_price: number; // Child ticket price
+  infant_price: number; // Infant ticket price
+  departure_terminal: string; // Departure terminal
+  refund_rules: []; // Refund policy rules
+  destination_terminal: string; // Arrival terminal
+  flight_duration: string; // Duration of flight
+  cobin_persian: string; // Persian cabin class
+  with_tour: boolean | null; // Whether flight includes tour
+  tag: string; // Additional tag info
+  status?: "On Time" | "Delayed" | "Cancelled"; // Flight status
+  departureCityData: any;
+  destinationCityData: any;
+}
+
+export interface CityData {
+  id: number;
+  name: string;
+  english_name: string;
+  iata: string;
+  latitude: string;
+  longitude: string;
+  description: string | null;
+  is_province_capital: boolean;
+  is_country_capital: boolean;
+  usage_flight: number;
+  usage_accommodation: number;
+  country: any; // Add specific type if available
+  province: any; // Add specific type if available
+  flight: any; // Add specific type if available
+  accommodation: any; // Add specific type if available
+  has_plan: boolean;
+  parto_id: string;
 }
 
 export interface Hotel {

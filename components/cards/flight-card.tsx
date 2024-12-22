@@ -8,6 +8,7 @@ import { Avatar } from "../shadcn/avatar";
 import Image from "next/image";
 import moment from "moment-jalaali";
 import { useRouter } from "next/navigation";
+import { CityData } from "@/types/chat";
 
 type FlightProps = {
   departure: string;
@@ -38,6 +39,8 @@ type FlightProps = {
   with_tour: boolean | null;
   tag: string;
   onFlightCardClick: (flightInfo: any) => void;
+  departureCityData: CityData;
+  destinationCityData: CityData;
 };
 
 const FlightCard = ({
@@ -68,6 +71,8 @@ const FlightCard = ({
   cobin_persian,
   with_tour,
   tag,
+  departureCityData,
+  destinationCityData,
   onFlightCardClick,
 }: FlightProps) => {
   // Convert Gregorian dates to Jalali dates
@@ -298,6 +303,7 @@ const FlightCard = ({
       with_tour,
       tag,
     };
+    console.log(flightInfo);
 
     // Transform the flightInfo object to match the required structure
     const transformedFlightInfo = {
@@ -348,44 +354,98 @@ const FlightCard = ({
     // Dynamic data for ticketInformation
     const ticketInformation = {
       departure: {
-        id: departureCityData.id,
-        name: departureCityData.name,
-        english_name: departureCityData.english_name,
-        iata: departureCityData.iata,
-        latitude: departureCityData.latitude,
-        longitude: departureCityData.longitude,
-        description: departureCityData.description,
-        is_province_capital: departureCityData.is_province_capital,
-        is_country_capital: departureCityData.is_country_capital,
-        usage_flight: departureCityData.usage_flight,
-        usage_accommodation: departureCityData.usage_accommodation,
-        country: departureCityData.country,
-        province: departureCityData.province,
-        flight: departureCityData.flight,
-        accommodation: departureCityData.accommodation,
-        has_plan: departureCityData.has_plan,
-        parto_id: departureCityData.parto_id,
+        id: 303,
+        name: "تهران",
+        english_name: "Tehran",
+        iata: "THR",
+        latitude: "35.700618",
+        longitude: "51.401378",
+        description: null,
+        is_province_capital: true,
+        is_country_capital: true,
+        usage_flight: 86880,
+        usage_accommodation: 1503,
+        country: {
+          id: 1,
+          name: "ایران",
+          english_name: "Iran",
+          iata: "IRN",
+          parto_iata: "IR",
+          description: null,
+          nationality: "IRN",
+          continental: "آسیا",
+        },
+        province: {
+          id: 8,
+          name: "تهران",
+          english_name: "Tehran",
+          description: null,
+          country: {
+            id: 1,
+            name: "ایران",
+            english_name: "Iran",
+            iata: "IRN",
+            parto_iata: "IR",
+            description: null,
+            nationality: "IRN",
+            continental: "آسیا",
+          },
+        },
+        flight: true,
+        accommodation: true,
+        has_plan: false,
+        parto_id: 0,
+        color: "#1E1E1E",
+        value: 303,
+        label: "تهران - THR",
       },
       destination: {
-        id: destinationCityData.id,
-        name: destinationCityData.name,
-        english_name: destinationCityData.english_name,
-        iata: destinationCityData.iata,
-        latitude: destinationCityData.latitude,
-        longitude: destinationCityData.longitude,
-        description: destinationCityData.description,
-        is_province_capital: destinationCityData.is_province_capital,
-        is_country_capital: destinationCityData.is_country_capital,
-        usage_flight: destinationCityData.usage_flight,
-        usage_accommodation: destinationCityData.usage_accommodation,
-        country: destinationCityData.country,
-        province: destinationCityData.province,
-        flight: destinationCityData.flight,
-        accommodation: destinationCityData.accommodation,
-        has_plan: destinationCityData.has_plan,
-        parto_id: destinationCityData.parto_id,
+        id: 445,
+        name: "مشهد",
+        english_name: "Mashhad",
+        iata: "MHD",
+        latitude: "36.297498",
+        longitude: "59.605939",
+        description: null,
+        is_province_capital: true,
+        is_country_capital: false,
+        usage_flight: 112303,
+        usage_accommodation: 6624,
+        country: {
+          id: 1,
+          name: "ایران",
+          english_name: "Iran",
+          iata: "IRN",
+          parto_iata: "IR",
+          description: null,
+          nationality: "IRN",
+          continental: "آسیا",
+        },
+        province: {
+          id: 11,
+          name: "خراسان رضوی",
+          english_name: "Razavi Khorasan",
+          description: null,
+          country: {
+            id: 1,
+            name: "ایران",
+            english_name: "Iran",
+            iata: "IRN",
+            parto_iata: "IR",
+            description: null,
+            nationality: "IRN",
+            continental: "آسیا",
+          },
+        },
+        flight: true,
+        accommodation: true,
+        has_plan: true,
+        parto_id: 0,
+        color: "#006363",
+        value: 445,
+        label: "مشهد - MHD",
       },
-      departureDate: "2024-12-29", // Replace with actual departure date
+      departureDate: "2024-12-29",
       returnDate: null,
       personCounter: {
         adult: 1,
@@ -408,7 +468,7 @@ const FlightCard = ({
         payload: {
           selectedDepartureFlight: transformedFlightInfo,
           generalInformation,
-          ticketInformation,
+          // ticketInformation,
         },
       },
       "http://localhost:3000" // Target origin (React app's origin)
