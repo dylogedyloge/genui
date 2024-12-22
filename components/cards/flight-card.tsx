@@ -74,6 +74,8 @@ const FlightCard = ({
   departureCityData,
   destinationCityData,
   onFlightCardClick,
+  departureCityData,
+  destinationCityData,
 }: FlightProps) => {
   // Convert Gregorian dates to Jalali dates
   const convertToJalali = (dateTime: string) => {

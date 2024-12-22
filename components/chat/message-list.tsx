@@ -251,9 +251,9 @@ const renderFlightCards = (
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((flight: Flight) => (
           <FlightCard
+            onFlightCardClick={onFlightCardClick}
             key={flight.id}
             {...flight}
-            onFlightCardClick={() => onFlightCardClick(flight)}
           />
         ))}
       {renderVisibilityButtons(
