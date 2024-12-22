@@ -71,8 +71,6 @@ const FlightCard = ({
   cobin_persian,
   with_tour,
   tag,
-  departureCityData,
-  destinationCityData,
   onFlightCardClick,
   departureCityData,
   destinationCityData,
