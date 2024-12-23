@@ -227,7 +227,7 @@ const FlightCard = ({
           ticketInformation,
         },
       },
-      "http://localhost:3000" // Target origin (React app's origin)
+      "*" // Target origin (React app's origin)
     );
   };
 
