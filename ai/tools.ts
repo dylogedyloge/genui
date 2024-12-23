@@ -1,5 +1,6 @@
 import { tool as createTool } from "ai";
 import { z } from "zod";
+import { API_ENDPOINTS } from "../endpoints/endpoints";
 
 export const FlightTool = createTool({
   description: "Display a grid of flight cards",
@@ -20,95 +21,377 @@ export const FlightTool = createTool({
     try {
       // Helper function to fetch city data and determine if it's domestic or international
       const fetchCityData = async (cityName: string) => {
-        // Fetch city data from the API
-        const response = await fetch(
-          `https://api.atripa.ir/api/v2/basic/cities?search=${cityName}`
+        // First, try fetching the city as a domestic city
+        const domesticResponse = await fetch(
+          `${API_ENDPOINTS.DOMESTIC.CITIES}?search=${cityName}`
         );
-        if (!response.ok) {
-          throw new Error(`Failed to fetch city data for ${cityName}`);
+        if (domesticResponse.ok) {
+          const domesticData = await domesticResponse.json();
+          console.log("domesticData", domesticData);
+          if (domesticData.data.results.length > 0) {
+            // Check if the city is in Iran (domestic)
+            if (domesticData.data.results[0].country?.name === "ایران") {
+              console.log(
+                "country",
+                domesticData.data.results[0].country?.name
+              );
+              return {
+                isDomestic: true, // Mark as domestic
+              };
+            }
+          }
         }
-        const cityData = await response.json();
+        // If not found as a domestic city in Iran, try fetching as an international city
+        const internationalResponse = await fetch(
+          `${API_ENDPOINTS.INTERNATIONAL.CITIES}?search=${cityName}?foreign=true`
+        );
+        if (internationalResponse.ok) {
+          const internationalData = await internationalResponse.json();
+          if (internationalData.data.length > 0) {
+            return {
+              isDomestic: false,
+            };
+          }
+        }
 
-        // Return the first result (assuming the city is found)
-        return cityData.data.results[0];
+        // If city is not found in either API, throw an error
+        throw new Error(
+          `City "${cityName}" not found in domestic or international cities`
+        );
       };
+      // Fetch city data from the API
+      // const response = await fetch(
+      //   // `https://api.atripa.ir/api/v2/basic/cities?search=${cityName}`
+      //   `${API_ENDPOINTS.DOMESTIC.CITIES}?search=${cityName}`
+      // );
+      // if (!response.ok) {
+      //   throw new Error(`Failed to fetch city data for ${cityName}`);
+      // }
+      // const cityData = await response.json();
+
+      // Return the first result (assuming the city is found)
+      // return cityData.data.results[0];
+      // };
 
       // Fetch data for both departure and destination cities
       const [departureData, destinationData] = await Promise.all([
         fetchCityData(departureCity),
+        console.log("departureCity", departureCity),
         fetchCityData(destinationCity),
+        console.log("destinationCity", destinationCity),
       ]);
-      // Fetch flight data
-      const flightResponse = await fetch(
-        `https://api.atripa.ir/api/v2/reserve/flight/list/?departure=${departureData.id}&destination=${destinationData.id}&round_trip=false&date=${date}`
-      );
-      if (!flightResponse.ok) {
-        throw new Error("Failed to fetch flight data");
-      }
-      const flightData = await flightResponse.json();
+      console.log("departureData", departureData);
+      console.log("destinationData", destinationData);
 
-      // Normalize the flight data
-      const flights = flightData.data.list.map(
-        (flight: {
-          airline_persian: any;
-          flight_number: any;
-          departure_date: any;
-          departure_time: any;
-          arrival_date: any;
-          destination_time: any;
-          adult_price: any;
-          departure_name: any;
-          destination_name: any;
-          aircraft: any;
-          airline_logo: any;
-          type: any;
-          capacity: any;
-          sellingType: any;
-          id: any;
-          baggage: any;
-          flightClass: any;
-          cobin: any;
-          persian_type: any;
-          refundable: any;
-          child_price: any;
-          infant_price: any;
-          departure_terminal: any;
-          refund_rules: any;
-          destination_terminal: any;
-          flight_duration: any;
-          cobin_persian: any;
-          with_tour: any;
-          tag: any;
-        }) => ({
-          airline: flight.airline_persian,
-          flightNumber: flight.flight_number,
-          departureTime: `${flight.departure_date}- ${flight.departure_time}`,
-          arrivalTime: `${flight.arrival_date}- ${flight.destination_time}`,
-          price: flight.adult_price,
-          departure: flight.departure_name,
-          destination: flight.destination_name,
-          aircraft: flight.aircraft,
-          baggage: flight.baggage,
-          airlineLogo: flight.airline_logo,
-          type: flight.type,
-          capacity: flight.capacity,
-          sellingType: flight.sellingType,
-          id: flight.id,
-          flightClass: flight.flightClass,
-          cobin: flight.cobin,
-          persian_type: flight.persian_type,
-          refundable: flight.refundable,
-          child_price: flight.child_price,
-          infant_price: flight.infant_price,
-          departure_terminal: flight.departure_terminal,
-          refund_rules: flight.refund_rules,
-          destination_terminal: flight.destination_terminal,
-          flight_duration: flight.flight_duration,
-          cobin_persian: flight.cobin_persian,
-          with_tour: flight.with_tour,
-          tag: flight.tag,
-        })
-      );
+      //       // Fetch flight data
+      //       const flightResponse = await fetch(
+      //         // `https://api.atripa.ir/api/v2/reserve/flight/list/?departure=${departureData.id}&destination=${destinationData.id}&round_trip=false&date=${date}`
+      //         `${API_ENDPOINTS.DOMESTIC.FLIGHTS}/?departure=${departureData.id}&destination=${destinationData.id}&round_trip=false&date=${date}`
+      //       );
+      //       if (!flightResponse.ok) {
+      //         throw new Error("Failed to fetch flight data");
+      //       }
+      //       const flightData = await flightResponse.json();
+
+      //       // Normalize the flight data
+      //       const flights = flightData.data.list.map(
+      //         (flight: {
+      //           airline_persian: any;
+      //           flight_number: any;
+      //           departure_date: any;
+      //           departure_time: any;
+      //           arrival_date: any;
+      //           destination_time: any;
+      //           adult_price: any;
+      //           departure_name: any;
+      //           destination_name: any;
+      //           aircraft: any;
+      //           airline_logo: any;
+      //           type: any;
+      //           capacity: any;
+      //           sellingType: any;
+      //           id: any;
+      //           baggage: any;
+      //           flightClass: any;
+      //           cobin: any;
+      //           persian_type: any;
+      //           refundable: any;
+      //           child_price: any;
+      //           infant_price: any;
+      //           departure_terminal: any;
+      //           refund_rules: any;
+      //           destination_terminal: any;
+      //           flight_duration: any;
+      //           cobin_persian: any;
+      //           with_tour: any;
+      //           tag: any;
+      //         }) => ({
+      //           airline: flight.airline_persian,
+      //           flightNumber: flight.flight_number,
+      //           departureTime: `${flight.departure_date}- ${flight.departure_time}`,
+      //           arrivalTime: `${flight.arrival_date}- ${flight.destination_time}`,
+      //           price: flight.adult_price,
+      //           departure: flight.departure_name,
+      //           destination: flight.destination_name,
+      //           aircraft: flight.aircraft,
+      //           baggage: flight.baggage,
+      //           airlineLogo: flight.airline_logo,
+      //           type: flight.type,
+      //           capacity: flight.capacity,
+      //           sellingType: flight.sellingType,
+      //           id: flight.id,
+      //           flightClass: flight.flightClass,
+      //           cobin: flight.cobin,
+      //           persian_type: flight.persian_type,
+      //           refundable: flight.refundable,
+      //           child_price: flight.child_price,
+      //           infant_price: flight.infant_price,
+      //           departure_terminal: flight.departure_terminal,
+      //           refund_rules: flight.refund_rules,
+      //           destination_terminal: flight.destination_terminal,
+      //           flight_duration: flight.flight_duration,
+      //           cobin_persian: flight.cobin_persian,
+      //           with_tour: flight.with_tour,
+      //           tag: flight.tag,
+      //         })
+      //       );
+
+      //       // Return the flights along with the departure and destination city data
+      //       return {
+      //         flights,
+      //         departureCityData: departureData,
+      //         destinationCityData: destinationData,
+      //       };
+      //     } catch (error) {
+      //       console.error("Error fetching flight data:", error);
+      //       return {
+      //         message: `متاسفم، در حال حاضر نمی‌توانیم اطلاعات پرواز را به شما بدهیم. لطفاً بعداً دوباره امتحان کنید.`,
+      //         flights: [],
+      //       };
+      //     }
+      //   },
+      // });
+      // Determine if both cities are domestic
+      const bothAreDomestic =
+        departureData.isDomestic && destinationData.isDomestic;
+
+      // Fetch IDs for departure and destination cities based on domestic or international status
+      let departureId, destinationId;
+      if (bothAreDomestic) {
+        // Fetch IDs from the domestic cities API
+        const [departureResponse, destinationResponse] = await Promise.all([
+          fetch(
+            `${API_ENDPOINTS.DOMESTIC.CITIES}?search=${departureCity}`
+            // `https://api.atripa.ir/api/v2/basic/cities?search=${departureCity}`
+          ),
+          fetch(
+            `${API_ENDPOINTS.DOMESTIC.CITIES}?search=${destinationCity}`
+            // `https://api.atripa.ir/api/v2/basic/cities?search=${destinationCity}`
+          ),
+        ]);
+
+        if (!departureResponse.ok || !destinationResponse.ok) {
+          throw new Error("Failed to fetch city IDs from the domestic API");
+        }
+
+        const departureData = await departureResponse.json();
+        const destinationData = await destinationResponse.json();
+
+        departureId = departureData.data.results[0].id;
+        destinationId = destinationData.data.results[0].id;
+        console.log("departureId bothAreDomestic", departureId);
+        console.log("destinationId  bothAreDomestic", destinationId);
+      } else {
+        // Fetch IDs from the international cities API
+        const [departureResponse, destinationResponse] = await Promise.all([
+          fetch(
+            `${API_ENDPOINTS.INTERNATIONAL.CITIES}?search=${departureCity}`
+            // `https://api.atripa.ir/api/v2/basic/intl/cities?search=${departureCity}`
+          ),
+          fetch(
+            `${API_ENDPOINTS.INTERNATIONAL.CITIES}?search=${destinationCity}`
+
+            // `https://api.atripa.ir/api/v2/basic/intl/cities?search=${destinationCity}`
+          ),
+        ]);
+
+        if (!departureResponse.ok || !destinationResponse.ok) {
+          throw new Error(
+            "Failed to fetch city IDs from the international API"
+          );
+        }
+
+        const departureData = await departureResponse.json();
+        const destinationData = await destinationResponse.json();
+
+        departureId = departureData.data[0].id;
+        destinationId = destinationData.data[0].id;
+        console.log("departureId bothAreNotDomestic", departureId);
+        console.log("destinationId  bothAreNotDomestic", destinationId);
+      }
+
+      // Determine which API to call based on the cities' domestic status
+      const isDomesticFlight = bothAreDomestic;
+
+      // Construct the API URL based on the flight type
+      let apiUrl;
+      if (isDomesticFlight) {
+        // apiUrl = `https://api.atripa.ir/api/v2/reserve/flight/list/?departure=${departureId}&destination=${destinationId}&round_trip=false&date=${date}`;
+        apiUrl = `${API_ENDPOINTS.DOMESTIC.FLIGHTS}?departure=${departureId}&destination=${destinationId}&round_trip=false&date=${date}`;
+      } else {
+        // For international flights, construct the URL with query parameters
+        // apiUrl = `https://api.atripa.ir/api/v2/reserve/foreign/flight/list/?departure=${departureId}&destination=${destinationId}&adult=1&child=0&infant=0&round_trip=false&date=${date}`;
+        apiUrl = `${API_ENDPOINTS.INTERNATIONAL.FLIGHTS}?departure=${departureId}&destination=${destinationId}&round_trip=false&date=${date}`;
+      }
+
+      // Fetch flight data using the appropriate API
+      let flightResponse;
+      if (isDomesticFlight) {
+        // Use GET for domestic flights
+        flightResponse = await fetch(apiUrl);
+        console.log("isDomesticFlight", isDomesticFlight);
+        console.log("flightResponse", flightResponse);
+        console.log("apiURL", apiUrl);
+      } else {
+        // Use POST for international flights, but send parameters as query parameters
+        flightResponse = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log("isNotDomesticFlight", isDomesticFlight);
+        console.log("flightResponse", flightResponse);
+        console.log("apiURL", apiUrl);
+      }
+
+      // Check if the API call was successful
+      if (!flightResponse.ok) {
+        throw new Error(
+          `Failed to fetch flight data: ${flightResponse.statusText}`
+        );
+      }
+
+      const flightData = await flightResponse.json();
+      console.log("flightData", flightData);
+      // Normalize the flight data for both domestic and international flights
+      let flights = [];
+      if (isDomesticFlight) {
+        // flights = flightData.data.list.map(
+        //   (flight: {
+        //     airline_persian: any;
+        //     flight_number: any;
+        //     departure_date: any;
+        //     departure_time: any;
+        //     arrival_date: any;
+        //     destination_time: any;
+        //     adult_price: any;
+        //     departure_name: any;
+        //     destination_name: any;
+        //     aircraft: any;
+        //     baggage: any;
+        //     airline_logo: any;
+        //   }) => ({
+        //     airline: flight.airline_persian,
+        //     flightNumber: flight.flight_number,
+        //     departureTime: `${flight.departure_date}- ${flight.departure_time}`,
+        //     arrivalTime: `${flight.arrival_date}- ${flight.destination_time}`,
+        //     price: flight.adult_price,
+        //     departure: flight.departure_name,
+        //     destination: flight.destination_name,
+        //     aircraft: flight.aircraft,
+        //     baggage: flight.baggage,
+        //     airlineLogo: flight.airline_logo,
+        //   })
+        // );
+        //       // Normalize the flight data
+        flights = flightData.data.list.map(
+          (flight: {
+            airline_persian: any;
+            flight_number: any;
+            departure_date: any;
+            departure_time: any;
+            arrival_date: any;
+            destination_time: any;
+            adult_price: any;
+            departure_name: any;
+            destination_name: any;
+            aircraft: any;
+            airline_logo: any;
+            type: any;
+            capacity: any;
+            sellingType: any;
+            id: any;
+            baggage: any;
+            flightClass: any;
+            cobin: any;
+            persian_type: any;
+            refundable: any;
+            child_price: any;
+            infant_price: any;
+            departure_terminal: any;
+            refund_rules: any;
+            destination_terminal: any;
+            flight_duration: any;
+            cobin_persian: any;
+            with_tour: any;
+            tag: any;
+          }) => ({
+            airline: flight.airline_persian,
+            flightNumber: flight.flight_number,
+            departureTime: `${flight.departure_date}- ${flight.departure_time}`,
+            arrivalTime: `${flight.arrival_date}- ${flight.destination_time}`,
+            price: flight.adult_price,
+            departure: flight.departure_name,
+            destination: flight.destination_name,
+            aircraft: flight.aircraft,
+            baggage: flight.baggage,
+            airlineLogo: flight.airline_logo,
+            type: flight.type,
+            capacity: flight.capacity,
+            sellingType: flight.sellingType,
+            id: flight.id,
+            flightClass: flight.flightClass,
+            cobin: flight.cobin,
+            persian_type: flight.persian_type,
+            refundable: flight.refundable,
+            child_price: flight.child_price,
+            infant_price: flight.infant_price,
+            departure_terminal: flight.departure_terminal,
+            refund_rules: flight.refund_rules,
+            destination_terminal: flight.destination_terminal,
+            flight_duration: flight.flight_duration,
+            cobin_persian: flight.cobin_persian,
+            with_tour: flight.with_tour,
+            tag: flight.tag,
+          })
+        );
+        console.log("flights domestic", flights);
+      } else {
+        flights = flightData.data.results.list.map(
+          (flight: {
+            segments: string | any[];
+            fares: { adult: { total_price: any } };
+          }) => {
+            const firstSegment = flight.segments[0]; // First segment (departure details)
+            const lastSegment = flight.segments[flight.segments.length - 1]; // Last segment (arrival details)
+            const normalizedFlight = {
+              airline: firstSegment.airline.persian, // Airline name in Persian
+              flightNumber: firstSegment.flight_number, // Flight number
+              departureTime: `${firstSegment.departure_date}- ${firstSegment.departure_time}`, // Departure time
+              arrivalTime: `${lastSegment.arrival_date}- ${lastSegment.destination_time}`, // Arrival time
+              price: flight.fares.adult.total_price, // Price for adults
+              departure: firstSegment.departure.city.persian, // Departure city in Persian
+              destination: lastSegment.destination.city.persian, // Destination city in Persian
+              baggage: firstSegment.baggage, // Baggage allowance
+              airlineLogo: firstSegment.airline.image, // Airline logo
+            };
+
+            return normalizedFlight;
+          }
+        );
+        console.log("flights international", flights);
+      }
 
       // Return the flights along with the departure and destination city data
       return {
@@ -157,7 +440,8 @@ export const HotelTool = createTool({
       const fetchCityData = async (cityName: string) => {
         // First, try fetching the city as a foreign city (foreign=true)
         const foreignResponse = await fetch(
-          `https://api.atripa.ir/api/v2/basic/cities?search=${cityName}&foreign=true&accommodation=true`
+          // `https://api.atripa.ir/api/v2/basic/cities?search=${cityName}&foreign=true&accommodation=true`
+          `${API_ENDPOINTS.INTERNATIONAL.CITIES}?search=${cityName}&foreign=true&accommodation=true`
         );
 
         if (foreignResponse.ok) {
@@ -173,7 +457,8 @@ export const HotelTool = createTool({
 
         // If not found as a foreign city, try fetching as a domestic city (foreign=false)
         const domesticResponse = await fetch(
-          `https://api.atripa.ir/api/v2/basic/cities?search=${cityName}&foreign=false&accommodation=true`
+          // `https://api.atripa.ir/api/v2/basic/cities?search=${cityName}&foreign=false&accommodation=true`
+          `${API_ENDPOINTS.DOMESTIC.CITIES}?search=${cityName}&foreign=false&accommodation=true`
         );
 
         if (domesticResponse.ok) {
@@ -198,14 +483,20 @@ export const HotelTool = createTool({
       let apiUrl;
       if (cityData.isDomestic) {
         // Domestic hotel API
-        apiUrl = `https://api.atripa.ir/reserve/accommodation/list/?city=${cityData.cityId}&check_in=${checkIn}&check_out=${checkOut}&adults_count=${adultsCount}`;
+        apiUrl = `${API_ENDPOINTS.DOMESTIC.HOTELS}/?city=${cityData.cityId}&check_in=${checkIn}&check_out=${checkOut}&adults_count=${adultsCount}`;
+        // apiUrl = `https://api.atripa.ir/reserve/accommodation/list/?city=${cityData.cityId}&check_in=${checkIn}&check_out=${checkOut}&adults_count=${adultsCount}`;
       } else {
         // International hotel API
-        apiUrl = `https://api.atripa.ir/api/v2/reserve/foreign/accommodation/list/?city=${
+        apiUrl = `${API_ENDPOINTS.INTERNATIONAL.HOTELS}/?city=${
           cityData.cityId
         }&check_in=${checkIn}&check_out=${checkOut}&adult_count=${adultsCount}&child_count=${childCount}&child_ages=${childAges.join(
           ","
         )}&nationality=IR`;
+        // apiUrl = `https://api.atripa.ir/api/v2/reserve/foreign/accommodation/list/?city=${
+        //   cityData.cityId
+        // }&check_in=${checkIn}&check_out=${checkOut}&adult_count=${adultsCount}&child_count=${childCount}&child_ages=${childAges.join(
+        //   ","
+        // )}&nationality=IR`;
       }
 
       // Fetch hotel data using the appropriate API
