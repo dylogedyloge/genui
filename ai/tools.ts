@@ -21,7 +21,7 @@ export const FlightTool = createTool({
     try {
       // Helper function to fetch city data and determine if it's domestic or international
       const fetchCityData = async (cityName: string) => {
-        // console.log(`Fetching data for city: ${cityName}`);
+
 
         // Check if the city is a domestic city in Iran
         const domesticResponse = await fetch(
@@ -29,7 +29,7 @@ export const FlightTool = createTool({
         );
         if (domesticResponse.ok) {
           const domesticData = await domesticResponse.json();
-          // console.log(`Domestic data for ${cityName}:`, domesticData);
+         
           if (domesticData.data.results.length > 0 && domesticData.data.results[0].country?.name === "ایران") {
             return {
               isDomestic: true,
@@ -43,7 +43,6 @@ export const FlightTool = createTool({
         );
         if (internationalResponse.ok) {
           const internationalData = await internationalResponse.json();
-          // console.log(`International data for ${cityName}:`, internationalData);
           if (internationalData.data.results.length > 0) {
             return {
               isDomestic: false,
@@ -82,7 +81,6 @@ export const FlightTool = createTool({
         if (!departureResponse.ok || !destinationResponse.ok) {
           throw new Error("Failed to fetch city IDs from the domestic API");
         }
-        console.log("destinationResponse for istanbul", destinationResponse);
         const departureData = await departureResponse.json();
         const destinationData = await destinationResponse.json();
         departureId = departureData.data.results[0].id;
@@ -106,18 +104,12 @@ export const FlightTool = createTool({
 
         const departureData = await departureResponse.json();
         const destinationData = await destinationResponse.json();
-         
-        console.log("Departure Data Id:", departureData.data.results[0].id);
-        console.log("Destination Data Id:", destinationData.data.results[0].id);
         
         if (departureData.data.results.length === 0 || destinationData.data.results.length === 0) {
           throw new Error("City data not found in the API response");
         }
-
         departureId = departureData.data.results[0].id;
         destinationId = destinationData.data.results[0].id;
-        
-
       }
 
       // Determine which API to call based on the cities' domestic status

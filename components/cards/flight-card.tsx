@@ -124,7 +124,7 @@ const FlightCard = ({
       departureCityData,
       destinationCityData,
     };
-    onFlightCardClick(flightInfo);
+    // onFlightCardClick(flightInfo);
     // Transform the flightInfo object to match the required structure
     const transformedFlightInfo = {
       type: flightInfo.type,
