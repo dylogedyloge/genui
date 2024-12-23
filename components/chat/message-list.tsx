@@ -249,7 +249,6 @@ const MessageList: React.FC<MessageListProps> = ({
  * Helper functions for rendering tool responses
  */
 const renderFlightCards = (
-  // flights: Flight[],
   flights: {
     flights: Flight[];
     departureCityData: CityData;
@@ -271,6 +270,7 @@ const renderFlightCards = (
             onFlightCardClick={onFlightCardClick}
             departureCityData={flights.departureCityData}
             destinationCityData={flights.destinationCityData}
+            isDomestic={flights.departureCityData.isDomestic && flights.destinationCityData.isDomestic}
           />
         ))}
       {renderVisibilityButtons(

@@ -241,8 +241,10 @@ export const FlightTool = createTool({
       // Return the flights along with the departure and destination city data
       return {
         flights,
-        departureCityData: departureData,
-        destinationCityData: destinationData,
+        // departureCityData: departureData,
+        // destinationCityData: destinationData,
+        departureCityData: { ...departureData, isDomestic: bothAreDomestic },
+        destinationCityData: { ...destinationData, isDomestic: bothAreDomestic },
       };
     } catch (error) {
       console.error("Error fetching flight data:", error);

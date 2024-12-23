@@ -54,6 +54,7 @@ export interface CityData {
   accommodation: any; // Add specific type if available
   has_plan: boolean;
   parto_id: string;
+  isDomestic: boolean;
 }
 
 export interface Hotel {

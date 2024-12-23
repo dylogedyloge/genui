@@ -41,6 +41,7 @@ type FlightProps = {
   onFlightCardClick: (flightInfo: any) => void;
   departureCityData: CityData;
   destinationCityData: CityData;
+  isDomestic: boolean;
 };
 
 const FlightCard = ({
@@ -74,6 +75,7 @@ const FlightCard = ({
   onFlightCardClick,
   departureCityData,
   destinationCityData,
+  isDomestic,
 }: FlightProps) => {
   // Convert Gregorian dates to Jalali dates
   const convertToJalali = (dateTime: string) => {
@@ -92,7 +94,8 @@ const FlightCard = ({
   const router = useRouter();
 
   // Function to handle card click
-  const handleFlightCardClick = () => {
+  const  handleFlightCardClick = () => {
+
     const flightInfo = {
       airline,
       flightNumber,
@@ -124,111 +127,118 @@ const FlightCard = ({
       departureCityData,
       destinationCityData,
     };
-    // onFlightCardClick(flightInfo);
+    if (isDomestic) {
+      const transformedFlightInfo = {
+        type: flightInfo.type,
+        capacity: flightInfo.capacity,
+        airline: flightInfo.airline.toLowerCase(),
+        sellingType: flightInfo.sellingType,
+        id: flightInfo.id,
+        aircraft: flightInfo.aircraft,
+        class: flightInfo.flightClass,
+        cobin: flightInfo.cobin,
+        persian_type: flightInfo.persian_type,
+        refundable: flightInfo.refundable,
+        adult_price: flightInfo.price,
+        child_price: flightInfo.child_price,
+        infant_price: flightInfo.infant_price,
+        airline_persian: flightInfo.airline,
+        airline_logo: flightInfo.airlineLogo,
+        flight_number: flightInfo.flightNumber.toUpperCase(),
+        departure: flightInfo.departure,
+        departure_name: flightInfo.departure,
+        english_departure_name: "Tehran", // Default value
+        departure_date: flightInfo.departureTime.split(" - ")[0],
+        departure_time: flightInfo.departureTime.split(" - ")[1],
+        baggage: flightInfo.baggage,
+        departure_terminal: flightInfo.departure_terminal,
+        refund_rules: flightInfo.refund_rules,
+        destination: flightInfo.destination,
+        destination_name: flightInfo.destination,
+        english_destination_name: "Mashhad", // Default value
+        destination_time: flightInfo.arrivalTime.split(" - ")[1],
+        destination_terminal: flightInfo.destination_terminal,
+        flight_duration: flightInfo.flight_duration,
+        arrival_date: flightInfo.arrivalTime.split(" - ")[0],
+        cobin_persian: flightInfo.cobin_persian,
+        with_tour: flightInfo.with_tour,
+        tag: flightInfo.tag,
+      };
+  
+      const generalInformation = {
+        ticket: true,
+        accommodation: false,
+        itinerary: false,
+        isInternational: false,
+      };
+  
+      const ticketInformation = {
+        departure: {
+          id: departureCityData.id,
+          name: departureCityData.name,
+          english_name: departureCityData.english_name,
+          iata: departureCityData.iata,
+          latitude: departureCityData.latitude,
+          longitude: departureCityData.longitude,
+          description: departureCityData.description,
+          is_province_capital: departureCityData.is_province_capital,
+          is_country_capital: departureCityData.is_country_capital,
+          usage_flight: departureCityData.usage_flight,
+          usage_accommodation: departureCityData.usage_accommodation,
+          country: departureCityData.country,
+          province: departureCityData.province,
+          flight: departureCityData.flight,
+          accommodation: departureCityData.accommodation,
+          has_plan: departureCityData.has_plan,
+          parto_id: departureCityData.parto_id,
+        },
+        destination: {
+          id: destinationCityData.id,
+          name: destinationCityData.name,
+          english_name: destinationCityData.english_name,
+          iata: destinationCityData.iata,
+          latitude: destinationCityData.latitude,
+          longitude: destinationCityData.longitude,
+          description: destinationCityData.description,
+          is_province_capital: destinationCityData.is_province_capital,
+          is_country_capital: destinationCityData.is_country_capital,
+          usage_flight: destinationCityData.usage_flight,
+          usage_accommodation: destinationCityData.usage_accommodation,
+          country: destinationCityData.country,
+          province: destinationCityData.province,
+          flight: destinationCityData.flight,
+          accommodation: destinationCityData.accommodation,
+          has_plan: destinationCityData.has_plan,
+          parto_id: destinationCityData.parto_id,
+        },
+        personCounter: {
+          adult: 1,
+          child: 0,
+          infant: 0,
+          totalPersons: 1,
+        },
+      };
+      window.parent.postMessage(
+        {
+          type: "SELECTED_FLIGHT",
+          payload: {
+            selectedDepartureFlight: transformedFlightInfo,
+            generalInformation,
+            ticketInformation,
+          },
+        },
+        "*" // Target origin (React app's origin)
+      );
+
+    } else {
+
+      onFlightCardClick(flightInfo);
+    }
     // Transform the flightInfo object to match the required structure
-    const transformedFlightInfo = {
-      type: flightInfo.type,
-      capacity: flightInfo.capacity,
-      airline: flightInfo.airline.toLowerCase(),
-      sellingType: flightInfo.sellingType,
-      id: flightInfo.id,
-      aircraft: flightInfo.aircraft,
-      class: flightInfo.flightClass,
-      cobin: flightInfo.cobin,
-      persian_type: flightInfo.persian_type,
-      refundable: flightInfo.refundable,
-      adult_price: flightInfo.price,
-      child_price: flightInfo.child_price,
-      infant_price: flightInfo.infant_price,
-      airline_persian: flightInfo.airline,
-      airline_logo: flightInfo.airlineLogo,
-      flight_number: flightInfo.flightNumber.toUpperCase(),
-      departure: flightInfo.departure,
-      departure_name: flightInfo.departure,
-      english_departure_name: "Tehran", // Default value
-      departure_date: flightInfo.departureTime.split(" - ")[0],
-      departure_time: flightInfo.departureTime.split(" - ")[1],
-      baggage: flightInfo.baggage,
-      departure_terminal: flightInfo.departure_terminal,
-      refund_rules: flightInfo.refund_rules,
-      destination: flightInfo.destination,
-      destination_name: flightInfo.destination,
-      english_destination_name: "Mashhad", // Default value
-      destination_time: flightInfo.arrivalTime.split(" - ")[1],
-      destination_terminal: flightInfo.destination_terminal,
-      flight_duration: flightInfo.flight_duration,
-      arrival_date: flightInfo.arrivalTime.split(" - ")[0],
-      cobin_persian: flightInfo.cobin_persian,
-      with_tour: flightInfo.with_tour,
-      tag: flightInfo.tag,
-    };
 
-    const generalInformation = {
-      ticket: true,
-      accommodation: false,
-      itinerary: false,
-      isInternational: false,
-    };
-
-    const ticketInformation = {
-      departure: {
-        id: departureCityData.id,
-        name: departureCityData.name,
-        english_name: departureCityData.english_name,
-        iata: departureCityData.iata,
-        latitude: departureCityData.latitude,
-        longitude: departureCityData.longitude,
-        description: departureCityData.description,
-        is_province_capital: departureCityData.is_province_capital,
-        is_country_capital: departureCityData.is_country_capital,
-        usage_flight: departureCityData.usage_flight,
-        usage_accommodation: departureCityData.usage_accommodation,
-        country: departureCityData.country,
-        province: departureCityData.province,
-        flight: departureCityData.flight,
-        accommodation: departureCityData.accommodation,
-        has_plan: departureCityData.has_plan,
-        parto_id: departureCityData.parto_id,
-      },
-      destination: {
-        id: destinationCityData.id,
-        name: destinationCityData.name,
-        english_name: destinationCityData.english_name,
-        iata: destinationCityData.iata,
-        latitude: destinationCityData.latitude,
-        longitude: destinationCityData.longitude,
-        description: destinationCityData.description,
-        is_province_capital: destinationCityData.is_province_capital,
-        is_country_capital: destinationCityData.is_country_capital,
-        usage_flight: destinationCityData.usage_flight,
-        usage_accommodation: destinationCityData.usage_accommodation,
-        country: destinationCityData.country,
-        province: destinationCityData.province,
-        flight: destinationCityData.flight,
-        accommodation: destinationCityData.accommodation,
-        has_plan: destinationCityData.has_plan,
-        parto_id: destinationCityData.parto_id,
-      },
-      personCounter: {
-        adult: 1,
-        child: 0,
-        infant: 0,
-        totalPersons: 1,
-      },
-    };
 
     // Send the transformed flight details, generalInformation, and ticketInformation to the parent React app using postMessage
-    window.parent.postMessage(
-      {
-        type: "SELECTED_FLIGHT",
-        payload: {
-          selectedDepartureFlight: transformedFlightInfo,
-          generalInformation,
-          ticketInformation,
-        },
-      },
-      "*" // Target origin (React app's origin)
-    );
+    
   };
 
   return (
