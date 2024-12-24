@@ -351,32 +351,43 @@ export const FlightTool = createTool({
         flights: [],
       };
     }
-
+console.log("departureCity", departureCity);
+console.log("destinationCity", destinationCity);
+console.log("date", date);
     try {
       // Helper function to fetch city data from the domestic API
       const fetchDomesticCityData = async (cityName: string) => {
+        console.log(`Checking ${cityName} in domestic cities`);
         const response = await fetch(
           `${API_ENDPOINTS.DOMESTIC.CITIES}?search=${cityName}`
         );
+        console.log(`Response of Checking ${cityName} in domestic cities :`, response);
         if (response.ok) {
           const data = await response.json();
           if (data.data.results.length > 0) {
             return data.data.results[0];
           }
+          console.log(`data.data.results[0] for ${cityName} in domestic cities :`, data.data.results[0])
         }
-        return null;
+        return null; 
       };
 
       // Helper function to fetch city data from the international API
       const fetchInternationalCityData = async (cityName: string) => {
+        console.log(`Checking ${cityName} in international cities`);
+
         const response = await fetch(
           `${API_ENDPOINTS.INTERNATIONAL.CITIES}?search=${cityName}&foreign=true`
         );
+        console.log(`Response of Checking ${cityName} in international cities :`, response);
+
         if (response.ok) {
           const data = await response.json();
           if (data.data.results.length > 0) {
             return data.data.results[0];
           }
+          console.log(`data.data.results[0] for ${cityName} in internationl cities :`, data.data.results[0])
+
         }
         return null;
       };
@@ -387,7 +398,8 @@ export const FlightTool = createTool({
           fetchDomesticCityData(departureCity),
           fetchDomesticCityData(destinationCity),
         ]);
-
+console.log(`domesticDepartureData for ${departureCity} `, domesticDepartureData);
+console.log(`domesticDestinationData for ${destinationCity}`, domesticDestinationData);
       let isDomesticFlight = false;
       let departureId, destinationId;
 
@@ -396,6 +408,9 @@ export const FlightTool = createTool({
         isDomesticFlight = true;
         departureId = domesticDepartureData.id;
         destinationId = domesticDestinationData.id;
+        console.log("isDomesticFligh",isDomesticFlight)
+        console.log(`departureId for ${departureCity} `, departureId);
+        console.log(`destinationId for ${destinationCity}`, destinationId);
       } else {
         // One or both cities are international, fetch both from international API
         const [internationalDepartureData, internationalDestinationData] =
