@@ -343,80 +343,86 @@ export const FlightTool = createTool({
     destinationCity: z.string(), // Name of the destination city
     date: z.string(), // Date of departure
   }),
-
   execute: async function ({ departureCity, destinationCity, date }) {
     if (!date) {
       return {
-        message: `لطفاً تاریخ پرواز رو به من بگین.`,
+        message: "لطفاً تاریخ پرواز رو به من بگین.",
         flights: [],
       };
     }
-console.log("departureCity", departureCity);
-console.log("destinationCity", destinationCity);
-console.log("date", date);
+
     try {
-      // Helper function to fetch city data from the domestic API
-      const fetchDomesticCityData = async (cityName: string) => {
-        console.log(`Checking ${cityName} in domestic cities`);
-        const response = await fetch(
-          `${API_ENDPOINTS.DOMESTIC.CITIES}?search=${cityName}`
+      // Helper function to fetch city data from the API
+      // const fetchCityData = async (cityName: string, apiEndpoint: string) => {
+      //   const response = await fetch(`${apiEndpoint}?search=${cityName}`);
+      //   if (response.ok) {
+      //     const data = await response.json();
+      //     return data.data.results[0] || null;
+      //   }
+      //   return null;
+      // };
+      const fetchCityData = async (cityName: string, apiEndpoint: string) => {
+        console.log(`Checking ${cityName} in ${apiEndpoint} cities`);
+        const response = await fetch(`${apiEndpoint}?search=${cityName}`);
+        console.log(
+          `Response of Checking ${cityName} in ${apiEndpoint} cities :`,
+          response
         );
-        console.log(`Response of Checking ${cityName} in domestic cities :`, response);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.data.results.length > 0) {
-            return data.data.results[0];
-          }
-          console.log(`data.data.results[0] for ${cityName} in domestic cities :`, data.data.results[0])
-        }
-        return null; 
-      };
-
-      // Helper function to fetch city data from the international API
-      const fetchInternationalCityData = async (cityName: string) => {
-        console.log(`Checking ${cityName} in international cities`);
-
-        const response = await fetch(
-          `${API_ENDPOINTS.INTERNATIONAL.CITIES}?search=${cityName}&foreign=true`
-        );
-        console.log(`Response of Checking ${cityName} in international cities :`, response);
 
         if (response.ok) {
           const data = await response.json();
-          if (data.data.results.length > 0) {
+          if (
+            Array.isArray(data.data.results) &&
+            data.data.results.length > 0
+          ) {
             return data.data.results[0];
           }
-          console.log(`data.data.results[0] for ${cityName} in internationl cities :`, data.data.results[0])
-
+          console.log(
+            `No results found for ${cityName} in ${apiEndpoint} cities:`,
+            data.data.results
+          );
+        } else {
+          console.error(`Failed to fetch city data for ${cityName}`);
         }
         return null;
       };
 
-      // Fetch data for both departure and destination cities from the domestic API
-      const [domesticDepartureData, domesticDestinationData] =
-        await Promise.all([
-          fetchDomesticCityData(departureCity),
-          fetchDomesticCityData(destinationCity),
-        ]);
-console.log(`domesticDepartureData for ${departureCity} `, domesticDepartureData);
-console.log(`domesticDestinationData for ${destinationCity}`, domesticDestinationData);
       let isDomesticFlight = false;
       let departureId, destinationId;
 
-      if (domesticDepartureData && domesticDestinationData) {
+      // Check both cities in the domestic API
+      const [domesticDepartureData, domesticDestinationData] =
+        await Promise.all([
+          fetchCityData(departureCity, API_ENDPOINTS.DOMESTIC.CITIES),
+          fetchCityData(destinationCity, API_ENDPOINTS.DOMESTIC.CITIES),
+        ]);
+
+      const departureIsDomestic =
+        domesticDepartureData && domesticDepartureData.country.id === 1;
+      const destinationIsDomestic =
+        domesticDestinationData && domesticDestinationData.country.id === 1;
+
+      if (departureIsDomestic && destinationIsDomestic) {
         // Both cities are domestic
         isDomesticFlight = true;
         departureId = domesticDepartureData.id;
         destinationId = domesticDestinationData.id;
-        console.log("isDomesticFligh",isDomesticFlight)
-        console.log(`departureId for ${departureCity} `, departureId);
-        console.log(`destinationId for ${destinationCity}`, destinationId);
       } else {
-        // One or both cities are international, fetch both from international API
+        // At least one city is international, check the international API
         const [internationalDepartureData, internationalDestinationData] =
           await Promise.all([
-            fetchInternationalCityData(departureCity),
-            fetchInternationalCityData(destinationCity),
+            fetchCityData(
+              `${departureCity}`,
+              `${API_ENDPOINTS.INTERNATIONAL.CITIES}?foreign=true`
+            ),
+
+            // For flights: internationl cities : intl/cities , domestic cities : cities , flight=true
+            // For hotel: internationl cities : cities&foreign=true , domestic cities : cities , accomodation=true
+
+            fetchCityData(
+              `${destinationCity}`,
+              `${API_ENDPOINTS.INTERNATIONAL.CITIES}?foreign=true`
+            ),
           ]);
 
         if (!internationalDepartureData) {
@@ -424,7 +430,6 @@ console.log(`domesticDestinationData for ${destinationCity}`, domesticDestinatio
             `Departure city "${departureCity}" not found in international cities`
           );
         }
-
         if (!internationalDestinationData) {
           throw new Error(
             `Destination city "${destinationCity}" not found in international cities`
@@ -453,17 +458,10 @@ console.log(`domesticDestinationData for ${destinationCity}`, domesticDestinatio
       }
 
       // Fetch flight data using the appropriate API
-      let flightResponse;
-      if (isDomesticFlight) {
-        flightResponse = await fetch(apiUrl);
-      } else {
-        flightResponse = await fetch(apiUrl, {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-          },
-        });
-      }
+      const flightResponse = await fetch(apiUrl, {
+        method: isDomesticFlight ? "GET" : "POST",
+        headers: isDomesticFlight ? {} : { Accept: "application/json" },
+      });
 
       if (!flightResponse.ok) {
         throw new Error(
@@ -487,12 +485,12 @@ console.log(`domesticDestinationData for ${destinationCity}`, domesticDestinatio
             departure_name: any;
             destination_name: any;
             aircraft: any;
-            baggage: any;
             airline_logo: any;
             type: any;
             capacity: any;
             sellingType: any;
             id: any;
+            baggage: any;
             flightClass: any;
             cobin: any;
             persian_type: any;
@@ -561,18 +559,274 @@ console.log(`domesticDestinationData for ${destinationCity}`, domesticDestinatio
 
       return {
         flights,
-        departureCityData: { isDomestic: isDomesticFlight },
-        destinationCityData: { isDomestic: isDomesticFlight },
+        departureCityData: { isDomestic: departureIsDomestic },
+        destinationCityData: { isDomestic: destinationIsDomestic },
       };
     } catch (error) {
       console.error("Error fetching flight data:", error);
       return {
-        message: `متاسفم، در حال حاضر نمی‌توانیم اطلاعات پرواز را به شما بدهیم. لطفاً بعداً دوباره امتحان کنید.`,
+        message:
+          "متاسفم، در حال حاضر نمی‌توانیم اطلاعات پرواز را به شما بدهیم. لطفاً بعداً دوباره امتحان کنید.",
         flights: [],
       };
     }
   },
 });
+
+// export const FlightTool = createTool({
+//   description: "Display a grid of flight cards",
+//   parameters: z.object({
+//     departureCity: z.string(), // Name of the departure city
+//     destinationCity: z.string(), // Name of the destination city
+//     date: z.string(), // Date of departure
+//   }),
+
+//   execute: async function ({ departureCity, destinationCity, date }) {
+//     if (!date) {
+//       return {
+//         message: `لطفاً تاریخ پرواز رو به من بگین.`,
+//         flights: [],
+//       };
+//     }
+//     console.log("departureCity", departureCity);
+//     console.log("destinationCity", destinationCity);
+//     console.log("date", date);
+//     try {
+//       // Helper function to fetch city data from the domestic API
+//       const fetchDomesticCityData = async (cityName: string) => {
+//         console.log(`Checking ${cityName} in domestic cities`);
+//         const response = await fetch(
+//           `${API_ENDPOINTS.DOMESTIC.CITIES}?search=${cityName}`
+//         );
+//         console.log(
+//           `Response of Checking ${cityName} in domestic cities :`,
+//           response
+//         );
+//         if (response.ok) {
+//           const data = await response.json();
+//           if (data.data.results.length > 0) {
+//             return data.data.results[0];
+//           }
+//           console.log(
+//             `data.data.results[0] for ${cityName} in domestic cities :`,
+//             data.data.results[0]
+//           );
+//         }
+//         return null;
+//       };
+
+//       // Helper function to fetch city data from the international API
+//       const fetchInternationalCityData = async (cityName: string) => {
+//         console.log(`Checking ${cityName} in international cities`);
+
+//         const response = await fetch(
+//           `${API_ENDPOINTS.INTERNATIONAL.CITIES}?search=${cityName}&foreign=true`
+//         );
+//         console.log(
+//           `Response of Checking ${cityName} in international cities :`,
+//           response
+//         );
+
+//         if (response.ok) {
+//           const data = await response.json();
+//           if (data.data.results.length > 0) {
+//             return data.data.results[0];
+//           }
+//           console.log(
+//             `data.data.results[0] for ${cityName} in internationl cities :`,
+//             data.data.results[0]
+//           );
+//         }
+//         return null;
+//       };
+
+//       // Fetch data for both departure and destination cities from the domestic API
+//       const [domesticDepartureData, domesticDestinationData] =
+//         await Promise.all([
+//           fetchDomesticCityData(departureCity),
+//           fetchDomesticCityData(destinationCity),
+//         ]);
+//       console.log(
+//         `domesticDepartureData for ${departureCity} `,
+//         domesticDepartureData
+//       );
+//       console.log(
+//         `domesticDestinationData for ${destinationCity}`,
+//         domesticDestinationData
+//       );
+//       let isDomesticFlight = false;
+//       let departureId, destinationId;
+
+//       if (domesticDepartureData && domesticDestinationData) {
+//         // Both cities are domestic
+//         isDomesticFlight = true;
+//         departureId = domesticDepartureData.id;
+//         destinationId = domesticDestinationData.id;
+//         console.log("isDomesticFligh", isDomesticFlight);
+//         console.log(`departureId for ${departureCity} `, departureId);
+//         console.log(`destinationId for ${destinationCity}`, destinationId);
+//       } else {
+//         // One or both cities are international, fetch both from international API
+//         const [internationalDepartureData, internationalDestinationData] =
+//           await Promise.all([
+//             fetchInternationalCityData(departureCity),
+//             fetchInternationalCityData(destinationCity),
+//           ]);
+
+//         if (!internationalDepartureData) {
+//           throw new Error(
+//             `Departure city "${departureCity}" not found in international cities`
+//           );
+//         }
+
+//         if (!internationalDestinationData) {
+//           throw new Error(
+//             `Destination city "${destinationCity}" not found in international cities`
+//           );
+//         }
+
+//         departureId = internationalDepartureData.id;
+//         destinationId = internationalDestinationData.id;
+//       }
+
+//       // Construct the API URL based on the flight type
+//       let apiUrl;
+//       if (isDomesticFlight) {
+//         apiUrl = `${API_ENDPOINTS.DOMESTIC.FLIGHTS}?departure=${departureId}&destination=${destinationId}&round_trip=false&date=${date}`;
+//       } else {
+//         const params = new URLSearchParams({
+//           departure: departureId.toString(),
+//           destination: destinationId.toString(),
+//           round_trip: "false",
+//           date: date,
+//           adult: "1",
+//           child: "0",
+//           infant: "0",
+//         });
+//         apiUrl = `${API_ENDPOINTS.INTERNATIONAL.FLIGHTS}/?${params}`;
+//       }
+
+//       // Fetch flight data using the appropriate API
+//       let flightResponse;
+//       if (isDomesticFlight) {
+//         flightResponse = await fetch(apiUrl);
+//       } else {
+//         flightResponse = await fetch(apiUrl, {
+//           method: "POST",
+//           headers: {
+//             Accept: "application/json",
+//           },
+//         });
+//       }
+
+//       if (!flightResponse.ok) {
+//         throw new Error(
+//           `Failed to fetch flight data: ${flightResponse.statusText}`
+//         );
+//       }
+
+//       const flightData = await flightResponse.json();
+//       let flights = [];
+
+//       if (isDomesticFlight) {
+//         flights = flightData.data.list.map(
+//           (flight: {
+//             airline_persian: any;
+//             flight_number: any;
+//             departure_date: any;
+//             departure_time: any;
+//             arrival_date: any;
+//             destination_time: any;
+//             adult_price: any;
+//             departure_name: any;
+//             destination_name: any;
+//             aircraft: any;
+//             baggage: any;
+//             airline_logo: any;
+//             type: any;
+//             capacity: any;
+//             sellingType: any;
+//             id: any;
+//             flightClass: any;
+//             cobin: any;
+//             persian_type: any;
+//             refundable: any;
+//             child_price: any;
+//             infant_price: any;
+//             departure_terminal: any;
+//             refund_rules: any;
+//             destination_terminal: any;
+//             flight_duration: any;
+//             cobin_persian: any;
+//             with_tour: any;
+//             tag: any;
+//           }) => ({
+//             airline: flight.airline_persian,
+//             flightNumber: flight.flight_number,
+//             departureTime: `${flight.departure_date}- ${flight.departure_time}`,
+//             arrivalTime: `${flight.arrival_date}- ${flight.destination_time}`,
+//             price: flight.adult_price,
+//             departure: flight.departure_name,
+//             destination: flight.destination_name,
+//             aircraft: flight.aircraft,
+//             baggage: flight.baggage,
+//             airlineLogo: flight.airline_logo,
+//             type: flight.type,
+//             capacity: flight.capacity,
+//             sellingType: flight.sellingType,
+//             id: flight.id,
+//             flightClass: flight.flightClass,
+//             cobin: flight.cobin,
+//             persian_type: flight.persian_type,
+//             refundable: flight.refundable,
+//             child_price: flight.child_price,
+//             infant_price: flight.infant_price,
+//             departure_terminal: flight.departure_terminal,
+//             refund_rules: flight.refund_rules,
+//             destination_terminal: flight.destination_terminal,
+//             flight_duration: flight.flight_duration,
+//             cobin_persian: flight.cobin_persian,
+//             with_tour: flight.with_tour,
+//             tag: flight.tag,
+//           })
+//         );
+//       } else {
+//         flights = flightData.data.results.list.map(
+//           (flight: {
+//             segments: string | any[];
+//             fares: { adult: { total_price: any } };
+//           }) => {
+//             const firstSegment = flight.segments[0];
+//             const lastSegment = flight.segments[flight.segments.length - 1];
+//             return {
+//               airline: firstSegment.airline.persian,
+//               flightNumber: firstSegment.flight_number,
+//               departureTime: `${firstSegment.departure_date}- ${firstSegment.departure_time}`,
+//               arrivalTime: `${lastSegment.arrival_date}- ${lastSegment.destination_time}`,
+//               price: flight.fares.adult.total_price,
+//               departure: firstSegment.departure.city.persian,
+//               destination: lastSegment.destination.city.persian,
+//               baggage: firstSegment.baggage,
+//               airlineLogo: firstSegment.airline.image,
+//             };
+//           }
+//         );
+//       }
+
+//       return {
+//         flights,
+//         departureCityData: { isDomestic: isDomesticFlight },
+//         destinationCityData: { isDomestic: isDomesticFlight },
+//       };
+//     } catch (error) {
+//       console.error("Error fetching flight data:", error);
+//       return {
+//         message: `متاسفم، در حال حاضر نمی‌توانیم اطلاعات پرواز را به شما بدهیم. لطفاً بعداً دوباره امتحان کنید.`,
+//         flights: [],
+//       };
+//     }
+//   },
+// });
 export const HotelTool = createTool({
   description: "Display the hotel card for a hotel",
   parameters: z.object({
