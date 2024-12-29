@@ -9,6 +9,14 @@ import Image from "next/image";
 import moment from "moment-jalaali";
 import { useRouter } from "next/navigation";
 import { CityData } from "@/types/chat";
+import { useState } from "react"; // Import useState for managing accordion state
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/shadcn/accordion"; // Import shadcn/ui Accordion components
+import { Card, CardContent, CardHeader, CardTitle } from "../shadcn/card";
 
 type FlightProps = {
   departure: string;
@@ -72,18 +80,17 @@ const FlightCard = ({
   cobin_persian,
   with_tour,
   tag,
-  onFlightCardClick,
   departureCityData,
   destinationCityData,
   isDomestic,
 }: FlightProps) => {
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false); // State for accordion
+  const [flightInfo, setFlightInfo] = useState<any>(null); // State to store flightInfo
+
   // Convert Gregorian dates to Jalali dates
   const convertToJalali = (dateTime: string) => {
-    // Split the date and time
     const [date, time] = dateTime.split("-");
-    // Parse the Gregorian date
     const jalaliDate = moment(date, "YYYY-MM-DD").format("jYYYY/jMM/jDD");
-    // Return the Jalali date and time
     return `${jalaliDate} - ${time.trim()}`;
   };
 
@@ -126,6 +133,7 @@ const FlightCard = ({
       departureCityData,
       destinationCityData,
     };
+
     if (isDomestic) {
       const transformedFlightInfo = {
         type: flightInfo.type,
@@ -226,15 +234,17 @@ const FlightCard = ({
             domesticFlightInformation,
           },
         },
-        "*" // Target origin (React app's origin)
+        "*"
       );
     } else {
-      onFlightCardClick(flightInfo);
+      // Set flightInfo before toggling the accordion
+      setFlightInfo(flightInfo);
+      console.log("flightInfo 1", flightInfo);
+      // Toggle accordion for international flights
+      setIsAccordionOpen(!isAccordionOpen);
     }
-    // Transform the flightInfo object to match the required structure
-
-    // Send the transformed flight details, generalInformation, and ticketInformation to the parent React app using postMessage
   };
+  console.log("flightInfo 2", flightInfo);
 
   return (
     <motion.div
@@ -303,10 +313,98 @@ const FlightCard = ({
               onClick={handleFlightCardClick}
               className="animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
             >
-              دیدن جزِئیات
+              {isDomestic
+                ? "دیدن جزِئیات"
+                : isAccordionOpen
+                ? "بستن"
+                : "جزئیات"}
             </Button>
           </motion.div>
         </div>
+
+        {/* Accordion for international flights */}
+        {!isDomestic && (
+          <Accordion
+            type="single"
+            collapsible
+            value={isAccordionOpen ? "item-1" : undefined}
+          >
+            <AccordionItem value="item-1">
+              <AccordionContent className="p-6 pt-0 text-card-foreground">
+                {flightInfo && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <motion.div
+                      className="space-y-4"
+                      initial="hidden"
+                      animate="visible"
+                      variants={{
+                        hidden: { opacity: 0 },
+                        visible: {
+                          opacity: 1,
+                          transition: {
+                            staggerChildren: 0.1,
+                          },
+                        },
+                      }}
+                    >
+                      {[
+                        {
+                          label: "شرکت هواپیمایی",
+                          value: flightInfo.airline,
+                        },
+                        {
+                          label: "شماره پرواز",
+                          value: flightInfo.flightNumber,
+                        },
+                        {
+                          label: "کلاس پرواز",
+                          value: flightInfo.flightClass,
+                        },
+                        { label: "بار مجاز", value: flightInfo.baggage },
+                        {
+                          label: "قابل استرداد",
+                          value: flightInfo.refundable ? "بله" : "خیر",
+                        },
+                        {
+                          label: "ترمینال خروج",
+                          value: flightInfo.departure_terminal,
+                        },
+                        {
+                          label: "ترمینال ورود",
+                          value: flightInfo.destination_terminal,
+                        },
+                        {
+                          label: "مدت پرواز",
+                          value: flightInfo.flight_duration,
+                        },
+                      ].map((item, index) => (
+                        <motion.div
+                          key={item.label}
+                          className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2"
+                          variants={{
+                            hidden: { opacity: 0, y: 20 },
+                            visible: { opacity: 1, y: 0 },
+                          }}
+                        >
+                          <p className="text-sm font-semibold text-card-foreground">
+                            {item.label}:
+                          </p>
+                          <p className="text-sm text-card-foreground">
+                            {item.value}
+                          </p>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        )}
       </div>
     </motion.div>
   );
