@@ -94,8 +94,7 @@ const FlightCard = ({
   const router = useRouter();
 
   // Function to handle card click
-  const  handleFlightCardClick = () => {
-
+  const handleFlightCardClick = () => {
     const flightInfo = {
       airline,
       flightNumber,
@@ -164,14 +163,14 @@ const FlightCard = ({
         with_tour: flightInfo.with_tour,
         tag: flightInfo.tag,
       };
-  
+
       const generalInformation = {
         ticket: true,
         accommodation: false,
         itinerary: false,
         isInternational: false,
       };
-  
+
       const ticketInformation = {
         departure: {
           id: departureCityData.id,
@@ -229,16 +228,12 @@ const FlightCard = ({
         },
         "*" // Target origin (React app's origin)
       );
-
     } else {
-
       onFlightCardClick(flightInfo);
     }
     // Transform the flightInfo object to match the required structure
 
-
     // Send the transformed flight details, generalInformation, and ticketInformation to the parent React app using postMessage
-    
   };
 
   return (
