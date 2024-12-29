@@ -171,7 +171,7 @@ const FlightCard = ({
         isInternational: false,
       };
 
-      const ticketInformation = {
+      const domesticFlightInformation = {
         departure: {
           id: departureCityData.id,
           name: departureCityData.name,
@@ -223,7 +223,7 @@ const FlightCard = ({
           payload: {
             selectedDepartureFlight: transformedFlightInfo,
             generalInformation,
-            ticketInformation,
+            domesticFlightInformation,
           },
         },
         "*" // Target origin (React app's origin)
