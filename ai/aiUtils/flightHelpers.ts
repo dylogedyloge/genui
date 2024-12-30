@@ -76,15 +76,6 @@ export const constructApiUrl = (
 export const transformFlightData = (flightData: any, isDomestic: boolean) => {
   if (isDomestic) {
     return flightData.data.list.map((flight: any) => ({
-      // airline: flight.airline_persian,
-      // flightNumber: flight.flight_number,
-      // departureTime: `${flight.departure_date}- ${flight.departure_time}`,
-      // arrivalTime: `${flight.arrival_date}- ${flight.destination_time}`,
-      // price: flight.adult_price,
-      // departure: flight.departure_name,
-      // destination: flight.destination_name,
-      // baggage: flight.baggage,
-      // airlineLogo: flight.airline_logo,
       airline: flight.airline_persian,
       flightNumber: flight.flight_number,
       departureTime: `${flight.departure_date}- ${flight.departure_time}`,
@@ -115,45 +106,76 @@ export const transformFlightData = (flightData: any, isDomestic: boolean) => {
     }));
   }
 
+  // return flightData.data.results.list.map((flight: any) => {
+  //   const firstSegment = flight.segments[0];
+  //   const lastSegment = flight.segments[flight.segments.length - 1];
+  //   return {
+  //     fareSourceCode: flight.fare_source_code,
+  //     airline: firstSegment.airline.persian, // Airline name in Persian
+  //     flightNumber: firstSegment.flight_number, // Flight number
+  //     departureTime: `${firstSegment.departure_date}- ${firstSegment.departure_time}`, // Departure time
+  //     arrivalTime: `${lastSegment.arrival_date}- ${lastSegment.destination_time}`, // Arrival time
+  //     price: flight.fares.adult.total_price, // Price for adults
+  //     departure: firstSegment.departure.city.persian, // Departure city in Persian
+  //     destination: lastSegment.destination.city.persian, // Destination city in Persian
+  //     baggage: firstSegment.baggage, // Baggage allowance
+  //     airlineLogo: firstSegment.airline.image, // Airline logo
+  //     type: firstSegment.type,
+  //     capacity: firstSegment.capacity,
+  //     sellingType: firstSegment.sellingType,
+  //     id: firstSegment.id,
+  //     class: firstSegment.class,
+  //     cobin: firstSegment.cobin,
+  //     persian_type: firstSegment.persian_type,
+  //     refundable: firstSegment.refundable,
+  //     child_price: firstSegment.child_price,
+  //     infant_price: firstSegment.infant_price,
+  //     departure_terminal: firstSegment.departure_terminal,
+  //     refund_rules: firstSegment.refund_rules,
+  //     destination_terminal: firstSegment.destination_terminal,
+  //     flight_duration: firstSegment.flight_duration,
+  //     cobin_persian: firstSegment.cobin_persian,
+  //     with_tour: firstSegment.with_tour,
+  //     tag: firstSegment.tag,
+  //   };
+  // });
   return flightData.data.results.list.map((flight: any) => {
     const firstSegment = flight.segments[0];
     const lastSegment = flight.segments[flight.segments.length - 1];
+
     return {
-      // airline: firstSegment.airline.persian,
-      // flightNumber: firstSegment.flight_number,
-      // departureTime: `${firstSegment.departure_date}- ${firstSegment.departure_time}`,
-      // arrivalTime: `${lastSegment.arrival_date}- ${lastSegment.destination_time}`,
-      // price: flight.fares.adult.total_price,
-      // departure: firstSegment.departure.city.persian,
-      // destination: lastSegment.destination.city.persian,
-      // baggage: firstSegment.baggage,
-      // airlineLogo: firstSegment.airline.image,
-      airline: firstSegment.airline.persian, // Airline name in Persian
-      flightNumber: firstSegment.flight_number, // Flight number
-      departureTime: `${firstSegment.departure_date}- ${firstSegment.departure_time}`, // Departure time
-      arrivalTime: `${lastSegment.arrival_date}- ${lastSegment.destination_time}`, // Arrival time
-      price: flight.fares.adult.total_price, // Price for adults
-      departure: firstSegment.departure.city.persian, // Departure city in Persian
-      destination: lastSegment.destination.city.persian, // Destination city in Persian
-      baggage: firstSegment.baggage, // Baggage allowance
-      airlineLogo: firstSegment.airline.image, // Airline logo
-      type: firstSegment.type,
-      capacity: firstSegment.capacity,
-      sellingType: firstSegment.sellingType,
-      id: firstSegment.id,
-      class: firstSegment.class,
-      cobin: firstSegment.cobin,
-      persian_type: firstSegment.persian_type,
-      refundable: firstSegment.refundable,
-      child_price: firstSegment.child_price,
-      infant_price: firstSegment.infant_price,
-      departure_terminal: firstSegment.departure_terminal,
-      refund_rules: firstSegment.refund_rules,
-      destination_terminal: firstSegment.destination_terminal,
-      flight_duration: firstSegment.flight_duration,
-      cobin_persian: firstSegment.cobin_persian,
-      with_tour: firstSegment.with_tour,
-      tag: firstSegment.tag,
+      id: flight.id,
+      fareSourceCode: flight.fare_source_code,
+      isClosed: flight.is_closed,
+      visaRequirements: flight.visa_requirements,
+      fares: flight.fares,
+      cabin: flight.cabin,
+      segments: flight.segments.map((segment: any) => ({
+        departureDate: segment.departure_date,
+        departureTime: segment.departure_time,
+        arrivalDate: segment.arrival_date,
+        destinationTime: segment.destination_time,
+        flightNumber: segment.flight_number,
+        flightDuration: segment.flight_duration,
+        connectionTime: segment.connection_time,
+        fareClass: segment.fare_class,
+        departure: {
+          country: segment.departure.country,
+          city: segment.departure.city,
+          terminal: segment.departure.terminal,
+        },
+        destination: {
+          country: segment.destination.country,
+          city: segment.destination.city,
+          terminal: segment.destination.terminal,
+        },
+        airline: segment.airline,
+        operatingAirline: segment.operating_airline,
+        aircraft: segment.aircraft,
+        baggage: segment.baggage,
+        capacity: segment.capacity,
+      })),
+      returnSegments: flight.return_segments,
     };
   });
 };

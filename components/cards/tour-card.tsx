@@ -97,7 +97,7 @@ const TourCard = ({
               <div className="flex items-center gap-2">
                 <Tag className="w-4 h-4 text-muted-foreground" />
                 <p className="text-sm font-semibold text-primary">
-                  {price} تومان
+                  {price} ریال
                 </p>
               </div>
             </div>

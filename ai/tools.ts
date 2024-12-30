@@ -113,6 +113,7 @@ import { API_ENDPOINTS } from "../endpoints/endpoints";
 //   if (isDomestic) {
 //     return flightData.data.list.map((flight: any) => ({
 //       airline: flight.airline_persian,
+//       fareSourceCode: flight.fare_source_code,
 //       flightNumber: flight.flight_number,
 //       departureTime: `${flight.departure_date}- ${flight.departure_time}`,
 //       arrivalTime: `${flight.arrival_date}- ${flight.destination_time}`,

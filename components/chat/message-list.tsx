@@ -265,12 +265,22 @@ const renderFlightCards = (
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((flight: Flight) => (
           <FlightCard
+            fareSourceCode={""}
+            isClosed={false}
+            visaRequirements={[]}
+            fares={undefined}
+            cabin={undefined}
+            segments={[]}
+            returnSegments={[]}
             key={flight.id}
             {...flight}
             onFlightCardClick={onFlightCardClick}
             departureCityData={flights.departureCityData}
             destinationCityData={flights.destinationCityData}
-            isDomestic={flights.departureCityData.isDomestic && flights.destinationCityData.isDomestic}
+            isDomestic={
+              flights.departureCityData.isDomestic &&
+              flights.destinationCityData.isDomestic
+            }
           />
         ))}
       {renderVisibilityButtons(

@@ -7,18 +7,47 @@ import { Button } from "@/components/shadcn/button";
 import { Avatar } from "../shadcn/avatar";
 import Image from "next/image";
 import moment from "moment-jalaali";
-import { useRouter } from "next/navigation";
 import { CityData } from "@/types/chat";
-import { useState } from "react"; // Import useState for managing accordion state
+import { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger,
-} from "@/components/shadcn/accordion"; // Import shadcn/ui Accordion components
-import { Card, CardContent, CardHeader, CardTitle } from "../shadcn/card";
+} from "@/components/shadcn/accordion";
+import {
+  Plane,
+  Hash,
+  MapPin,
+  CalendarClock,
+  Wallet,
+  Users,
+  ShoppingCart,
+  Tag,
+  Luggage,
+  Sofa,
+  Baby,
+  Terminal,
+  Clock,
+  Gift,
+  Building,
+  Landmark,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+} from "lucide-react";
+import { Card } from "../shadcn/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../shadcn/tabs";
+import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 
 type FlightProps = {
+  fareSourceCode: string;
+  isClosed: boolean;
+  visaRequirements: any[];
+  fares: any;
+  cabin: any;
+  segments: any[];
+  returnSegments: any[];
   departure: string;
   destination: string;
   airline: string;
@@ -53,6 +82,14 @@ type FlightProps = {
 };
 
 const FlightCard = ({
+  id,
+  fareSourceCode,
+  isClosed,
+  visaRequirements,
+  fares,
+  cabin,
+  segments,
+  returnSegments,
   airline,
   flightNumber,
   departure,
@@ -64,7 +101,6 @@ const FlightCard = ({
   type,
   capacity,
   sellingType,
-  id,
   aircraft,
   baggage,
   flightClass,
@@ -86,35 +122,164 @@ const FlightCard = ({
 }: FlightProps) => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false); // State for accordion
   const [flightInfo, setFlightInfo] = useState<any>(null); // State to store flightInfo
+  const [baggageRules, setBaggageRules] = useState<any>(null); // State for baggage rules
+  const [refundRules, setRefundRules] = useState<any>(null); // State for refund rules
+  const [isLoadingBaggage, setIsLoadingBaggage] = useState(false); // State for baggage rules loading
+  const [isLoadingRefund, setIsLoadingRefund] = useState(false); // State for refund rules loading
 
   // Convert Gregorian dates to Jalali dates
-  const convertToJalali = (dateTime: string) => {
-    const [date, time] = dateTime.split("-");
+  const convertToJalali = (
+    date: string,
+    time: string,
+    isDomestic: boolean,
+    isDeparture: boolean
+  ) => {
     const jalaliDate = moment(date, "YYYY-MM-DD").format("jYYYY/jMM/jDD");
-    return `${jalaliDate} - ${time.trim()}`;
+
+    if (isDomestic) {
+      // For domestic flights, extract the time part if it includes a Gregorian date
+      const extractedTime = time.includes("-")
+        ? time.split("-").pop()?.trim()
+        : time;
+
+      if (isDeparture) {
+        return `${jalaliDate} - ${extractedTime}`; // Format for departure: "1403/10/11 - 23:45"
+      } else {
+        return jalaliDate; // Format for arrival: "1403/10/11"
+      }
+    } else {
+      // For international flights, use the existing logic
+      const formattedTime = time.includes(":")
+        ? time.split(":").slice(0, 2).join(":") // Remove seconds if present
+        : time; // Use as-is if no colon
+      return `${jalaliDate} - ${formattedTime}`;
+    }
   };
 
-  // Convert departure and arrival times to Jalali
-  const jalaliDepartureTime = convertToJalali(departureTime);
-  const jalaliArrivalTime = convertToJalali(arrivalTime);
+  // Extract departure and arrival details based on flight type
+  const getFlightDetails = () => {
+    if (isDomestic) {
+      return {
+        airline: airline,
+        flightNumber: flightNumber,
+        departureCity: departureCityData?.name || departure, // Fallback to `departure` if `departureCityData.name` is missing
+        destinationCity: destinationCityData?.name || destination, // Fallback to `destination` if `destinationCityData.name` is missing
+        departureTime: convertToJalali(
+          departureTime.split("T")[0],
+          departureTime.split("T")[1] || departureTime,
+          isDomestic,
+          true
+        ), // Pass isDomestic and isDeparture flags
+        arrivalTime: convertToJalali(
+          arrivalTime.split("T")[0],
+          arrivalTime.split("T")[1] || arrivalTime,
+          isDomestic,
+          false
+        ), // Pass isDomestic and isDeparture flags
+        baggage: baggage,
+        flightDuration: flight_duration,
+      };
+    } else {
+      const firstSegment = segments[0];
+      return {
+        airline: firstSegment.airline.persian,
+        flightNumber: firstSegment.flightNumber,
+        departureCity: firstSegment.departure.city.persian,
+        destinationCity: firstSegment.destination.city.persian,
+        departureTime: convertToJalali(
+          firstSegment.departureDate,
+          firstSegment.departureTime,
+          isDomestic,
+          true
+        ), // Pass isDomestic and isDeparture flags
+        arrivalTime: convertToJalali(
+          firstSegment.arrivalDate,
+          firstSegment.destinationTime,
+          isDomestic,
+          false
+        ), // Pass isDomestic and isDeparture flags
+        baggage: firstSegment.baggage,
+        flightDuration: firstSegment.flightDuration,
+      };
+    }
+  };
 
-  const router = useRouter();
+  const flightDetails = getFlightDetails();
 
+  // Get the price based on flight type
+  const getPrice = () => {
+    if (isDomestic) {
+      return price; // For domestic flights, use the `price` prop directly
+    } else {
+      return fares.adult.total_price; // For international flights, use `fares.adult.total_price`
+    }
+  };
+
+  // Fetch baggage and refund rules when accordion is opened
+  useEffect(() => {
+    if (isAccordionOpen && !isDomestic) {
+      // Fetch baggage rules
+      setIsLoadingBaggage(true);
+      fetch(
+        `https://api.atripa.ir/api/v2/reserve/foreign/flight/baggages/?fare_source_code=${fareSourceCode}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          setBaggageRules(data.data.baggage_info);
+          setIsLoadingBaggage(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching baggage rules:", error);
+          setIsLoadingBaggage(false);
+        });
+
+      // Fetch refund rules
+      setIsLoadingRefund(true);
+      fetch(
+        `https://api.atripa.ir/api/v2/reserve/foreign/flight/rules/?fare_source_code=${fareSourceCode}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          setRefundRules(data.data);
+          setIsLoadingRefund(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching refund rules:", error);
+          setIsLoadingRefund(false);
+        });
+    }
+  }, [isAccordionOpen, isDomestic, fareSourceCode]);
+
+  // Function to render Markdown content
+  const renderMarkdown = (content: string) => {
+    return (
+      <ReactMarkdown remarkPlugins={[remarkBreaks]}>{content}</ReactMarkdown>
+    );
+  };
   // Function to handle card click
   const handleFlightCardClick = () => {
     const flightInfo = {
+      id,
+      fareSourceCode,
+      isClosed,
+      visaRequirements,
+      fares,
+      cabin,
+      segments,
+      returnSegments,
+      departureCityData,
+      destinationCityData,
       airline,
       flightNumber,
       departure,
       destination,
-      departureTime: jalaliDepartureTime,
-      arrivalTime: jalaliArrivalTime,
-      price,
+      departureTime: flightDetails.departureTime,
+      arrivalTime: flightDetails.arrivalTime,
+      price: getPrice(), // Use the `getPrice` function here
       airlineLogo,
       type,
       capacity,
       sellingType,
-      id,
       aircraft,
       baggage,
       flightClass,
@@ -130,8 +295,6 @@ const FlightCard = ({
       cobin_persian,
       with_tour,
       tag,
-      departureCityData,
-      destinationCityData,
     };
 
     if (isDomestic) {
@@ -146,7 +309,7 @@ const FlightCard = ({
         cobin: flightInfo.cobin,
         persian_type: flightInfo.persian_type,
         refundable: flightInfo.refundable,
-        adult_price: flightInfo.price,
+        adult_price: flightInfo.price, // Use the `price` directly
         child_price: flightInfo.child_price,
         infant_price: flightInfo.infant_price,
         airline_persian: flightInfo.airline,
@@ -239,12 +402,11 @@ const FlightCard = ({
     } else {
       // Set flightInfo before toggling the accordion
       setFlightInfo(flightInfo);
-      console.log("flightInfo 1", flightInfo);
       // Toggle accordion for international flights
       setIsAccordionOpen(!isAccordionOpen);
+      console.log(flightInfo);
     }
   };
-  console.log("flightInfo 2", flightInfo);
 
   return (
     <motion.div
@@ -258,17 +420,21 @@ const FlightCard = ({
             <div className="flex items-center gap-1">
               <Avatar>
                 <Image
-                  width={50}
+                  width={70}
                   height={50}
-                  src={airlineLogo}
-                  alt={`${airline} logo`}
+                  src={isDomestic ? airlineLogo : segments[0].airline.image}
+                  alt={`${
+                    isDomestic ? airline : segments[0].airline.persian
+                  } logo`}
                 />
               </Avatar>
-              <h2 className="text-sm font-semibold text-primary">{airline}</h2>
+              <h2 className="text-sm font-semibold text-primary">
+                {isDomestic ? airline : segments[0].airline.persian}
+              </h2>
             </div>
 
             <Badge variant="secondary" className="text-xs font-medium">
-              {flightNumber}
+              {isDomestic ? flightNumber : segments[0].flightNumber}
             </Badge>
           </div>
           <motion.div
@@ -279,22 +445,21 @@ const FlightCard = ({
           >
             <div className="text-left flex flex-col items-start">
               <p className="text-md text-card-foreground font-bold mb-2">
-                {departure}
+                {flightDetails.departureCity} {/* Departure city */}
               </p>
               <p className="text-xs prose-sm text-muted-foreground ">
-                {jalaliDepartureTime}
+                {flightDetails.departureTime} {/* Departure date and time */}
               </p>
             </div>
             <div className="flex flex-col items-center px-4">
               <FaPlane className="text-card-foreground w-6 h-6 rotate-180" />
             </div>
-
             <div className="text-right flex flex-col items-end">
               <p className="text-md text-card-foreground font-bold mb-2">
-                {destination}
+                {flightDetails.destinationCity} {/* Destination city */}
               </p>
               <p className="text-xs prose-sm text-muted-foreground">
-                {jalaliArrivalTime}
+                {flightDetails.arrivalTime} {/* Arrival date and time */}
               </p>
             </div>
           </motion.div>
@@ -306,18 +471,20 @@ const FlightCard = ({
           >
             <div>
               <p className="prose-sm text-sm font-semibold text-card-foreground">
-                {price.toLocaleString()} ریال
+                {getPrice().toLocaleString()} ریال
               </p>
             </div>
             <Button
               onClick={handleFlightCardClick}
               className="animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
             >
-              {isDomestic
-                ? "دیدن جزِئیات"
-                : isAccordionOpen
-                ? "بستن"
-                : "جزئیات"}
+              {isDomestic ? (
+                "خرید"
+              ) : isAccordionOpen ? (
+                <ChevronUp />
+              ) : (
+                <ChevronDown />
+              )}
             </Button>
           </motion.div>
         </div>
@@ -332,74 +499,183 @@ const FlightCard = ({
             <AccordionItem value="item-1">
               <AccordionContent className="p-6 pt-0 text-card-foreground">
                 {flightInfo && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <motion.div
-                      className="space-y-4"
-                      initial="hidden"
-                      animate="visible"
-                      variants={{
-                        hidden: { opacity: 0 },
-                        visible: {
-                          opacity: 1,
-                          transition: {
-                            staggerChildren: 0.1,
-                          },
-                        },
-                      }}
-                    >
-                      {[
-                        {
-                          label: "شرکت هواپیمایی",
-                          value: flightInfo.airline,
-                        },
-                        {
-                          label: "شماره پرواز",
-                          value: flightInfo.flightNumber,
-                        },
-                        {
-                          label: "کلاس پرواز",
-                          value: flightInfo.flightClass,
-                        },
-                        { label: "بار مجاز", value: flightInfo.baggage },
-                        {
-                          label: "قابل استرداد",
-                          value: flightInfo.refundable ? "بله" : "خیر",
-                        },
-                        {
-                          label: "ترمینال خروج",
-                          value: flightInfo.departure_terminal,
-                        },
-                        {
-                          label: "ترمینال ورود",
-                          value: flightInfo.destination_terminal,
-                        },
-                        {
-                          label: "مدت پرواز",
-                          value: flightInfo.flight_duration,
-                        },
-                      ].map((item, index) => (
+                  <Card className="p-4 rounded-lg">
+                    <Tabs defaultValue="details" className="w-full">
+                      <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="details">جزئیات پرواز</TabsTrigger>
+                        <TabsTrigger value="baggage-rules">
+                          {isLoadingBaggage ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            "قوانین بار"
+                          )}
+                        </TabsTrigger>
+                        <TabsTrigger value="refund-rules">
+                          {isLoadingRefund ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            "قوانین استرداد"
+                          )}
+                        </TabsTrigger>
+                      </TabsList>
+
+                      {/* جزئیات پرواز Tab */}
+                      <TabsContent value="details">
                         <motion.div
-                          key={item.label}
-                          className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2"
+                          className="space-y-4"
+                          initial="hidden"
+                          animate="visible"
                           variants={{
-                            hidden: { opacity: 0, y: 20 },
-                            visible: { opacity: 1, y: 0 },
+                            hidden: { opacity: 0 },
+                            visible: {
+                              opacity: 1,
+                              transition: {
+                                staggerChildren: 0.1,
+                              },
+                            },
                           }}
                         >
-                          <p className="text-sm font-semibold text-card-foreground">
-                            {item.label}:
-                          </p>
-                          <p className="text-sm text-card-foreground">
-                            {item.value}
-                          </p>
+                          {[
+                            {
+                              label: "شرکت هواپیمایی",
+                              value: flightDetails.airline,
+                              icon: <Plane className="w-4 h-4" />,
+                            },
+                            {
+                              label: "شماره پرواز",
+                              value: flightDetails.flightNumber,
+                              icon: <Hash className="w-4 h-4" />,
+                            },
+                            {
+                              label: "مبدا",
+                              value: flightDetails.departureCity,
+                              icon: <MapPin className="w-4 h-4" />,
+                            },
+                            {
+                              label: "مقصد",
+                              value: flightDetails.destinationCity,
+                              icon: <MapPin className="w-4 h-4" />,
+                            },
+                            {
+                              label: "حرکت",
+                              value: flightDetails.departureTime,
+                              icon: <CalendarClock className="w-4 h-4" />,
+                            },
+                            {
+                              label: "فرود",
+                              value: flightDetails.arrivalTime,
+                              icon: <CalendarClock className="w-4 h-4" />,
+                            },
+                            {
+                              label: "قیمت به ریال",
+                              value: getPrice().toLocaleString(),
+                              icon: <Wallet className="w-4 h-4" />,
+                            },
+                            {
+                              label: "کلاس پرواز",
+                              value: cabin.persian,
+                              icon: <Sofa className="w-4 h-4" />,
+                            },
+                            {
+                              label: "بار مجاز",
+                              value: flightDetails.baggage,
+                              icon: <Luggage className="w-4 h-4" />,
+                            },
+                            {
+                              label: "مدت پرواز",
+                              value: flightDetails.flightDuration,
+                              icon: <Clock className="w-4 h-4" />,
+                            },
+                          ].map(
+                            (item, index) =>
+                              item.value && (
+                                <motion.div
+                                  key={item.label}
+                                  className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2"
+                                  variants={{
+                                    hidden: { opacity: 0, y: 20 },
+                                    visible: { opacity: 1, y: 0 },
+                                  }}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {item.icon}
+                                    <p className="text-sm font-semibold text-card-foreground">
+                                      {item.label}:
+                                    </p>
+                                  </div>
+                                  <p className="text-sm text-card-foreground">
+                                    {item.value}
+                                  </p>
+                                </motion.div>
+                              )
+                          )}
                         </motion.div>
-                      ))}
-                    </motion.div>
-                  </motion.div>
+                        <Button className="w-full animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+                          خرید
+                        </Button>
+                      </TabsContent>
+
+                      {/* قوانین بار Tab */}
+                      <TabsContent value="baggage-rules">
+                        <div className="space-y-4" dir="ltr">
+                          {baggageRules ? (
+                            Array.isArray(baggageRules) ? (
+                              <>
+                                <ul className="list-disc list-inside text-sm text-card-foreground">
+                                  {baggageRules.map(
+                                    (rule: any, index: number) => (
+                                      <li key={index}>
+                                        {rule.departure} به {rule.arrival}:{" "}
+                                        {rule.baggage}
+                                      </li>
+                                    )
+                                  )}
+                                </ul>
+                              </>
+                            ) : (
+                              renderMarkdown(baggageRules)
+                            )
+                          ) : (
+                            <p className="text-sm text-card-foreground">
+                              داده‌ای یافت نشد.
+                            </p>
+                          )}
+                        </div>
+                      </TabsContent>
+
+                      {/* قوانین استرداد Tab */}
+                      <TabsContent value="refund-rules">
+                        <div className="space-y-4 w-full" dir="ltr">
+                          {refundRules ? (
+                            Array.isArray(refundRules) ? (
+                              <>
+                                {refundRules.map((rule: any, index: number) => (
+                                  <div key={index}>
+                                    {rule.rule_details.map(
+                                      (detail: any, detailIndex: number) => (
+                                        <div key={detailIndex} className="mb-4">
+                                          <p className="font-semibold text-card-foreground">
+                                            {detail.category}:
+                                          </p>
+                                          {renderMarkdown(detail.rules_parsed)}
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                ))}
+                              </>
+                            ) : (
+                              renderMarkdown(refundRules)
+                            )
+                          ) : (
+                            <p className="text-sm text-card-foreground">
+                              داده‌ای یافت نشد.
+                            </p>
+                          )}
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </Card>
                 )}
               </AccordionContent>
             </AccordionItem>

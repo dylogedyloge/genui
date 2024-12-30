@@ -35,6 +35,7 @@ export async function POST(request: Request) {
    - Ask for missing parameters if needed.
    - Display relevant cards.
    - Follow-up question or closing remark.
+   - Note that all the prices are in RIALS. ریال
 
 Example flow:
 User: "پروازهای تهران به مشهد رو برای فردا پیدا کن."
