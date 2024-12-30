@@ -39,6 +39,8 @@ import { Card } from "../shadcn/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../shadcn/tabs";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
+import rehypeRaw from "rehype-raw";
+import DOMPurify from "dompurify";
 
 type FlightProps = {
   fareSourceCode: string;
@@ -226,6 +228,7 @@ const FlightCard = ({
         .then((response) => response.json())
         .then((data) => {
           setBaggageRules(data.data.baggage_info);
+          console.log(baggageRules);
           setIsLoadingBaggage(false);
         })
         .catch((error) => {
@@ -248,12 +251,19 @@ const FlightCard = ({
           setIsLoadingRefund(false);
         });
     }
-  }, [isAccordionOpen, isDomestic, fareSourceCode]);
+  }, [isAccordionOpen, isDomestic, fareSourceCode, baggageRules]);
 
   // Function to render Markdown content
+  const removeInlineStyles = (html: string) => {
+    return html.replace(/style="[^"]*"/g, ""); // Remove all style attributes
+  };
+
   const renderMarkdown = (content: string) => {
+    const cleanContent = DOMPurify.sanitize(removeInlineStyles(content)); // Sanitize and remove styles
     return (
-      <ReactMarkdown remarkPlugins={[remarkBreaks]}>{content}</ReactMarkdown>
+      <ReactMarkdown remarkPlugins={[remarkBreaks]} rehypePlugins={[rehypeRaw]}>
+        {cleanContent}
+      </ReactMarkdown>
     );
   };
   // Function to handle card click
@@ -657,7 +667,12 @@ const FlightCard = ({
                                           <p className="font-semibold text-card-foreground">
                                             {detail.category}:
                                           </p>
-                                          {renderMarkdown(detail.rules_parsed)}
+                                          {/* {renderMarkdown(detail.rules_parsed)} */}
+                                          <div className="rule-text">
+                                            {renderMarkdown(
+                                              detail.rules_parsed
+                                            )}
+                                          </div>
                                         </div>
                                       )
                                     )}

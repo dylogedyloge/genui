@@ -79,7 +79,13 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 } */
-
+.rule-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  /* white-space: pre-wrap; */
+  max-height: 200px; /* Optional: for scrollable container */
+  overflow-y: auto; /* Optional: for scrollable container */
+}
 @layer base {
   :root {
     --background: 0 0% 100%;
