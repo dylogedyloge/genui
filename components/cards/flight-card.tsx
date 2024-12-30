@@ -41,6 +41,8 @@ import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import rehypeRaw from "rehype-raw";
 import DOMPurify from "dompurify";
+import { API_ENDPOINTS } from "../../endpoints/endpoints";
+
 
 type FlightProps = {
   fareSourceCode: string;
@@ -223,7 +225,8 @@ const FlightCard = ({
       // Fetch baggage rules
       setIsLoadingBaggage(true);
       fetch(
-        `https://api.atripa.ir/api/v2/reserve/foreign/flight/baggages/?fare_source_code=${fareSourceCode}`
+       
+        `${API_ENDPOINTS.INTERNATIONAL.BAGGAGE}?fare_source_code=${fareSourceCode}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -239,7 +242,8 @@ const FlightCard = ({
       // Fetch refund rules
       setIsLoadingRefund(true);
       fetch(
-        `https://api.atripa.ir/api/v2/reserve/foreign/flight/rules/?fare_source_code=${fareSourceCode}`
+        `${API_ENDPOINTS.INTERNATIONAL.RULES}?fare_source_code=${fareSourceCode}`
+
       )
         .then((response) => response.json())
         .then((data) => {
@@ -251,7 +255,7 @@ const FlightCard = ({
           setIsLoadingRefund(false);
         });
     }
-  }, [isAccordionOpen, isDomestic, fareSourceCode, baggageRules]);
+  }, [isAccordionOpen, isDomestic, fareSourceCode]);
 
   // Function to render Markdown content
   const removeInlineStyles = (html: string) => {
