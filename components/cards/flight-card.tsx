@@ -43,7 +43,6 @@ import rehypeRaw from "rehype-raw";
 import DOMPurify from "dompurify";
 import { API_ENDPOINTS } from "../../endpoints/endpoints";
 
-
 type FlightProps = {
   fareSourceCode: string;
   isClosed: boolean;
@@ -225,7 +224,6 @@ const FlightCard = ({
       // Fetch baggage rules
       setIsLoadingBaggage(true);
       fetch(
-       
         `${API_ENDPOINTS.INTERNATIONAL.BAGGAGE}?fare_source_code=${fareSourceCode}`
       )
         .then((response) => response.json())
@@ -243,7 +241,6 @@ const FlightCard = ({
       setIsLoadingRefund(true);
       fetch(
         `${API_ENDPOINTS.INTERNATIONAL.RULES}?fare_source_code=${fareSourceCode}`
-
       )
         .then((response) => response.json())
         .then((data) => {
@@ -270,6 +267,116 @@ const FlightCard = ({
       </ReactMarkdown>
     );
   };
+
+  // Add this function to construct the required data for international flights
+  const handleInternationalFlightPurchase = () => {
+    // Ensure departureTime is defined and in the correct format
+    const departureDate =
+      segments[0]?.departureDate || departureTime?.split("T")[0];
+
+    if (!departureDate) {
+      console.error("Departure date is missing or invalid.");
+      return;
+    }
+
+    // Construct generalInformation
+    const generalInformation = {
+      ticket: true,
+      accommodation: false,
+      itinerary: false,
+      isInternational: true,
+    };
+    console.log("generalInformation", generalInformation);
+
+    // Construct intFlightInformation
+    const intFlightInformation = {
+      departure: {
+        id: departureCityData.id,
+        subs: [],
+        name: departureCityData.name,
+        english_name: departureCityData.english_name,
+        code: departureCityData.iata,
+        city: departureCityData.name,
+        english_city: departureCityData.english_name,
+        country: departureCityData.country,
+        english_country: departureCityData.country,
+        country_code: departureCityData.country_code,
+      },
+      destination: {
+        id: destinationCityData.id,
+        subs: [],
+        name: destinationCityData.name,
+        english_name: destinationCityData.english_name,
+        code: destinationCityData.iata,
+        city: destinationCityData.name,
+        english_city: destinationCityData.english_name,
+        country: destinationCityData.country,
+        english_country: destinationCityData.country,
+        country_code: destinationCityData.country_code,
+      },
+      departureDate, // Use the validated departureDate
+      returnDate: null, // No return date for one-way flights
+      personCounter: {
+        adult: 1,
+        child: 0,
+        infant: 0,
+        totalPersons: 1,
+      },
+      isDirect: segments.length === 1, // True if there are no connecting flights
+    };
+    console.log("intFlightInformation", intFlightInformation);
+    // Construct selectedIntFlight
+    const selectedIntFlight = {
+      id,
+      fare_source_code: fareSourceCode,
+      is_closed: isClosed,
+      visa_requirements: visaRequirements,
+      fares,
+      cabin,
+      segments,
+      return_segments: returnSegments,
+    };
+    console.log("selectedIntFlight", selectedIntFlight);
+    // Post the data to the parent app
+    window.parent.postMessage(
+      {
+        type: "SELECTED_INT_FLIGHT",
+        payload: {
+          generalInformation,
+          intFlightInformation,
+          selectedIntFlight,
+        },
+      },
+      "*"
+    );
+  };
+
+  // Update the خرید button in the جزئیات پرواز tab
+  <TabsContent value="details">
+    <motion.div
+      className="space-y-4"
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.1,
+          },
+        },
+      }}
+    >
+      {/* Flight details rendering */}
+    </motion.div>
+    <Button
+      onClick={handleInternationalFlightPurchase} // Add the handler here
+      className="w-full animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+    >
+      خرید
+    </Button>
+  </TabsContent>;
+
   // Function to handle card click
   const handleFlightCardClick = () => {
     const flightInfo = {
@@ -517,14 +624,20 @@ const FlightCard = ({
                     <Tabs defaultValue="details" className="w-full">
                       <TabsList className="grid w-full grid-cols-3">
                         <TabsTrigger value="details">جزئیات پرواز</TabsTrigger>
-                        <TabsTrigger value="baggage-rules">
+                        <TabsTrigger
+                          value="baggage-rules"
+                          disabled={isLoadingBaggage ? true : undefined}
+                        >
                           {isLoadingBaggage ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
                             "قوانین بار"
                           )}
                         </TabsTrigger>
-                        <TabsTrigger value="refund-rules">
+                        <TabsTrigger
+                          value="refund-rules"
+                          disabled={isLoadingRefund ? true : undefined}
+                        >
                           {isLoadingRefund ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
@@ -624,14 +737,17 @@ const FlightCard = ({
                               )
                           )}
                         </motion.div>
-                        <Button className="w-full animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+                        <Button
+                          onClick={handleInternationalFlightPurchase}
+                          className="w-full animate-shimmer border-slate-800 items-center justify-center border border-primary dark:text-card-foreground bg-primary bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+                        >
                           خرید
                         </Button>
                       </TabsContent>
 
                       {/* قوانین بار Tab */}
                       <TabsContent value="baggage-rules">
-                        <div className="space-y-4" dir="ltr">
+                        <div className="space-y-4 text-center" dir="ltr">
                           {baggageRules ? (
                             Array.isArray(baggageRules) ? (
                               <>
@@ -650,7 +766,7 @@ const FlightCard = ({
                               renderMarkdown(baggageRules)
                             )
                           ) : (
-                            <p className="text-sm text-card-foreground">
+                            <p className="text-sm text-card-foreground text-center">
                               داده‌ای یافت نشد.
                             </p>
                           )}
@@ -659,7 +775,7 @@ const FlightCard = ({
 
                       {/* قوانین استرداد Tab */}
                       <TabsContent value="refund-rules">
-                        <div className="space-y-4 w-full" dir="ltr">
+                        <div className="space-y-4 w-full text-center" dir="ltr">
                           {refundRules ? (
                             Array.isArray(refundRules) ? (
                               <>
@@ -687,7 +803,7 @@ const FlightCard = ({
                               renderMarkdown(refundRules)
                             )
                           ) : (
-                            <p className="text-sm text-card-foreground">
+                            <p className="text-sm text-card-foreground text-center">
                               داده‌ای یافت نشد.
                             </p>
                           )}

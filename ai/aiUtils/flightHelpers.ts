@@ -59,6 +59,10 @@ export const constructApiUrl = (
   if (isDomestic) {
     return `${API_ENDPOINTS.DOMESTIC.FLIGHTS}?departure=${departureId}&destination=${destinationId}&round_trip=false&date=${date}`;
   }
+  console.log(
+    "domestic apiUrl",
+    `${API_ENDPOINTS.DOMESTIC.FLIGHTS}?departure=${departureId}&destination=${destinationId}&round_trip=false&date=${date}`
+  );
 
   const params = new URLSearchParams({
     departure: departureId.toString(),
@@ -69,6 +73,10 @@ export const constructApiUrl = (
     child: "0",
     infant: "0",
   });
+  console.log(
+    "intenrationl apiUrl",
+    `${API_ENDPOINTS.INTERNATIONAL.FLIGHTS}/?${params}`
+  );
   return `${API_ENDPOINTS.INTERNATIONAL.FLIGHTS}/?${params}`;
 };
 
