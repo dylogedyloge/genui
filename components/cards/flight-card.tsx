@@ -268,17 +268,21 @@ const FlightCard = ({
     );
   };
 
-  // Add this function to construct the required data for international flights
   const handleInternationalFlightPurchase = () => {
     // Ensure departureTime is defined and in the correct format
     const departureDate =
       segments[0]?.departureDate || departureTime?.split("T")[0];
-
+  
     if (!departureDate) {
       console.error("Departure date is missing or invalid.");
       return;
     }
-
+  
+    // Extract departure and destination data from the first segment
+    const firstSegment = segments[0];
+    const departureCity = firstSegment.departure.city;
+    const destinationCity = firstSegment.destination.city;
+  
     // Construct generalInformation
     const generalInformation = {
       ticket: true,
@@ -286,33 +290,32 @@ const FlightCard = ({
       itinerary: false,
       isInternational: true,
     };
-    console.log("generalInformation", generalInformation);
-
+  console.log("generalInformation",generalInformation)
     // Construct intFlightInformation
     const intFlightInformation = {
       departure: {
-        id: departureCityData.id,
+        id: departureCityData?.id || undefined,
         subs: [],
-        name: departureCityData.name,
-        english_name: departureCityData.english_name,
-        code: departureCityData.iata,
-        city: departureCityData.name,
-        english_city: departureCityData.english_name,
-        country: departureCityData.country,
-        english_country: departureCityData.country,
-        country_code: departureCityData.country_code,
+        name: departureCity.persian,
+        english_name: departureCity.english,
+        code: firstSegment.departure.terminal.code,
+        city: departureCity.persian,
+        english_city: departureCity.english,
+        country: firstSegment.departure.country.persian,
+        english_country: firstSegment.departure.country.english,
+        country_code: firstSegment.departure.country.code,
       },
       destination: {
-        id: destinationCityData.id,
+        id: destinationCityData?.id || undefined,
         subs: [],
-        name: destinationCityData.name,
-        english_name: destinationCityData.english_name,
-        code: destinationCityData.iata,
-        city: destinationCityData.name,
-        english_city: destinationCityData.english_name,
-        country: destinationCityData.country,
-        english_country: destinationCityData.country,
-        country_code: destinationCityData.country_code,
+        name: destinationCity.persian,
+        english_name: destinationCity.english,
+        code: firstSegment.destination.terminal.code,
+        city: destinationCity.persian,
+        english_city: destinationCity.english,
+        country: firstSegment.destination.country.persian,
+        english_country: firstSegment.destination.country.english,
+        country_code: firstSegment.destination.country.code,
       },
       departureDate, // Use the validated departureDate
       returnDate: null, // No return date for one-way flights
@@ -324,7 +327,8 @@ const FlightCard = ({
       },
       isDirect: segments.length === 1, // True if there are no connecting flights
     };
-    console.log("intFlightInformation", intFlightInformation);
+    console.log("intFlightInformation",intFlightInformation)
+  
     // Construct selectedIntFlight
     const selectedIntFlight = {
       id,
@@ -336,7 +340,8 @@ const FlightCard = ({
       segments,
       return_segments: returnSegments,
     };
-    console.log("selectedIntFlight", selectedIntFlight);
+    console.log("selectedIntFlight",selectedIntFlight)
+  
     // Post the data to the parent app
     window.parent.postMessage(
       {
