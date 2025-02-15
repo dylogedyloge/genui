@@ -58,8 +58,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
         size="icon"
         onClick={() => handleSubmit()} // Call the custom handleSubmit
         disabled={isLoading || error != null}
+        className="bg-[#006363]"
       >
-        <SendHorizontal className="w-4 h-4 -rotate-180" />
+        <SendHorizontal className="w-4 h-4 -rotate-180 text-white" />
         <span className="sr-only">ارسال</span>
       </Button>
     </div>

@@ -1,6 +1,6 @@
 export interface ChatInterfaceProps {}
 
-// Define the structure of the Flight, Hotel, Restaurant, and Tour
+// Define the structure of the Flight, or Hotel
 export interface Flight {
   id: number; // Unique identifier
   airline: string; // Airline name (e.g. "هواپیمایی ماهان")
@@ -68,35 +68,12 @@ export interface Hotel {
   rating: number; // Hotel rating (e.g., out of 5 stars)
 }
 
-export interface Restaurant {
-  id: string; // Unique identifier for the restaurant
-  name: string; // Name of the restaurant
-  cuisine: string; // Type of cuisine (e.g., "Italian", "Persian")
-  location: string; // Location of the restaurant
-  openingTime: string; // Opening time of the restaurant
-  closingTime: string; // Closing time of the restaurant
-  rating: number; // Rating of the restaurant (e.g., out of 5 stars)
-  priceRange: string; // Price range (e.g., "$$", "$$$")
-}
-
-export interface Tour {
-  id: string; // Unique identifier for the tour
-  name: string; // Name of the tour
-  destination: string; // Destination of the tour
-  duration: string; // Duration of the tour (e.g., "3 days")
-  startDate: string; // Start date of the tour
-  endDate: string; // End date of the tour
-  groupSize: number; // Number of people in the tour group
-  price: number; // Price of the tour (e.g., in Toman)
-  category: string; // Category (e.g., "Adventure", "Luxury")
-}
-
-// Tool Invocation for displaying flight, hotel, restaurant, or tour details
+// Tool Invocation for displaying flight, or hotel details
 export interface ToolInvocation {
   toolName: string;
   toolCallId: string;
   state: "calling" | "result";
-  result?: Flight[] | Hotel[] | Restaurant[] | Tour[];
+  result?: Flight[] | Hotel[];
 }
 
 // Message structure

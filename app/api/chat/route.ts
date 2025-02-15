@@ -1,21 +1,13 @@
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
 import { tools } from "@/ai/tools";
-import moment from "moment-jalaali"; // Import moment-jalaali
+import DateService from "@/services//date-service";
 
 export async function POST(request: Request) {
   const { messages } = await request.json();
-  // Get today's date in Gregorian format (for API calls) and Jalali format (for display)
-  const today = new Date();
-  const currentDateGregorian = today.toISOString().split("T")[0]; // Gregorian format: YYYY-MM-DD
-  const currentDateJalali = moment(today).format("jYYYY/jMM/jDD"); // Jalali format: jYYYY/jMM/jDD
-  const tomorrow = new Date(currentDateGregorian);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tommorrowDateGerogorian = tomorrow.toISOString().split("T")[0];
-  const tommorrowDateJalali = moment(tomorrow).format("jYYYY/jMM/jDD");
-  console.log("currentDateJalali", currentDateJalali);
-  console.log("currentDateGregorian", currentDateGregorian);
-  console.log("tomorrow", tomorrow);
+  const { gregorian: tomorrowDateGregorian, jalali: tomorrowDateJalali } =
+    DateService.getTomorrow();
+
   const result = await streamText({
     model: openai("gpt-4o"),
     system: `
@@ -25,9 +17,7 @@ export async function POST(request: Request) {
 2. When users ask about:
    - Flights → Use 'displayFlightCard' tool
    - Hotels → Use 'displayHotelCard' tool
-   - Restaurants → Use 'displayRestaurantCard' tool
-   - Tours → Use 'displayTourCard' tool
-3. The tommorrow date is ${tommorrowDateGerogorian} (Gregorian) and ${tommorrowDateJalali} (Jalali). Use this to interpret relative dates.
+3. The tommorrow date is ${tomorrowDateGregorian} (Gregorian) and ${tomorrowDateJalali} (Jalali). Use this to interpret relative dates.
 4. Important Rules:
    - NEVER list travel details in text.
    - ALWAYS use the appropriate card display tool.

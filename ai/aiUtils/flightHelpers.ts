@@ -54,7 +54,8 @@ export const constructApiUrl = (
   isDomestic: boolean,
   departureId: string,
   destinationId: string,
-  date: string
+  date: string,
+  passengers: { adult: number; child: number; infant: number }
 ) => {
   if (isDomestic) {
     return `${API_ENDPOINTS.DOMESTIC.FLIGHTS}?departure=${departureId}&destination=${destinationId}&round_trip=false&date=${date}`;
@@ -69,12 +70,12 @@ export const constructApiUrl = (
     destination: destinationId.toString(),
     round_trip: "false",
     date: date,
-    adult: "1",
-    child: "0",
-    infant: "0",
+    adult: passengers.adult.toString(),
+    child: passengers.child.toString(),
+    infant: passengers.infant.toString(),
   });
   console.log(
-    "intenrationl apiUrl",
+    "internationl apiUrl",
     `${API_ENDPOINTS.INTERNATIONAL.FLIGHTS}/?${params}`
   );
   return `${API_ENDPOINTS.INTERNATIONAL.FLIGHTS}/?${params}`;
@@ -114,39 +115,6 @@ export const transformFlightData = (flightData: any, isDomestic: boolean) => {
     }));
   }
 
-  // return flightData.data.results.list.map((flight: any) => {
-  //   const firstSegment = flight.segments[0];
-  //   const lastSegment = flight.segments[flight.segments.length - 1];
-  //   return {
-  //     fareSourceCode: flight.fare_source_code,
-  //     airline: firstSegment.airline.persian, // Airline name in Persian
-  //     flightNumber: firstSegment.flight_number, // Flight number
-  //     departureTime: `${firstSegment.departure_date}- ${firstSegment.departure_time}`, // Departure time
-  //     arrivalTime: `${lastSegment.arrival_date}- ${lastSegment.destination_time}`, // Arrival time
-  //     price: flight.fares.adult.total_price, // Price for adults
-  //     departure: firstSegment.departure.city.persian, // Departure city in Persian
-  //     destination: lastSegment.destination.city.persian, // Destination city in Persian
-  //     baggage: firstSegment.baggage, // Baggage allowance
-  //     airlineLogo: firstSegment.airline.image, // Airline logo
-  //     type: firstSegment.type,
-  //     capacity: firstSegment.capacity,
-  //     sellingType: firstSegment.sellingType,
-  //     id: firstSegment.id,
-  //     class: firstSegment.class,
-  //     cobin: firstSegment.cobin,
-  //     persian_type: firstSegment.persian_type,
-  //     refundable: firstSegment.refundable,
-  //     child_price: firstSegment.child_price,
-  //     infant_price: firstSegment.infant_price,
-  //     departure_terminal: firstSegment.departure_terminal,
-  //     refund_rules: firstSegment.refund_rules,
-  //     destination_terminal: firstSegment.destination_terminal,
-  //     flight_duration: firstSegment.flight_duration,
-  //     cobin_persian: firstSegment.cobin_persian,
-  //     with_tour: firstSegment.with_tour,
-  //     tag: firstSegment.tag,
-  //   };
-  // });
   return flightData.data.results.list.map((flight: any) => {
     const firstSegment = flight.segments[0];
     const lastSegment = flight.segments[flight.segments.length - 1];

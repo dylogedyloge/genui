@@ -195,12 +195,31 @@ export const FlightTool = createTool({
     departureCity: z.string(),
     destinationCity: z.string(),
     date: z.string(),
+    passengers: z
+      .object({
+        adult: z.number(),
+        child: z.number(),
+        infant: z.number(),
+      })
+      .optional(),
   }),
-  execute: async function ({ departureCity, destinationCity, date }) {
+  execute: async function ({
+    departureCity,
+    destinationCity,
+    date,
+    passengers,
+  }) {
     if (!date) {
       return {
         message: "لطفاً تاریخ پرواز رو به من بگین.",
         flights: [],
+      };
+    }
+
+    if (!passengers) {
+      return {
+        message: "لطفاً تعداد مسافران رو بهم بگین.",
+        showPAssengerCounter: true,
       };
     }
 
@@ -214,7 +233,8 @@ export const FlightTool = createTool({
         isDomestic,
         departureId,
         destinationId,
-        date
+        date,
+        passengers
       );
 
       // Fetch flight data
@@ -297,7 +317,6 @@ export const HotelTool = createTool({
 
         // If not found as a foreign city, try fetching as a domestic city (foreign=false)
         const domesticResponse = await fetch(
-          // `https://api.atripa.ir/api/v2/basic/cities?search=${cityName}&foreign=false&accommodation=true`
           `${API_ENDPOINTS.DOMESTIC.CITIES}?search=${cityName}&foreign=false&accommodation=true`
         );
 
@@ -324,7 +343,6 @@ export const HotelTool = createTool({
       if (cityData.isDomestic) {
         // Domestic hotel API
         apiUrl = `${API_ENDPOINTS.DOMESTIC.HOTELS}/?city=${cityData.cityId}&check_in=${checkIn}&check_out=${checkOut}&adults_count=${adultsCount}`;
-        // apiUrl = `https://api.atripa.ir/reserve/accommodation/list/?city=${cityData.cityId}&check_in=${checkIn}&check_out=${checkOut}&adults_count=${adultsCount}`;
       } else {
         // International hotel API
         apiUrl = `${API_ENDPOINTS.INTERNATIONAL.HOTELS}/?city=${
@@ -332,16 +350,11 @@ export const HotelTool = createTool({
         }&check_in=${checkIn}&check_out=${checkOut}&adult_count=${adultsCount}&child_count=${childCount}&child_ages=${childAges.join(
           ","
         )}&nationality=IR`;
-        // apiUrl = `https://api.atripa.ir/api/v2/reserve/foreign/accommodation/list/?city=${
-        //   cityData.cityId
-        // }&check_in=${checkIn}&check_out=${checkOut}&adult_count=${adultsCount}&child_count=${childCount}&child_ages=${childAges.join(
-        //   ","
-        // )}&nationality=IR`;
       }
-
+      console.log("first api url", apiUrl);
       // Fetch hotel data using the appropriate API
       const hotelResponse = await fetch(apiUrl);
-
+      console.log("API URL", apiUrl);
       // Check if the API call was successful
       if (!hotelResponse.ok) {
         throw new Error(
@@ -350,7 +363,6 @@ export const HotelTool = createTool({
       }
 
       const hotelData = await hotelResponse.json();
-
       // Normalize the hotel data for both domestic and international hotels
       let hotels = [];
       if (cityData.isDomestic) {
@@ -401,125 +413,8 @@ export const HotelTool = createTool({
     }
   },
 });
-export const RestaurantTool = createTool({
-  description: "Display the restaurant card for a restaurant",
-  parameters: z.object({
-    location: z.string(),
-  }),
-  execute: async function ({ location }) {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    return [
-      {
-        name: "رستوران فرنو",
-        cuisine: "ایتالیایی",
-        location,
-        openingTime: "9 صبح",
-        closingTime: "12 شب",
-        rating: 4.6,
-        priceRange: 850000,
-      },
-      {
-        name: "کافه دیدار",
-        cuisine: "فرانسوی",
-        location,
-        openingTime: "8 صبح",
-        closingTime: "11 شب",
-        rating: 4.3,
-        priceRange: 500000,
-      },
-      {
-        name: "فست‌فود برگ سبز",
-        cuisine: "فست‌فود",
-        location,
-        openingTime: "11 صبح",
-        closingTime: "1 بامداد",
-        rating: 4.7,
-        priceRange: 300000,
-      },
-      {
-        name: "رستوران شب‌های تهران",
-        cuisine: "ایرانی",
-        location,
-        openingTime: "10 صبح",
-        closingTime: "11 شب",
-        rating: 4.5,
-        priceRange: 600000,
-      },
-      {
-        name: "کافه سیمرغ",
-        cuisine: "ترکی",
-        location,
-        openingTime: "9 صبح",
-        closingTime: "12 شب",
-        rating: 4.8,
-        priceRange: 750000,
-      },
-      {
-        name: "رستوران بام سبز",
-        cuisine: "مدیترانه‌ای",
-        location,
-        openingTime: "12 ظهر",
-        closingTime: "2 بامداد",
-        rating: 4.2,
-        priceRange: 950000,
-      },
-      {
-        name: "رستوران طهران قدیم",
-        cuisine: "سنتی",
-        location,
-        openingTime: "10 صبح",
-        closingTime: "10 شب",
-        rating: 4.4,
-        priceRange: 400000,
-      },
-    ];
-  },
-});
-export const TourTool = createTool({
-  description: "Display the tour card for a tour",
-  parameters: z.object({
-    destination: z.string(),
-  }),
-  execute: async function ({ destination }) {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    return [
-      {
-        name: "تور اهرام مصر",
-        destination,
-        duration: "7 روز",
-        startDate: "14 دی 1403",
-        endDate: "21 دی 1403",
-        groupSize: "50 نفر",
-        price: "1200000",
-        category: "ماجراجویی",
-      },
-      {
-        name: "تور جزایر مالدیو",
-        destination,
-        duration: "5 روز",
-        startDate: "10 بهمن 1403",
-        endDate: "15 بهمن 1403",
-        groupSize: "20 نفر",
-        price: "3000000",
-        category: "استراحتی",
-      },
-      {
-        name: "تور طبیعت‌گردی گیلان",
-        destination,
-        duration: "3 روز",
-        startDate: "5 اسفند 1403",
-        endDate: "8 اسفند 1403",
-        groupSize: "35 نفر",
-        price: "800000",
-        category: "طبیعت‌گردی",
-      },
-    ];
-  },
-});
 
 export const tools = {
   displayFlightCard: FlightTool,
   displayHotelCard: HotelTool,
-  displayRestaurantCard: RestaurantTool,
-  displayTourCard: TourTool,
 };

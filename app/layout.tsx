@@ -8,7 +8,7 @@ import { Providers } from "@/components/providers/providers";
 
 // Persian font
 const vazir = localFont({
-  src: "./fonts/Vazir-Light-FD.ttf",
+  src: "./fonts/YekanBakhFaNum-Light.ttf",
   display: "swap",
 });
 

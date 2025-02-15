@@ -34,9 +34,9 @@ INSTRUCTIONS:
       USE_LOCAL_RELAY_SERVER_URL
         ? { url: USE_LOCAL_RELAY_SERVER_URL }
         : {
-          apiKey: apiKey,
-          dangerouslyAllowAPIKeyInBrowser: true,
-        }
+            apiKey: apiKey,
+            dangerouslyAllowAPIKeyInBrowser: true,
+          }
     )
   );
 
@@ -202,7 +202,7 @@ INSTRUCTIONS:
     client.updateSession({ instructions: instructions });
     client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
     client.updateSession({ voice: "ash" });
-    
+
     client.on("error", (event: any) => console.error(event));
     client.on("conversation.interrupted", async () => {
       const trackSampleOffset = await wavStreamPlayer.interrupt();
@@ -211,7 +211,7 @@ INSTRUCTIONS:
         await client.cancelResponse(trackId, offset);
       }
     });
-    
+
     client.on("conversation.updated", async ({ item, delta }: any) => {
       const items = client.conversation.getItems();
       if (delta?.audio) {
@@ -247,8 +247,9 @@ INSTRUCTIONS:
             variant={isConnected ? "destructive" : "default"}
             size="icon"
             onClick={isConnected ? disconnectConversation : connectConversation}
-            className={`w-16 h-16 rounded-full ${isConnected ? "animate-pulse" : ""
-              }`}
+            className={`w-16 h-16 rounded-full ${
+              isConnected ? "animate-pulse" : ""
+            }`}
           >
             {isConnected ? <MicOff /> : <Mic />}
           </Button>

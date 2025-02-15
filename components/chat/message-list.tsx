@@ -3,13 +3,9 @@ import { AnimatePresence } from "framer-motion";
 
 import FlightCard from "@/components/cards/flight-card";
 import HotelCard from "@/components/cards/hotel-card";
-import RestaurantCard from "@/components/cards/restaurant-card";
-import TourCard from "@/components/cards/tour-card";
 
 import FlightCardSkeleton from "@/components/skeletons/flight-card-skeleton";
 import HotelCardSkeleton from "@/components/skeletons/hotel-card-skeleton";
-import RestaurantCardSkeleton from "@/components/skeletons/restaurant-card-skeleton";
-import TourCardSkeleton from "@/components/skeletons/tour-card-skeleton";
 
 import { formatPersianTime } from "@/utils/time-helpers";
 import { Button } from "@/components/shadcn/button";
@@ -18,8 +14,6 @@ import { useEffect, useRef, useState } from "react";
 import {
   Flight,
   Hotel,
-  Restaurant,
-  Tour,
   ToolInvocation,
   Message,
   VisibilityControl,
@@ -47,28 +41,11 @@ function isFlightArray(result: any): result is FlightResult {
     result.destinationCityData
   );
 }
-// const isFlightArray = (
-//   result: any | undefined
-// ): result is { flights: Flight[] } => {
-//   return !!result && Array.isArray(result.flights);
-// };
 
 const isHotelArray = (
-  result: Flight[] | Hotel[] | Restaurant[] | Tour[] | undefined
+  result: Flight[] | Hotel[] | undefined
 ): result is Hotel[] => {
   return !!result && (result as Hotel[])[0]?.hotelName !== undefined;
-};
-
-const isRestaurantArray = (
-  result: Flight[] | Hotel[] | Restaurant[] | Tour[] | undefined
-): result is Restaurant[] => {
-  return !!result && (result as Restaurant[])[0]?.cuisine !== undefined;
-};
-
-const isTourArray = (
-  result: Flight[] | Hotel[] | Restaurant[] | Tour[] | undefined
-): result is Tour[] => {
-  return !!result && (result as Tour[])[0]?.destination !== undefined;
 };
 
 interface MessageListProps {
@@ -81,8 +58,6 @@ interface MessageListProps {
   visibilityControls: {
     flights: VisibilityControl;
     hotels: VisibilityControl;
-    restaurants: VisibilityControl;
-    tours: VisibilityControl;
   };
 }
 
@@ -177,29 +152,6 @@ const MessageList: React.FC<MessageListProps> = ({
                             );
                           }
                           break;
-
-                        case "displayRestaurantCard":
-                          if (isRestaurantArray(result)) {
-                            return renderRestaurantCards(
-                              result,
-                              messageIndex,
-                              invocationIndex,
-                              visibilityControls.restaurants
-                            );
-                          }
-                          break;
-
-                        case "displayTourCard":
-                          if (isTourArray(result)) {
-                            return renderTourCards(
-                              result,
-                              messageIndex,
-                              invocationIndex,
-                              visibilityControls.tours
-                            );
-                          }
-                          break;
-
                         default:
                           return null;
                       }
@@ -321,52 +273,6 @@ const renderHotelCards = (
   );
 };
 
-const renderRestaurantCards = (
-  restaurants: Restaurant[],
-  messageIndex: number,
-  invocationIndex: number,
-  visibilityControl: VisibilityControl
-) => {
-  return (
-    <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
-      {restaurants
-        .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
-        .map((restaurant: Restaurant) => (
-          <RestaurantCard key={restaurant.id} {...restaurant} />
-        ))}
-      {renderVisibilityButtons(
-        restaurants.length,
-        messageIndex,
-        invocationIndex,
-        visibilityControl
-      )}
-    </div>
-  );
-};
-
-const renderTourCards = (
-  tours: Tour[],
-  messageIndex: number,
-  invocationIndex: number,
-  visibilityControl: VisibilityControl
-) => {
-  return (
-    <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
-      {tours
-        .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
-        .map((tour: Tour) => (
-          <TourCard key={tour.id} {...tour} />
-        ))}
-      {renderVisibilityButtons(
-        tours.length,
-        messageIndex,
-        invocationIndex,
-        visibilityControl
-      )}
-    </div>
-  );
-};
-
 /**
  * Render "Show More" and "Show Less" buttons
  */
@@ -421,22 +327,6 @@ const renderSkeletonsForTool = (toolName: string) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[...Array(2)].map((_, i) => (
             <HotelCardSkeleton key={i} />
-          ))}
-        </div>
-      );
-    case "displayRestaurantCard":
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[...Array(2)].map((_, i) => (
-            <RestaurantCardSkeleton key={i} />
-          ))}
-        </div>
-      );
-    case "displayTourCard":
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[...Array(2)].map((_, i) => (
-            <TourCardSkeleton key={i} />
           ))}
         </div>
       );

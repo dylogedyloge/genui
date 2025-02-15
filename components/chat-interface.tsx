@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 // Components
 import MessageList from "./chat/message-list";
 import ChatInput from "./chat/chat-input";
-import VoiceChat from "./voice.chat";
+import VoiceChat from "./voice-chat";
 import {
   Drawer,
   DrawerContent,
@@ -41,18 +41,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
   } = useVisibilityMap();
 
   const {
-    visibilityMap: restaurantsMap,
-    showMore: showMoreRestaurants,
-    showLess: showLessRestaurants,
-  } = useVisibilityMap();
-
-  const {
-    visibilityMap: toursMap,
-    showMore: showMoreTours,
-    showLess: showLessTours,
-  } = useVisibilityMap();
-
-  const {
     messages: aiMessages,
     input,
     handleInputChange,
@@ -69,7 +57,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
       {
         id: "initial",
         role: "assistant",
-        content: `سلام! من دستیار هوشمند سفر هستم. چطور می‌تونم کمکتون کنم؟`,
+        content: `سلام! من آتریپا هستم. چطور می‌تونم کمکتون کنم؟`,
       },
     ],
   });
@@ -106,12 +94,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
       showMore: showMoreHotels,
       showLess: showLessHotels,
     },
-    restaurants: {
-      map: restaurantsMap,
-      showMore: showMoreRestaurants,
-      showLess: showLessRestaurants,
-    },
-    tours: { map: toursMap, showMore: showMoreTours, showLess: showLessTours },
   };
 
   const mappedMessages = aiMessages.map((message) => ({
