@@ -6,6 +6,7 @@ import HotelCard from "@/components/cards/hotel-card";
 
 import FlightCardSkeleton from "@/components/skeletons/flight-card-skeleton";
 import HotelCardSkeleton from "@/components/skeletons/hotel-card-skeleton";
+import  PassengerCounter  from "@/components/passenger-counter/passenger-counter";
 
 import { formatPersianTime } from "@/utils/time-helpers";
 import { Button } from "@/components/shadcn/button";
@@ -71,6 +72,8 @@ const MessageList: React.FC<MessageListProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
   const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
+  const [showPassengerCounter, setShowPassengerCounter] = useState(false);
+  const [passengerCounterMessage, setPassengerCounterMessage] = useState("");
 
   useEffect(() => {
     if (inputRef.current) {
@@ -86,6 +89,21 @@ const MessageList: React.FC<MessageListProps> = ({
   const handleHotelCardClick = (hotelInfo: Hotel) => {
     setSelectedHotel(hotelInfo);
   };
+
+    // Callback function to handle passenger selection
+    const handlePassengersSelected = (passengers: {
+      adult: number;
+      child: number;
+      infant: number;
+    }) => {
+      // Hide the PassengerCounter component
+      setShowPassengerCounter(false);
+  
+      // Call the FlightTool again with the selected passengers
+      // You can use a function like `retryFlightTool(passengers)`
+      console.log("Selected passengers:", passengers);
+      // Example: retryFlightTool(passengers);
+    };
 
   return (
     <div className="flex-grow overflow-auto space-y-4 mb-4">
@@ -127,6 +145,15 @@ const MessageList: React.FC<MessageListProps> = ({
                     const { toolName, state, result } = toolInvocation;
 
                     if (state === "result") {
+
+// Check if the result includes the `showPassengerCounter` flag
+if (result?.showPassengerCounter) {
+  // Show the PassengerCounter component
+  // setShowPassengerCounter(true); این قسمت را چک کنید
+  setPassengerCounterMessage(result.message);
+  return null; // Skip rendering other content
+}
+
                       // Use type guards to determine the type of `result`
                       switch (toolName) {
                         case "displayFlightCard":
@@ -177,6 +204,15 @@ const MessageList: React.FC<MessageListProps> = ({
         </div>
       ))}
 
+
+
+{/* Render the PassengerCounter component if needed */}
+{showPassengerCounter && (
+        <div className="max-w-[80%] p-3 rounded-lg bg-secondary text-secondary-foreground">
+          <p>{passengerCounterMessage}</p>
+          <PassengerCounter onPassengersSelected={handlePassengersSelected} />
+        </div>
+      )}
       {/* Conditionally render the selected flight details with text transition animation */}
       <AnimatePresence>
         {(selectedFlight || selectedHotel) && (
