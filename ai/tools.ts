@@ -38,7 +38,7 @@ export const FlightTool = createTool({
     if (!passengers) {
       return {
         message: "لطفاً تعداد مسافران رو بهم بگین.",
-        showPAssengerCounter: true,
+        showPassengerCounter: true,
       };
     }
 

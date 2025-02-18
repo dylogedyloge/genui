@@ -17,8 +17,10 @@ import {
 } from "react-icons/fa";
 
 type PassengerType = "بزرگسال" | "کودک" | "نوزاد";
-
-const PassengerCounter = () => {
+interface PassengerCounterProps {
+  onPassengersSelected: (passengers: { adult: number; child: number; infant: number; }) => void;
+}
+const PassengerCounter = ({ onPassengersSelected }: PassengerCounterProps) => {
   const [state, setState] = useState({
     counts: { بزرگسال: 1, کودک: 0, نوزاد: 0 },
     lastUpdated: null as PassengerType | null,
@@ -45,19 +47,14 @@ const PassengerCounter = () => {
     }
   };
 
+// 
   const handleSendNumOfPassengers = () => {
-    const result = {
-      personCounter: {
-        adult: state.counts["بزرگسال"],
-        child: state.counts["کودک"],
-        infant: state.counts["نوزاد"],
-        totalPersons:
-          state.counts["بزرگسال"] +
-          state.counts["کودک"] +
-          state.counts["نوزاد"],
-      },
+    const passengers = {
+      adult: state.counts["بزرگسال"],
+      child: state.counts["کودک"],
+      infant: state.counts["نوزاد"],
     };
-    console.log(JSON.stringify(result, null, 2));
+    onPassengersSelected(passengers); // Call the callback with the selected passengers
   };
 
   const CounterItem = ({

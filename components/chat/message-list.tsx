@@ -145,15 +145,6 @@ const MessageList: React.FC<MessageListProps> = ({
                     const { toolName, state, result } = toolInvocation;
 
                     if (state === "result") {
-
-// Check if the result includes the `showPassengerCounter` flag
-if (result?.showPassengerCounter) {
-  // Show the PassengerCounter component
-  // setShowPassengerCounter(true); این قسمت را چک کنید
-  setPassengerCounterMessage(result.message);
-  return null; // Skip rendering other content
-}
-
                       // Use type guards to determine the type of `result`
                       switch (toolName) {
                         case "displayFlightCard":
@@ -244,7 +235,7 @@ const renderFlightCards = (
   },
   messageIndex: number,
   invocationIndex: number,
-  visibilityControl: VisibilityControl,
+  visibilityControl: VisibilityControl, 
   onFlightCardClick: (flightInfo: Flight) => void
 ) => {
   return (
