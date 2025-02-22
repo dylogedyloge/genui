@@ -244,22 +244,31 @@ const renderFlightCards = (
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((flight: Flight) => (
           <FlightCard
-            fareSourceCode={""}
-            isClosed={false}
-            visaRequirements={[]}
-            fares={undefined}
-            cabin={undefined}
-            segments={[]}
-            returnSegments={[]}
-            key={flight.id}
-            {...flight}
-            onFlightCardClick={onFlightCardClick}
-            departureCityData={flights.departureCityData}
-            destinationCityData={flights.destinationCityData}
-            isDomestic={
-              flights.departureCityData.isDomestic &&
-              flights.destinationCityData.isDomestic
-            }
+          fareSourceCode={""}
+          isClosed={false}
+          visaRequirements={[]}
+          fares={{
+            adult: {
+              price: 0,
+              count: 0,
+              total_price: 0
+            },
+            total_price: 0
+          }}
+          cabin={{ persian: "" }}
+          segments={[]}
+          returnSegments={[]}
+          key={flight.id}
+          {...flight}
+          onFlightCardClick={onFlightCardClick}
+          refundable={flight.refundable ?? false}
+          departureCityData={flights.departureCityData}
+          destinationCityData={flights.destinationCityData}
+          with_tour={flight.with_tour ?? false}
+          isDomestic={
+            flights.departureCityData.isDomestic &&
+            flights.destinationCityData.isDomestic
+          }
           />
         ))}
       {renderVisibilityButtons(

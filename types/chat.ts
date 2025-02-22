@@ -25,7 +25,7 @@ export interface Flight {
   child_price: number; // Child ticket price
   infant_price: number; // Infant ticket price
   departure_terminal: string; // Departure terminal
-  refund_rules: []; // Refund policy rules
+  refund_rules: any[]; // Refund policy rules
   destination_terminal: string; // Arrival terminal
   flight_duration: string; // Duration of flight
   cobin_persian: string; // Persian cabin class

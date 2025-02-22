@@ -822,6 +822,7 @@ import { FaPlane } from "react-icons/fa";
 import type React from "react";
 import { API_ENDPOINTS } from "@/endpoints/endpoints";
 import DOMPurify from "dompurify";
+import type { Flight } from "@/types/chat";
 
 interface FlightSegment {
   departure_date: string;
@@ -831,12 +832,34 @@ interface FlightSegment {
   flight_number: string;
   flight_duration: string;
   departure: {
-    city: { persian: string };
-    terminal: { name: string; code: string };
+    city: {
+      persian: string;
+      english?: string;
+    };
+    terminal: {
+      name: string;
+      code: string;
+    };
+    country?: {
+      persian: string;
+      english: string;
+      code: string;
+    };
   };
   destination: {
-    city: { persian: string };
-    terminal: { name: string; code: string };
+    city: {
+      persian: string;
+      english?: string;
+    };
+    terminal: {
+      name: string;
+      code: string;
+    };
+    country?: {
+      persian: string;
+      english: string;
+      code: string;
+    };
   };
   airline: {
     persian: string;
@@ -899,7 +922,7 @@ interface FlightProps {
   flightClass: string;
   cobin: string;
   persian_type: string;
-  refundable: boolean;
+  refundable: boolean | null;
   child_price: number;
   infant_price: number;
   departure_terminal: string;
@@ -912,6 +935,7 @@ interface FlightProps {
   departureCityData: CityData | null;
   destinationCityData: CityData | null;
   isDomestic: boolean;
+  onFlightCardClick: (flightInfo: Flight) => void;
 }
 
 const convertToJalali = (
@@ -987,6 +1011,8 @@ const FlightCard: React.FC<FlightProps> = ({
   departureCityData,
   destinationCityData,
   isDomestic,
+  onFlightCardClick,
+  
 }: FlightProps) => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [flightInfo, setFlightInfo] = useState<any | null>(null);
@@ -1006,10 +1032,51 @@ const FlightCard: React.FC<FlightProps> = ({
   //   console.log("Purchasing international flight...");
   // };
   const handleFlightCardClick = () => {
+    const flightInfo = {
+      id,
+      fareSourceCode,
+      isClosed,
+      visaRequirements,
+      fares,
+      cabin,
+      segments,
+      returnSegments,
+      airline,
+      flightNumber,
+      departure,
+      destination,
+      departureTime,
+      arrivalTime,
+      price,
+      airlineLogo,
+      type,
+      capacity,
+      sellingType,
+      aircraft,
+      baggage,
+      flightClass,
+      cobin,
+      persian_type,
+      refundable,
+      child_price,
+      infant_price,
+      departure_terminal,
+      refund_rules,
+      destination_terminal,
+      flight_duration,
+      cobin_persian,
+      with_tour,
+      tag,
+      departureCityData,
+      destinationCityData,
+    };
+
     if (isDomestic) {
       handleDomesticFlightPurchase();
     } else {
       setIsAccordionOpen(!isAccordionOpen);
+      // Call the onFlightCardClick prop with the flight information
+      onFlightCardClick(flightInfo);
     }
   };
   // Function to handle card click
@@ -1100,26 +1167,26 @@ const FlightCard: React.FC<FlightProps> = ({
       departure: {
         id: departureCityData?.id,
         subs: [],
-        name: firstSegment.departure.city.persian,
-        english_name: firstSegment.departure.city.english,
-        code: firstSegment.departure.terminal.code,
-        city: firstSegment.departure.city.persian,
-        english_city: firstSegment.departure.city.english,
-        country: firstSegment.departure.country.persian,
-        english_country: firstSegment.departure.country.english,
-        country_code: firstSegment.departure.country.code,
+        name: firstSegment.departure.city.persian || "",
+        english_name: firstSegment.departure.city?.english || "",
+        code: firstSegment.departure.terminal?.code || "",
+        city: firstSegment.departure.city?.persian || "",
+        english_city: firstSegment.departure.city?.english || "",
+        country: firstSegment.departure.country?.persian || "",
+        english_country: firstSegment.departure.country?.english || "",
+        country_code: firstSegment.departure.country?.code || "",
       },
       destination: {
         id: destinationCityData?.id,
         subs: [],
-        name: firstSegment.destination.city.persian,
-        english_name: firstSegment.destination.city.english,
-        code: firstSegment.destination.terminal.code,
-        city: firstSegment.destination.city.persian,
-        english_city: firstSegment.destination.city.english,
-        country: firstSegment.destination.country.persian,
-        english_country: firstSegment.destination.country.english,
-        country_code: firstSegment.destination.country.code,
+        name: firstSegment.destination.city?.persian || "",
+        english_name: firstSegment.destination.city?.english || "",
+        code: firstSegment.destination.terminal?.code || "",
+        city: firstSegment.destination.city?.persian || "",
+        english_city: firstSegment.destination.city?.english || "",
+        country: firstSegment.destination.country?.persian || "",
+        english_country: firstSegment.destination.country?.english || "",
+        country_code: firstSegment.destination.country?.code || "",
       },
       departureDate: firstSegment.departure_date,
       returnDate: null,
