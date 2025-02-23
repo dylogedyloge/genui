@@ -7,7 +7,6 @@ import {
 } from "./aiUtils";
 import { API_ENDPOINTS } from "../endpoints/endpoints";
 
-
 export const FlightTool = createTool({
   description: "Display a grid of flight cards",
   parameters: z.object({
@@ -55,12 +54,24 @@ export const FlightTool = createTool({
         date,
         passengers
       );
+      console.log("apiUrl:", apiUrl);
 
       // Fetch flight data
       const flightResponse = await fetch(apiUrl, {
         method: isDomestic ? "GET" : "POST",
-        headers: isDomestic ? {} : { Accept: "application/json" },
+        headers: isDomestic
+          ? {}
+          : {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+              // Add any other required headers
+              "X-Requested-With": "XMLHttpRequest",
+              "Cache-Control": "no-cache",
+            },
+        cache: "no-store",
+        credentials: "include",
       });
+      console.log("apiUrl in tools", apiUrl);
 
       if (!flightResponse.ok) {
         throw new Error(

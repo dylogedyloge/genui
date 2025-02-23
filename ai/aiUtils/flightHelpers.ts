@@ -52,109 +52,46 @@ export const determineFlightType = async (
 // Function to construct the API URL based on flight type
 export const constructApiUrl = (
   isDomestic: boolean,
-  departureId: string,
-  destinationId: string,
+  departureId: string | number,
+  destinationId: string | number,
   date: string,
-  passengers: { adult: number; child: number; infant: number }
+  passengers: { adult: number; child: number; infant: number } | undefined
 ) => {
-  if (isDomestic) {
-    return `${API_ENDPOINTS.DOMESTIC.FLIGHTS}?departure=${departureId}&destination=${destinationId}&round_trip=false&date=${date}`;
-  }
-  console.log(
-    "domestic apiUrl",
-    `${API_ENDPOINTS.DOMESTIC.FLIGHTS}?departure=${departureId}&destination=${destinationId}&round_trip=false&date=${date}`
-  );
+  const baseUrl = isDomestic
+    ? API_ENDPOINTS.DOMESTIC.FLIGHTS
+    : `${API_ENDPOINTS.INTERNATIONAL.FLIGHTS}/`;
 
-  const params = new URLSearchParams({
-    departure: departureId.toString(),
-    destination: destinationId.toString(),
-    round_trip: "false",
-    date: date,
-    adult: passengers.adult.toString(),
-    child: passengers.child.toString(),
-    infant: passengers.infant.toString(),
-  });
-  console.log(
-    "internationl apiUrl",
-    `${API_ENDPOINTS.INTERNATIONAL.FLIGHTS}/?${params}`
-  );
-  return `${API_ENDPOINTS.INTERNATIONAL.FLIGHTS}/?${params}`;
+  const passengerParams = passengers
+    ? `&adult=${passengers.adult}&child=${passengers.child}&infant=${passengers.infant}`
+    : '';
+
+  return `${baseUrl}?departure=${departureId}&destination=${destinationId}&date=${date}${passengerParams}&round_trip=false`;
 };
+// export const constructApiUrl = (
+//   isDomestic: boolean,
+//   departureId: string | number,
+//   destinationId: string | number,
+//   date: string,
+//   passengers: { adult: number; child: number; infant: number } | undefined
+// ) => {
+//   const baseUrl = isDomestic
+//     ? API_ENDPOINTS.DOMESTIC.FLIGHTS
+//     : API_ENDPOINTS.INTERNATIONAL.FLIGHTS;
 
-// Function to transform flight data into a consistent format
-// export const transformFlightData = (flightData: any, isDomestic: boolean) => {
+//   // Construct passenger query params
+//   const passengerParams = passengers
+//     ? `&adult=${passengers.adult}&child=${passengers.child}&infant=${passengers.infant}`
+//     : '';
+
 //   if (isDomestic) {
-//     return flightData.data.list.map((flight: any) => ({
-//       airline: flight.airline_persian,
-//       flightNumber: flight.flight_number,
-//       departureTime: `${flight.departure_date}- ${flight.departure_time}`,
-//       arrivalTime: `${flight.arrival_date}- ${flight.destination_time}`,
-//       price: flight.adult_price,
-//       departure: flight.departure_name,
-//       destination: flight.destination_name,
-//       aircraft: flight.aircraft,
-//       baggage: flight.baggage,
-//       airlineLogo: flight.airline_logo,
-//       type: flight.type,
-//       capacity: flight.capacity,
-//       sellingType: flight.sellingType,
-//       id: flight.id,
-//       flightClass: flight.class,
-//       cobin: flight.cobin,
-//       persian_type: flight.persian_type,
-//       refundable: flight.refundable,
-//       child_price: flight.child_price,
-//       infant_price: flight.infant_price,
-//       departure_terminal: flight.departure_terminal,
-//       refund_rules: flight.refund_rules,
-//       destination_terminal: flight.destination_terminal,
-//       flight_duration: flight.flight_duration,
-//       cobin_persian: flight.cobin_persian,
-//       with_tour: flight.with_tour,
-//       tag: flight.tag,
-//     }));
+//     console.log("isDomestic",isDomestic)
+//     return `${baseUrl}?departure=${departureId}&destination=${destinationId}&date=${date}${passengerParams}&round_trip=false`;
+//   } else {
+//     console.log("isDomestic",isDomestic)
+//     return `${baseUrl}/?departure=${departureId}&destination=${destinationId}&date=${date}${passengerParams}&round_trip=false`; /*look at the slash before url*/
 //   }
-
-//   return flightData.data.results.list.map((flight: any) => {
-//     const firstSegment = flight.segments[0];
-//     const lastSegment = flight.segments[flight.segments.length - 1];
-
-//     return {
-//       id: flight.id,
-//       fareSourceCode: flight.fare_source_code,
-//       isClosed: flight.is_closed,
-//       visaRequirements: flight.visa_requirements,
-//       fares: flight.fares,
-//       cabin: flight.cabin,
-//       segments: flight.segments.map((segment: any) => ({
-//         departureDate: segment.departure_date,
-//         departureTime: segment.departure_time,
-//         arrivalDate: segment.arrival_date,
-//         destinationTime: segment.destination_time,
-//         flightNumber: segment.flight_number,
-//         flightDuration: segment.flight_duration,
-//         connectionTime: segment.connection_time,
-//         fareClass: segment.fare_class,
-//         departure: {
-//           country: segment.departure.country,
-//           city: segment.departure.city,
-//           terminal: segment.departure.terminal,
-//         },
-//         destination: {
-//           country: segment.destination.country,
-//           city: segment.destination.city,
-//           terminal: segment.destination.terminal,
-//         },
-//         airline: segment.airline,
-//         operatingAirline: segment.operating_airline,
-//         aircraft: segment.aircraft,
-//         baggage: segment.baggage,
-//         capacity: segment.capacity,
-//       })),
-//       returnSegments: flight.return_segments,
-//     };
-//   });
 // };
+
 // Function to transform flight data into a consistent format
 export const transformFlightData = (flightData: any, isDomestic: boolean) => {
   if (!flightData?.data) {
