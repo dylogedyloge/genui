@@ -260,7 +260,6 @@ const renderFlightCards = (
           returnSegments={[]}
           key={flight.id}
           {...flight}
-          onFlightCardClick={onFlightCardClick}
           refundable={flight.refundable ?? false}
           departureCityData={flights.departureCityData}
           destinationCityData={flights.destinationCityData}

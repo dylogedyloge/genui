@@ -935,7 +935,7 @@ interface FlightProps {
   departureCityData: CityData | null;
   destinationCityData: CityData | null;
   isDomestic: boolean;
-  onFlightCardClick: (flightInfo: Flight) => void;
+  // onFlightCardClick: (flightInfo: Flight) => void;
 }
 
 const convertToJalali = (
@@ -1011,7 +1011,7 @@ const FlightCard: React.FC<FlightProps> = ({
   departureCityData,
   destinationCityData,
   isDomestic,
-  onFlightCardClick,
+
   
 }: FlightProps) => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
@@ -1076,7 +1076,7 @@ const FlightCard: React.FC<FlightProps> = ({
     } else {
       setIsAccordionOpen(!isAccordionOpen);
       // Call the onFlightCardClick prop with the flight information
-      onFlightCardClick(flightInfo);
+      // onFlightCardClick(flightInfo);
     }
   };
   // Function to handle card click
@@ -1582,7 +1582,7 @@ const FlightCard: React.FC<FlightProps> = ({
                       </motion.div>
                     </motion.div>
                     <Button
-                      onClick={handleFlightCardClick}
+                      onClick={handleInternationalFlightPurchase}
                       className="w-full mt-4"
                     >
                       خرید

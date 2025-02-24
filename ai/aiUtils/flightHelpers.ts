@@ -63,39 +63,15 @@ export const constructApiUrl = (
 
   const passengerParams = passengers
     ? `&adult=${passengers.adult}&child=${passengers.child}&infant=${passengers.infant}`
-    : '';
+    : "";
 
   return `${baseUrl}?departure=${departureId}&destination=${destinationId}&date=${date}${passengerParams}&round_trip=false`;
 };
-// export const constructApiUrl = (
-//   isDomestic: boolean,
-//   departureId: string | number,
-//   destinationId: string | number,
-//   date: string,
-//   passengers: { adult: number; child: number; infant: number } | undefined
-// ) => {
-//   const baseUrl = isDomestic
-//     ? API_ENDPOINTS.DOMESTIC.FLIGHTS
-//     : API_ENDPOINTS.INTERNATIONAL.FLIGHTS;
-
-//   // Construct passenger query params
-//   const passengerParams = passengers
-//     ? `&adult=${passengers.adult}&child=${passengers.child}&infant=${passengers.infant}`
-//     : '';
-
-//   if (isDomestic) {
-//     console.log("isDomestic",isDomestic)
-//     return `${baseUrl}?departure=${departureId}&destination=${destinationId}&date=${date}${passengerParams}&round_trip=false`;
-//   } else {
-//     console.log("isDomestic",isDomestic)
-//     return `${baseUrl}/?departure=${departureId}&destination=${destinationId}&date=${date}${passengerParams}&round_trip=false`; /*look at the slash before url*/
-//   }
-// };
 
 // Function to transform flight data into a consistent format
 export const transformFlightData = (flightData: any, isDomestic: boolean) => {
   if (!flightData?.data) {
-    console.error('Invalid flight data structure:', flightData);
+    console.error("Invalid flight data structure:", flightData);
     return [];
   }
 
@@ -142,33 +118,42 @@ export const transformFlightData = (flightData: any, isDomestic: boolean) => {
     visaRequirements: flight.visa_requirements,
     fares: flight.fares,
     cabin: flight.cabin,
-    airline: flight.segments[0]?.airline?.persian || '',
-    flightNumber: flight.segments[0]?.flight_number || '',
-    departureTime: flight.segments[0]?.departure_date + 'T' + flight.segments[0]?.departure_time,
-    arrivalTime: flight.segments[flight.segments.length - 1]?.arrival_date + 'T' + flight.segments[flight.segments.length - 1]?.destination_time,
-    departure: flight.segments[0]?.departure?.city?.persian || '',
-    destination: flight.segments[flight.segments.length - 1]?.destination?.city?.persian || '',
-    aircraft: flight.segments[0]?.aircraft || '',
-    baggage: flight.segments[0]?.baggage || '',
-    airlineLogo: flight.segments[0]?.airline?.image || '',
-    flight_duration: flight.segments[0]?.flight_duration || '',
-    segments: flight.segments?.map((segment: any) => ({
-      departure_date: segment.departure_date,
-      departure_time: segment.departure_time,
-      arrival_date: segment.arrival_date,
-      destination_time: segment.destination_time,
-      flight_number: segment.flight_number,
-      flight_duration: segment.flight_duration,
-      connection_time: segment.connection_time,
-      fare_class: segment.fare_class,
-      departure: segment.departure,
-      destination: segment.destination,
-      airline: segment.airline,
-      operating_airline: segment.operating_airline,
-      aircraft: segment.aircraft,
-      baggage: segment.baggage,
-      capacity: segment.capacity,
-    })) || [],
+    airline: flight.segments[0]?.airline?.persian || "",
+    flightNumber: flight.segments[0]?.flight_number || "",
+    departureTime:
+      flight.segments[0]?.departure_date +
+      "T" +
+      flight.segments[0]?.departure_time,
+    arrivalTime:
+      flight.segments[flight.segments.length - 1]?.arrival_date +
+      "T" +
+      flight.segments[flight.segments.length - 1]?.destination_time,
+    departure: flight.segments[0]?.departure?.city?.persian || "",
+    destination:
+      flight.segments[flight.segments.length - 1]?.destination?.city?.persian ||
+      "",
+    aircraft: flight.segments[0]?.aircraft || "",
+    baggage: flight.segments[0]?.baggage || "",
+    airlineLogo: flight.segments[0]?.airline?.image || "",
+    flight_duration: flight.segments[0]?.flight_duration || "",
+    segments:
+      flight.segments?.map((segment: any) => ({
+        departure_date: segment.departure_date,
+        departure_time: segment.departure_time,
+        arrival_date: segment.arrival_date,
+        destination_time: segment.destination_time,
+        flight_number: segment.flight_number,
+        flight_duration: segment.flight_duration,
+        connection_time: segment.connection_time,
+        fare_class: segment.fare_class,
+        departure: segment.departure,
+        destination: segment.destination,
+        airline: segment.airline,
+        operating_airline: segment.operating_airline,
+        aircraft: segment.aircraft,
+        baggage: segment.baggage,
+        capacity: segment.capacity,
+      })) || [],
     returnSegments: flight.return_segments || [],
   }));
 };
