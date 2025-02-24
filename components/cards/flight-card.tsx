@@ -1015,7 +1015,7 @@ const FlightCard: React.FC<FlightProps> = ({
   
 }: FlightProps) => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
-  const [flightInfo, setFlightInfo] = useState<any | null>(null);
+  // const [flightInfo, setFlightInfo] = useState<any | null>(null);
   const [baggageRules, setBaggageRules] = useState<
     BaggageRule[] | string | null
   >(null);
@@ -1023,60 +1023,50 @@ const FlightCard: React.FC<FlightProps> = ({
   const [isLoadingBaggage, setIsLoadingBaggage] = useState(false);
   const [isLoadingRefund, setIsLoadingRefund] = useState(false);
 
-  // const handleDomestFlightPurchase = () => {
-  //   setIsAccordionOpen(!isAccordionOpen);
-  // };
-
-  // const handleInternationalFlightPurchase = () => {
-  //   // Handle international flight purchase logic here
-  //   console.log("Purchasing international flight...");
-  // };
   const handleFlightCardClick = () => {
-    const flightInfo = {
-      id,
-      fareSourceCode,
-      isClosed,
-      visaRequirements,
-      fares,
-      cabin,
-      segments,
-      returnSegments,
-      airline,
-      flightNumber,
-      departure,
-      destination,
-      departureTime,
-      arrivalTime,
-      price,
-      airlineLogo,
-      type,
-      capacity,
-      sellingType,
-      aircraft,
-      baggage,
-      flightClass,
-      cobin,
-      persian_type,
-      refundable,
-      child_price,
-      infant_price,
-      departure_terminal,
-      refund_rules,
-      destination_terminal,
-      flight_duration,
-      cobin_persian,
-      with_tour,
-      tag,
-      departureCityData,
-      destinationCityData,
-    };
+    // const flightInfo = {
+    //   id,
+    //   fareSourceCode,
+    //   isClosed,
+    //   visaRequirements,
+    //   fares,
+    //   cabin,
+    //   segments,
+    //   returnSegments,
+    //   airline,
+    //   flightNumber,
+    //   departure,
+    //   destination,
+    //   departureTime,
+    //   arrivalTime,
+    //   price,
+    //   airlineLogo,
+    //   type,
+    //   capacity,
+    //   sellingType,
+    //   aircraft,
+    //   baggage,
+    //   flightClass,
+    //   cobin,
+    //   persian_type,
+    //   refundable,
+    //   child_price,
+    //   infant_price,
+    //   departure_terminal,
+    //   refund_rules,
+    //   destination_terminal,
+    //   flight_duration,
+    //   cobin_persian,
+    //   with_tour,
+    //   tag,
+    //   departureCityData,
+    //   destinationCityData,
+    // };
 
     if (isDomestic) {
       handleDomesticFlightPurchase();
     } else {
       setIsAccordionOpen(!isAccordionOpen);
-      // Call the onFlightCardClick prop with the flight information
-      // onFlightCardClick(flightInfo);
     }
   };
   // Function to handle card click
@@ -1224,9 +1214,6 @@ const FlightCard: React.FC<FlightProps> = ({
     console.log("generalInformation",generalInformation);
     console.log("intFlightInformation",intFlightInformation);
     console.log("selectedIntFlight",selectedIntFlight);
-
-
-    
   };
 
   // Fetch baggage and refund rules when accordion is opened
@@ -1340,39 +1327,39 @@ const FlightCard: React.FC<FlightProps> = ({
       <div className="min-w-60 sm:w-96 shadow-md dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Avatar className="w-10 h-10">
+            <div className="flex items-center gap-1">
+              <Avatar className="w-12 h-12">
                 <Image
-                  width={48}
-                  height={48}
+                  width={64}
+                  height={64}
                   src={isDomestic ? airlineLogo : segments[0].airline.image}
                   alt={`${flightSegments[0].airline} logo`}
-                  className="rounded-full"
+                  className="rounded-full object-contain bg-white"
                 />
               </Avatar>
               <div>
-                <CardTitle className="text-sm font-semibold">
+                <CardTitle className="text-sm font-semibold ">
                   {flightSegments[0].airline}
                 </CardTitle>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground ">
                   {flightSegments[0].flightNumber}
                 </p>
               </div>
             </div>
-            <Badge variant="default" className="text-sm font-bold">
+            <Badge variant="default" className="text-sm font-medium">
               {(isDomestic ? price : fares.adult.total_price).toLocaleString()}{" "}
               ریال
             </Badge>
           </div>
         </CardHeader>
-        <CardContent className="pt-4">
+        <CardContent className="pt-6">
           {flightSegments.map((segment, index) => (
             <div key={index} className="mb-4">
               <div className="flex items-center justify-between relative">
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <MapPin size={16} className="text-blue-900" />
-                    <p className="text-sm font-medium">
+                  <div className="flex items-center gap-1">
+                    <MapPin size={16} />
+                    <p className="text-sm font-semibold">
                       {segment.departureCity}
                     </p>
                   </div>
@@ -1382,14 +1369,14 @@ const FlightCard: React.FC<FlightProps> = ({
                 </div>
                 <div className="flex items-center space-x-4">
                   <FaPlane
-                    size={24}
+                    size={16}
                     className="text-primary transform rotate-180"
                   />
                 </div>
                 <div className="space-y-2 text-right">
-                  <div className="flex items-center space-x-2 justify-end">
-                    <MapPin size={16} className="text-red-900" />
-                    <p className="text-sm font-medium">
+                  <div className="flex items-center gap-1 justify-end">
+                    <MapPin size={16} />
+                    <p className="text-sm font-semibold">
                       {segment.destinationCity}
                     </p>
                   </div>
@@ -1401,19 +1388,19 @@ const FlightCard: React.FC<FlightProps> = ({
               <div className="mt-2 flex justify-between items-center text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Clock className="text-primary" size={16} />
-                  مدت پرواز:
+                  <span className="font-semibold">مدت پرواز:</span>
                   <span className="text-primary">{segment.flightDuration}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Luggage className="text-primary" size={16} />
-                  بار مجاز:
+                  <span className="font-semibold"> بار مجاز:</span>
                   <span className="text-primary">{segment.baggage}</span>
                 </div>
               </div>
               {index < flightSegments.length - 1 && (
-                <div className="my-2 text-center text-sm text-muted-foreground">
-                  <Badge variant="destructive" className="gap-2">
-                    <Route className="text-primary" size={16} />
+                <div className="mt-2 mb-10 text-center text-sm text-muted-foreground">
+                  <Badge variant="outline" className="gap-1">
+                    <Route className="text-card-foreground" size={12} />
                     <div>
                       {flightSegments[index + 1].departureCity} پیاده می‌شید
                     </div>
@@ -1425,7 +1412,7 @@ const FlightCard: React.FC<FlightProps> = ({
           <div className="mt-2 flex justify-center items-center text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <Sofa className="text-primary" size={16} />
-              <span className="text-primary">
+              <span className="text-primary font-semibold">
                 {isDomestic ? cobin_persian : cabin.persian}
               </span>
             </div>

@@ -123,31 +123,41 @@ INSTRUCTIONS:
       const width = ctx.canvas.width;
       const height = ctx.canvas.height;
       ctx.clearRect(0, 0, width, height);
-      ctx.beginPath();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 2;
 
-      const sliceWidth = width / values.length;
-      let x = 0;
+      // Number of bars to display
+      const barCount = 32;
+      // Width of each bar
+      const barWidth = width / barCount;
+      // Gap between bars
+      const gap = 2;
+      // Actual width of each bar considering the gap
+      const actualBarWidth = barWidth - gap;
 
-      // Center Y should be at the vertical mid-point of the canvas
-      const centerY = height / 2;
+      ctx.fillStyle = color;
 
-      for (let i = 0; i < values.length; i++) {
-        const v = values[i] * (height / 4); // Scale the values to control the height of the wave
-        const y = centerY - v; // Oscillate around the centerY, allowing for both positive and negative
+      // Sample the frequency data to match our bar count
+      const step = Math.floor(values.length / barCount);
 
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
+      for (let i = 0; i < barCount; i++) {
+        // Get average value for this bar
+        let sum = 0;
+        for (let j = 0; j < step; j++) {
+          sum += Math.abs(values[i * step + j] || 0);
         }
-        x += sliceWidth;
-      }
-      ctx.lineTo(width, centerY); // Draw to the center line
-      ctx.stroke();
-    };
+        const average = sum / step;
 
+        // Calculate bar height (scale the value for better visualization)
+        const barHeight = average * (height * 1.5);
+
+        // Draw the bar
+        ctx.fillRect(
+          i * barWidth, // x position
+          height - barHeight, // y position (draw from bottom)
+          actualBarWidth, // bar width
+          barHeight // bar height
+        );
+      }
+    };
     const getColor = (className: string) => {
       const tempDiv = document.createElement("div");
       tempDiv.className = className;
@@ -195,6 +205,45 @@ INSTRUCTIONS:
     };
   }, []);
 
+  // useEffect(() => {
+  //   const wavStreamPlayer = wavStreamPlayerRef.current;
+  //   const client = clientRef.current;
+
+  //   client.updateSession({ instructions: instructions });
+  //   client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
+  //   client.updateSession({ voice: "ash" });
+
+  //   client.on("error", (event: any) => console.error(event));
+  //   client.on("conversation.interrupted", async () => {
+  //     const trackSampleOffset = await wavStreamPlayer.interrupt();
+  //     if (trackSampleOffset?.trackId) {
+  //       const { trackId, offset } = trackSampleOffset;
+  //       await client.cancelResponse(trackId, offset);
+  //     }
+  //   });
+
+  //   client.on("conversation.updated", async ({ item, delta }: any) => {
+  //     const items = client.conversation.getItems();
+  //     if (delta?.audio) {
+  //       wavStreamPlayer.add16BitPCM(delta.audio, item.id);
+  //     }
+  //     if (item.status === "completed" && item.formatted.audio?.length) {
+  //       const wavFile = await WavRecorder.decode(
+  //         item.formatted.audio,
+  //         24000,
+  //         24000
+  //       );
+  //       item.formatted.file = wavFile;
+  //     }
+  //     setItems(items);
+  //   });
+
+  //   setItems(client.conversation.getItems());
+
+  //   return () => {
+  //     client.reset();
+  //   };
+  // }, []);
   useEffect(() => {
     const wavStreamPlayer = wavStreamPlayerRef.current;
     const client = clientRef.current;
@@ -212,6 +261,7 @@ INSTRUCTIONS:
       }
     });
 
+    // Enhanced conversation update handling
     client.on("conversation.updated", async ({ item, delta }: any) => {
       const items = client.conversation.getItems();
       if (delta?.audio) {
@@ -234,30 +284,64 @@ INSTRUCTIONS:
       client.reset();
     };
   }, []);
-
   return (
     <div data-component="VoiceChat" dir="rtl">
-      {/* Visualization Section */}
+            {/* Conversation Display */}
+            <div
+        className="w-full max-w-2xl mx-auto h-64 overflow-y-auto p-4 rounded-lg border bg-background"
+        data-conversation-content
+      >
+        {items.map((item, index) => {
+          // Type guard to check if item has the required properties
+          const isMessageItem = "status" in item && "role" in item;
+
+          return (
+            <div
+              key={index}
+              className={`mb-4 ${
+                isMessageItem && item.role === "assistant"
+                  ? "text-primary"
+                  : "text-foreground"
+              }`}
+            >
+              <div className="font-semibold mb-1">
+                {isMessageItem && item.role === "assistant"
+                  ? "🤖 دستیار"
+                  : "👤 شما"}
+                :
+              </div>
+              <div className="text-sm">
+                {isMessageItem && item.status === "completed"
+                  ? item.formatted?.transcript || item.formatted?.text || ""
+                  : isMessageItem && item.status === "in_progress"
+                  ? "در حال پردازش..."
+                  : ""}
+              </div>
+            </div>
+          );
+        })}
+      </div>
       <div className="flex items-center justify-center gap-2 m-1">
-        <div className="flex items-center">
-          <div className="flex flex-col items-center">
-            <canvas ref={clientCanvasRef} />
+        <div className="flex items-baseline justify-center gap-2">
+          <div className="w-16 h-16">
+            <canvas ref={clientCanvasRef} className="w-full h-full" />
           </div>
           <Button
             variant={isConnected ? "destructive" : "default"}
             size="icon"
             onClick={isConnected ? disconnectConversation : connectConversation}
-            className={`w-16 h-16 rounded-full ${
+            className={`w-12 h-12 rounded-full ${
               isConnected ? "animate-pulse" : ""
             }`}
           >
             {isConnected ? <MicOff /> : <Mic />}
           </Button>
-          <div className="flex flex-col items-center">
-            <canvas ref={serverCanvasRef} />
+          <div className="w-16 h-16">
+            <canvas ref={serverCanvasRef} className="w-full h-full" />
           </div>
         </div>
       </div>
+
     </div>
   );
 };
