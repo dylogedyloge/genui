@@ -79,7 +79,7 @@ export const constructHotelApiUrl = (
   const { checkIn, checkOut, adultsCount, childCount, childAges } = params;
 
   if (isDomestic) {
-    return `${API_ENDPOINTS.DOMESTIC.HOTELS}/?city=${cityId}&check_in=${checkIn}&check_out=${checkOut}&adults_count=${adultsCount}`;
+    return `${API_ENDPOINTS.DOMESTIC.HOTELS}/?city=${cityId}&check_in=${checkIn}&check_out=${checkOut}&adults_count=${adultsCount}&page=1`;
   }
 
   const queryParams = new URLSearchParams({
