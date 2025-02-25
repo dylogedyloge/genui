@@ -5,12 +5,23 @@ import { ItemType } from "@openai/realtime-api-beta/dist/lib/client.js";
 import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index";
 import { Mic, MicOff } from "lucide-react";
 import { Button } from "./shadcn/button";
+import ReactMarkdown from "react-markdown";
+import Image from "next/image";
+import { formatPersianTime } from "@/utils/time-helpers";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
 
 const USE_LOCAL_RELAY_SERVER_URL: string | undefined = void 0;
 
-const VoiceChat = () => {
+const VoiceChat = () => { 
+  const { setTheme } = useTheme();
   const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || "";
-
+  // Set dark theme when component mounts
+  useEffect(() => {
+    setTheme("dark");
+    // Optional: Cleanup function to reset theme when component unmounts
+    return () => setTheme("light");
+  }, [setTheme]);
   const instructions = `SYSTEM SETTINGS:
 ------
 INSTRUCTIONS:
@@ -19,8 +30,6 @@ INSTRUCTIONS:
 - لطفاً پاسخ‌های خود را به صورت صوتی و مفید ارائه دهید.
 - پاسخ‌ها باید کوتاه و مفید باشند و حداکثر ۲۰۰ کاراکتر داشته باشند.
 - می‌توانید از کاربر سؤال بپرسید.
-
-
 `;
 
   const wavRecorderRef = useRef<WavRecorder>(
@@ -205,45 +214,6 @@ INSTRUCTIONS:
     };
   }, []);
 
-  // useEffect(() => {
-  //   const wavStreamPlayer = wavStreamPlayerRef.current;
-  //   const client = clientRef.current;
-
-  //   client.updateSession({ instructions: instructions });
-  //   client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
-  //   client.updateSession({ voice: "ash" });
-
-  //   client.on("error", (event: any) => console.error(event));
-  //   client.on("conversation.interrupted", async () => {
-  //     const trackSampleOffset = await wavStreamPlayer.interrupt();
-  //     if (trackSampleOffset?.trackId) {
-  //       const { trackId, offset } = trackSampleOffset;
-  //       await client.cancelResponse(trackId, offset);
-  //     }
-  //   });
-
-  //   client.on("conversation.updated", async ({ item, delta }: any) => {
-  //     const items = client.conversation.getItems();
-  //     if (delta?.audio) {
-  //       wavStreamPlayer.add16BitPCM(delta.audio, item.id);
-  //     }
-  //     if (item.status === "completed" && item.formatted.audio?.length) {
-  //       const wavFile = await WavRecorder.decode(
-  //         item.formatted.audio,
-  //         24000,
-  //         24000
-  //       );
-  //       item.formatted.file = wavFile;
-  //     }
-  //     setItems(items);
-  //   });
-
-  //   setItems(client.conversation.getItems());
-
-  //   return () => {
-  //     client.reset();
-  //   };
-  // }, []);
   useEffect(() => {
     const wavStreamPlayer = wavStreamPlayerRef.current;
     const client = clientRef.current;
@@ -264,6 +234,17 @@ INSTRUCTIONS:
     // Enhanced conversation update handling
     client.on("conversation.updated", async ({ item, delta }: any) => {
       const items = client.conversation.getItems();
+
+      // Check for flight or hotel related queries
+  if (item.formatted?.transcript) {
+    const transcript = item.formatted.transcript.toLowerCase();
+    if (transcript.includes('پرواز') || 
+        transcript.includes('بلیط') || 
+        transcript.includes('هتل') || 
+        transcript.includes('اقامت')) {
+      toast.warning("امکان جستجوی پرواز و هتل در نسخه صوتی فعلا فعال نیست");
+    }
+  }
       if (delta?.audio) {
         wavStreamPlayer.add16BitPCM(delta.audio, item.id);
       }
@@ -283,65 +264,80 @@ INSTRUCTIONS:
     return () => {
       client.reset();
     };
-  }, []);
+  }, [instructions]);
   return (
-    <div data-component="VoiceChat" dir="rtl">
-            {/* Conversation Display */}
-            <div
-        className="w-full max-w-2xl mx-auto h-64 overflow-y-auto p-4 rounded-lg border bg-background"
+    <div data-component="VoiceChat" dir="rtl" className="flex flex-col h-full">
+      {/* Conversation Display */}
+      <div
+        className="flex-1 w-full overflow-y-auto p-4 rounded-lg  bg-background space-y-4"
         data-conversation-content
       >
         {items.map((item, index) => {
-          // Type guard to check if item has the required properties
           const isMessageItem = "status" in item && "role" in item;
 
           return (
             <div
               key={index}
-              className={`mb-4 ${
+              className={`flex ${
                 isMessageItem && item.role === "assistant"
-                  ? "text-primary"
-                  : "text-foreground"
+                  ? "justify-end"
+                  : "justify-start"
               }`}
             >
-              <div className="font-semibold mb-1">
-                {isMessageItem && item.role === "assistant"
-                  ? "🤖 دستیار"
-                  : "👤 شما"}
-                :
-              </div>
-              <div className="text-sm">
-                {isMessageItem && item.status === "completed"
-                  ? item.formatted?.transcript || item.formatted?.text || ""
-                  : isMessageItem && item.status === "in_progress"
-                  ? "در حال پردازش..."
-                  : ""}
-              </div>
+              {isMessageItem && item.role === "user" ? (
+                <div className="max-w-[80%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
+                  <ReactMarkdown className="prose-sm text-sm">
+                    {item.formatted?.transcript || item.formatted?.text || ""}
+                  </ReactMarkdown>
+                  <p className="text-xs text-muted-foreground text-left my-1">
+                    {formatPersianTime(new Date())}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="max-w-[80%] p-2 rounded-lg bg-primary text-primary-foreground rounded-tl-none">
+                    <ReactMarkdown className="prose-sm text-sm">
+                      {"status" in item && item.status === "completed"
+                        ? item.formatted?.transcript ||
+                          item.formatted?.text ||
+                          ""
+                        : "در حال پردازش..."}
+                    </ReactMarkdown>
+                    <p className="text-xs text-muted-foreground prose-sm text-left my-1">
+                      {formatPersianTime(new Date())}
+                    </p>
+                  </div>
+                  <Image
+                    src="/logo1.png"
+                    width={100}
+                    height={100}
+                    alt="logo"
+                    className="w-6 h-8 mr-4"
+                  />
+                </>
+              )}
             </div>
           );
         })}
       </div>
-      <div className="flex items-center justify-center gap-2 m-1">
-        <div className="flex items-baseline justify-center gap-2">
-          <div className="w-16 h-16">
-            <canvas ref={clientCanvasRef} className="w-full h-full" />
-          </div>
-          <Button
-            variant={isConnected ? "destructive" : "default"}
-            size="icon"
-            onClick={isConnected ? disconnectConversation : connectConversation}
-            className={`w-12 h-12 rounded-full ${
-              isConnected ? "animate-pulse" : ""
-            }`}
-          >
-            {isConnected ? <MicOff /> : <Mic />}
-          </Button>
-          <div className="w-16 h-16">
-            <canvas ref={serverCanvasRef} className="w-full h-full" />
-          </div>
+      <div className="flex items-baseline justify-center w-full px-8 py-4 gap-4">
+        <div className="w-[40%]">
+          <canvas ref={clientCanvasRef} className="w-full h-16" />
+        </div>
+        <Button
+          variant={isConnected ? "destructive" : "default"}
+          size="icon"
+          onClick={isConnected ? disconnectConversation : connectConversation}
+          className={`w-12 h-12 rounded-full ${
+            isConnected ? "animate-pulse" : ""
+          }`}
+        >
+          {isConnected ? <MicOff /> : <Mic />}
+        </Button>
+        <div className="w-[40%]">
+          <canvas ref={serverCanvasRef} className="w-full h-16" />
         </div>
       </div>
-
     </div>
   );
 };

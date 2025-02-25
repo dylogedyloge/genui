@@ -116,10 +116,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
         <DrawerTrigger>
           <AudioLines />
         </DrawerTrigger>
-        <DrawerContent>
-          <DrawerFooter>
+        <DrawerContent className="h-[90vh]">
+          <div className="h-full">
             <VoiceChat />
-          </DrawerFooter>
+          </div>
         </DrawerContent>
       </Drawer>
 
