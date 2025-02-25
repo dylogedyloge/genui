@@ -26,9 +26,8 @@ const VoiceChat = () => {
 ------
 INSTRUCTIONS:
 - به زبان فارسی صحبت کنید
-- فقط به سوالات در مورد سفر پاسخ دهید
 - لطفاً پاسخ‌های خود را به صورت صوتی و مفید ارائه دهید
-- پاسخ‌ها باید کوتاه و مفید باشند و حداکثر ۲۰۰ کاراکتر داشته باشند
+- پاسخ‌ها باید کوتاه و مفید باشند و حداکثر 400 کاراکتر داشته باشند
 - برای جستجو و رزرو هتل یا پرواز، به کاربر بگویید: "لطفا از چت متنی برای جستجوی پرواز یا هتل استفاده کنید"
 - به سوالات عمومی در مورد سفر، هتل و پرواز پاسخ دهید
 - می‌توانید از کاربر سؤال بپرسید
@@ -222,7 +221,7 @@ INSTRUCTIONS:
 
     client.updateSession({ instructions: instructions });
     client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
-    client.updateSession({ voice: "ash" });
+    client.updateSession({ voice: "sage" });
 
     client.on("error", (event: any) => console.error(event));
     client.on("conversation.interrupted", async () => {
@@ -237,16 +236,6 @@ INSTRUCTIONS:
     client.on("conversation.updated", async ({ item, delta }: any) => {
       const items = client.conversation.getItems();
 
-      // Check for flight or hotel related queries
-  if (item.formatted?.transcript) {
-    const transcript = item.formatted.transcript.toLowerCase();
-    if (transcript.includes('پرواز') || 
-        transcript.includes('بلیط') || 
-        transcript.includes('هتل') || 
-        transcript.includes('اقامت')) {
-      toast.warning("امکان جستجوی پرواز و هتل در نسخه صوتی فعلا فعال نیست");
-    }
-  }
       if (delta?.audio) {
         wavStreamPlayer.add16BitPCM(delta.audio, item.id);
       }
