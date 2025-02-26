@@ -211,14 +211,14 @@ const MessageList: React.FC<MessageListProps> = ({
         </div>
       )}
       {/* Conditionally render the selected flight details with text transition animation */}
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {(selectedFlight || selectedHotel) && (
           <SelectedFlightAndHotelDetails
             selectedFlight={selectedFlight}
             selectedHotel={selectedHotel}
           />
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
       {error && (
         <div className="flex justify-center">
           <Button variant="destructive" size="sm" onClick={() => reload()}>

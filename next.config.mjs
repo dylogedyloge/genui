@@ -5,9 +5,9 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "api.atripa.com",
+        hostname: "api.atripa.ir", // Changed from api.atripa.com
         port: "",
-        pathname: "/media/airlines/**",
+        pathname: "/media/**", // Updated to include all media paths
       },
     ],
   },
