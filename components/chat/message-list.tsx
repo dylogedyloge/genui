@@ -6,7 +6,7 @@ import HotelCard from "@/components/cards/hotel-card";
 
 import FlightCardSkeleton from "@/components/skeletons/flight-card-skeleton";
 import HotelCardSkeleton from "@/components/skeletons/hotel-card-skeleton";
-import  PassengerCounter  from "@/components/passenger-counter/passenger-counter";
+import PassengerCounter from "@/components/passenger-counter/passenger-counter";
 
 import { formatPersianTime } from "@/utils/time-helpers";
 import { Button } from "@/components/shadcn/button";
@@ -26,7 +26,12 @@ import SelectedFlightAndHotelDetails from "../selected-card-details/selected-fli
 /**
  * Type Guards to check the type of `result` based on the toolName
  */
-// 1. Update type guard interface
+
+interface HotelResult {
+  hotels: Hotel[];
+  message: string;
+  cityData: CityData;
+}
 interface FlightResult {
   flights: Flight[];
   departureCityData: CityData;
@@ -43,10 +48,13 @@ function isFlightArray(result: any): result is FlightResult {
   );
 }
 
-const isHotelArray = (
-  result: Flight[] | Hotel[] | undefined
-): result is Hotel[] => {
-  return !!result && (result as Hotel[])[0]?.hotelName !== undefined;
+const isHotelArray = (result: any): result is HotelResult => {
+  return (
+    result &&
+    Array.isArray(result.hotels) &&
+    result.cityData &&
+    typeof result.message === "string"
+  );
 };
 
 interface MessageListProps {
@@ -90,20 +98,20 @@ const MessageList: React.FC<MessageListProps> = ({
     setSelectedHotel(hotelInfo);
   };
 
-    // Callback function to handle passenger selection
-    const handlePassengersSelected = (passengers: {
-      adult: number;
-      child: number;
-      infant: number;
-    }) => {
-      // Hide the PassengerCounter component
-      setShowPassengerCounter(false);
-  
-      // Call the FlightTool again with the selected passengers
-      // You can use a function like `retryFlightTool(passengers)`
-      console.log("Selected passengers:", passengers);
-      // Example: retryFlightTool(passengers);
-    };
+  // Callback function to handle passenger selection
+  const handlePassengersSelected = (passengers: {
+    adult: number;
+    child: number;
+    infant: number;
+  }) => {
+    // Hide the PassengerCounter component
+    setShowPassengerCounter(false);
+
+    // Call the FlightTool again with the selected passengers
+    // You can use a function like `retryFlightTool(passengers)`
+    console.log("Selected passengers:", passengers);
+    // Example: retryFlightTool(passengers);
+  };
 
   return (
     <div className="flex-grow overflow-auto space-y-4 mb-4">
@@ -195,10 +203,8 @@ const MessageList: React.FC<MessageListProps> = ({
         </div>
       ))}
 
-
-
-{/* Render the PassengerCounter component if needed */}
-{showPassengerCounter && (
+      {/* Render the PassengerCounter component if needed */}
+      {showPassengerCounter && (
         <div className="max-w-[80%] p-3 rounded-lg bg-secondary text-secondary-foreground">
           <p>{passengerCounterMessage}</p>
           <PassengerCounter onPassengersSelected={handlePassengersSelected} />
@@ -235,7 +241,7 @@ const renderFlightCards = (
   },
   messageIndex: number,
   invocationIndex: number,
-  visibilityControl: VisibilityControl, 
+  visibilityControl: VisibilityControl,
   onFlightCardClick: (flightInfo: Flight) => void
 ) => {
   return (
@@ -244,30 +250,30 @@ const renderFlightCards = (
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((flight: Flight) => (
           <FlightCard
-          fareSourceCode={""}
-          isClosed={false}
-          visaRequirements={[]}
-          fares={{
-            adult: {
-              price: 0,
-              count: 0,
-              total_price: 0
-            },
-            total_price: 0
-          }}
-          cabin={{ persian: "" }}
-          segments={[]}
-          returnSegments={[]}
-          key={flight.id}
-          {...flight}
-          refundable={flight.refundable ?? false}
-          departureCityData={flights.departureCityData}
-          destinationCityData={flights.destinationCityData}
-          with_tour={flight.with_tour ?? false}
-          isDomestic={
-            flights.departureCityData.isDomestic &&
-            flights.destinationCityData.isDomestic
-          }
+            fareSourceCode={""}
+            isClosed={false}
+            visaRequirements={[]}
+            fares={{
+              adult: {
+                price: 0,
+                count: 0,
+                total_price: 0,
+              },
+              total_price: 0,
+            }}
+            cabin={{ persian: "" }}
+            segments={[]}
+            returnSegments={[]}
+            key={flight.id}
+            {...flight}
+            refundable={flight.refundable ?? false}
+            departureCityData={flights.departureCityData}
+            destinationCityData={flights.destinationCityData}
+            with_tour={flight.with_tour ?? false}
+            isDomestic={
+              flights.departureCityData.isDomestic &&
+              flights.destinationCityData.isDomestic
+            }
           />
         ))}
       {renderVisibilityButtons(
@@ -281,7 +287,7 @@ const renderFlightCards = (
 };
 
 const renderHotelCards = (
-  hotels: Hotel[],
+  result: HotelResult,
   messageIndex: number,
   invocationIndex: number,
   visibilityControl: VisibilityControl,
@@ -289,17 +295,18 @@ const renderHotelCards = (
 ) => {
   return (
     <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
-      {hotels
+      {result.hotels
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((hotel: Hotel) => (
           <HotelCard
+            
             key={hotel.id}
             onHotelCardClick={onHotelCardClick}
             {...hotel}
           />
         ))}
       {renderVisibilityButtons(
-        hotels.length,
+        result.hotels.length,
         messageIndex,
         invocationIndex,
         visibilityControl

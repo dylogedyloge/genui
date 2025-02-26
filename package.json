@@ -31,6 +31,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dompurify": "^3.2.3",
+    "embla-carousel-react": "^8.5.2",
     "framer-motion": "^11.11.10",
     "lucide-react": "^0.452.0",
     "mini-svg-data-uri": "^1.4.4",

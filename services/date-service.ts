@@ -35,13 +35,22 @@ class DateService {
   }
 
   // Get tomorrow's date in both formats
+  // public getTomorrow(): { gregorian: string; jalali: string } {
+  //   const today = new Date();
+  //   const tomorrow = new Date(today);
+  //   tomorrow.setDate(today.getDate() + 1);
+  //   return {
+  //     gregorian: tomorrow.toISOString().split("T")[0],
+  //     jalali: this.toJalali(tomorrow),
+  //   };
+  // }
   public getTomorrow(): { gregorian: string; jalali: string } {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    const today = moment();
+    const tomorrow = today.clone().add(1, 'days');
+    
     return {
-      gregorian: tomorrow.toISOString().split("T")[0],
-      jalali: this.toJalali(tomorrow),
+      gregorian: tomorrow.format('YYYY-MM-DD'),
+      jalali: tomorrow.format('jYYYY/jMM/jDD'),
     };
   }
 

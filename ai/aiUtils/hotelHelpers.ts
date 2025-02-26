@@ -78,14 +78,26 @@ export const constructHotelApiUrl = (
 ): string => {
   const { checkIn, checkOut, adultsCount, childCount, childAges } = params;
 
+  // Ensure dates are in correct format
+  const formattedCheckIn = checkIn.split('T')[0];  
+  const formattedCheckOut = checkOut.split('T')[0]; 
+
+
+  console.log('Formatted dates:', {
+    checkIn: formattedCheckIn,
+    checkOut: formattedCheckOut
+  });
+
   if (isDomestic) {
-    return `${API_ENDPOINTS.DOMESTIC.HOTELS}/?city=${cityId}&check_in=${checkIn}&check_out=${checkOut}&adults_count=${adultsCount}&page=1`;
+    const url = `${API_ENDPOINTS.DOMESTIC.HOTELS}/?city=${cityId}&check_in=${formattedCheckIn}&check_out=${formattedCheckOut}&adults_count=${adultsCount}`;
+    console.log('Generated URL:', url);
+    return url;
   }
 
   const queryParams = new URLSearchParams({
     city: cityId,
-    check_in: checkIn,
-    check_out: checkOut,
+    check_in: formattedCheckIn,
+    check_out: formattedCheckOut,
     adult_count: adultsCount.toString(),
     child_count: childCount.toString(),
     child_ages: childAges.join(","),
@@ -103,32 +115,40 @@ export const normalizeHotelData = (
   checkIn: string,
   checkOut: string
 ): NormalizedHotel[] => {
+  // First check if we have valid data
+  if (!rawData?.data?.data || !Array.isArray(rawData.data.data)) {
+    console.error('Invalid hotel data structure:', rawData);
+    return [];
+  }
+
+  // Filter out null values from the data array
+  const validData = rawData.data.data.filter((hotel: any) => hotel !== null);
   if (isDomestic) {
-    return rawData.data.data.map((hotel: any) => ({
-      id: hotel.id,
-      hotelName: hotel.name,
+    return validData.map((hotel: any) => ({
+      id: hotel.id?.toString() || '',
+      hotelName: hotel.name || '',
       location: location,
       checkIn: DateService.toJalali(checkIn),
       checkOut: DateService.toJalali(checkOut),
-      roomType: hotel.rooms[0]?.room_type_name || "Standard",
-      price: hotel.min_price,
-      rating: hotel.star_rating,
-      imageUrl: hotel.image_url,
-      amenities: hotel.amenities,
+      roomType: hotel.rooms?.[0]?.room_type_name || "Standard",
+      price: hotel.min_price || 0,
+      rating: hotel.star || 0,
+      imageUrl: hotel.images?.[0]?.image || '',
+      amenities: [], // Add amenities if available in the API response
     }));
   }
-
+  // International hotels (keeping the existing logic but with safety checks)
   return rawData.data.results.map((hotel: any) => ({
-    id: hotel.id,
-    hotelName: hotel.name,
+    id: hotel.id?.toString() || '',
+    hotelName: hotel.name || '',
     location: location,
     checkIn: DateService.toJalali(checkIn),
     checkOut: DateService.toJalali(checkOut),
-    roomType: hotel.rooms["1"]?.name || "Standard",
+    roomType: hotel.rooms?.["1"]?.name || "Standard",
     price: hotel.fare?.total || 0,
-    rating: hotel.star_rating,
-    imageUrl: hotel.image_url,
-    amenities: hotel.amenities,
+    rating: hotel.star_rating || 0,
+    imageUrl: hotel.images?.[0]?.image || '',
+    amenities: [], // Add amenities if available in the API response
   }));
 };
 
@@ -153,9 +173,19 @@ export const searchHotels = async (
     );
 
     // Fetch hotel data
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+      },
+    });
     if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
+      // throw new Error(`API request failed with status ${response.status}`);
+      const errorData = await response.json();
+      console.error('API Error Response:', errorData);
+      throw new Error(`API request failed: ${JSON.stringify(errorData)}`);
     }
 
     const rawData = await response.json();
