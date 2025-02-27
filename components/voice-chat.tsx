@@ -52,7 +52,7 @@ INSTRUCTIONS:
   // );
   const clientRef = useRef<RealtimeClient>(
     new RealtimeClient({
-      url: process.env.NODE_ENV === 'production' 
+      url: process.env.NODE_ENV === 'production'
         ? `wss://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/voice-ws`
         : 'ws://localhost:3000/api/voice-ws',
       dangerouslyAllowAPIKeyInBrowser: false,

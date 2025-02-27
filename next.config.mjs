@@ -9,6 +9,9 @@ const nextConfig = {
     }
     return config;
   },
+  experimental: {
+    serverComponentsExternalPackages: ['ws']
+  },
   images: {
     domains: ["api.atripa.ir"],
     remotePatterns: [
