@@ -38,15 +38,23 @@ INSTRUCTIONS:
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(
     new WavStreamPlayer({ sampleRate: 24000 })
   );
-  const clientRef = useRef<RealtimeClient>(
-    new RealtimeClient(
-      USE_LOCAL_RELAY_SERVER_URL
-        ? { url: USE_LOCAL_RELAY_SERVER_URL }
-        : {
-            apiKey: apiKey,
-            dangerouslyAllowAPIKeyInBrowser: true,
-          }
-    )
+  // const clientRef = useRef<RealtimeClient>(
+  //   new RealtimeClient(
+  //     USE_LOCAL_RELAY_SERVER_URL
+  //       ? { url: USE_LOCAL_RELAY_SERVER_URL }
+  //       : {
+  //           apiKey: apiKey,
+  //           dangerouslyAllowAPIKeyInBrowser: true,
+  //         }
+  //   )
+  // );
+    const clientRef = useRef<RealtimeClient>(
+    new RealtimeClient({
+      url: process.env.NODE_ENV === 'production'
+        ? `wss://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/voice`
+        : 'ws://localhost:3000/api/voice',
+      dangerouslyAllowAPIKeyInBrowser: false,
+    })
   );
 
 
