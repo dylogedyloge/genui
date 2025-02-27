@@ -299,10 +299,25 @@ const renderHotelCards = (
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((hotel: Hotel) => (
           <HotelCard
-            
-            key={hotel.id}
-            onHotelCardClick={onHotelCardClick}
-            {...hotel}
+          key={hotel.id}
+          id={hotel.id}
+          hotelName={hotel.hotelName}
+          location={hotel.location}
+          checkIn={hotel.checkIn}
+          checkOut={hotel.checkOut}
+          roomType={hotel.roomType}
+          price={hotel.price}
+          rating={hotel.rating}
+          images={hotel.images}
+          address={hotel.address}
+          star={hotel.star}
+          type={hotel.type}
+          rooms={hotel.rooms}
+          amenities={hotel.amenities}
+          onHotelCardClick={onHotelCardClick}
+            // key={hotel.id}
+            // onHotelCardClick={onHotelCardClick}
+            // {...hotel}
           />
         ))}
       {renderVisibilityButtons(

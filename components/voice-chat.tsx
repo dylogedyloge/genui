@@ -9,11 +9,10 @@ import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import { formatPersianTime } from "@/utils/time-helpers";
 import { useTheme } from "next-themes";
-import { toast } from "sonner";
 
 const USE_LOCAL_RELAY_SERVER_URL: string | undefined = void 0;
 
-const VoiceChat = () => { 
+const VoiceChat = () => {
   const { setTheme } = useTheme();
   const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || "";
   // Set dark theme when component mounts
@@ -44,8 +43,10 @@ INSTRUCTIONS:
       USE_LOCAL_RELAY_SERVER_URL
         ? { url: USE_LOCAL_RELAY_SERVER_URL }
         : {
-            apiKey: apiKey,
-            dangerouslyAllowAPIKeyInBrowser: true,
+            // apiKey: apiKey,
+            // dangerouslyAllowAPIKeyInBrowser: true,
+            url: "/api/voice-proxy", // Point to our proxy endpoint
+            dangerouslyAllowAPIKeyInBrowser: false,
           }
     )
   );
