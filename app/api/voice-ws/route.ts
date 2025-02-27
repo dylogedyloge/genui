@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { WebSocket } from 'ws';
+import  WebSocket  from 'ws';
 
 export async function GET(req: NextRequest) {
   if (!process.env.OPENAI_API_KEY) {
