@@ -1,63 +1,48 @@
-import { NextRequest } from 'next/server';
-import  WebSocket  from 'ws';
+import { Server as SocketIOServer } from 'socket.io';
+import { NextApiRequest } from 'next';
+import { Server as NetServer } from 'http';
+import { NextApiResponse } from 'next';
 
-export async function GET(req: NextRequest) {
-  if (!process.env.OPENAI_API_KEY) {
-    return new Response('OpenAI API key not configured', { status: 500 });
-  }
+export default function SocketHandler(req: NextApiRequest, res: NextApiResponse) {
+  if (!res.socket.server.io) {
+    const httpServer = res.socket.server as any as NetServer;
+    const io = new SocketIOServer(httpServer, {
+      path: '/api/socket',
+      addTrailingSlash: false,
+    });
 
-  const upgrade = req.headers.get('upgrade');
-  if (!upgrade || upgrade.toLowerCase() !== 'websocket') {
-    return new Response('Expected Websocket connection', { status: 426 });
-  }
+    io.on('connection', (socket) => {
+      socket.on('voice-input', async (audioData) => {
+        try {
+          const response = await fetch('https://api.openai.com/v1/audio/speech', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(audioData)
+          });
 
-  const wsServer = new WebSocket.Server({ noServer: true });
+          if (!response.ok) {
+            throw new Error('OpenAI API error');
+          }
 
-  wsServer.on('connection', (ws) => {
-    const openAIWs = new WebSocket(
-      'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17',
-      [
-        'realtime',
-        `openai-insecure-api-key.${process.env.OPENAI_API_KEY}`,
-        'openai-beta.realtime-v1'
-      ]
-    );
-
-    openAIWs.on('open', () => {
-      const initEvent = {
-        type: 'response.create',
-        response: {
-          modalities: ['audio', 'text'],
-          instructions: 'Please assist the user in Persian language.'
+          const data = await response.json();
+          socket.emit('voice-response', data);
+        } catch (error) {
+          socket.emit('error', { message: 'Failed to process voice input' });
         }
-      };
-      openAIWs.send(JSON.stringify(initEvent));
+      });
     });
 
-    openAIWs.on('message', (data) => {
-      ws.send(data);
-    });
+    res.socket.server.io = io;
+  }
 
-    ws.on('message', (data) => {
-      if (openAIWs.readyState === openAIWs.OPEN) {
-        openAIWs.send(data);
-      }
-    });
-
-    ws.on('close', () => {
-      openAIWs.close();
-    });
-  });
-
-  const { socket, response } = Upgrade(req, {
-    protocol: 'websocket',
-  });
-
-  wsServer.handleUpgrade(req, socket, Buffer.alloc(0), (ws) => {
-    wsServer.emit('connection', ws);
-  });
-
-  return response;
+  res.end();
 }
 
-export const runtime = 'nodejs';
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
