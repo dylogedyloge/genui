@@ -314,10 +314,8 @@ const renderHotelCards = (
           type={hotel.type}
           rooms={hotel.rooms}
           amenities={hotel.amenities}
-          onHotelCardClick={onHotelCardClick}
-            // key={hotel.id}
-            // onHotelCardClick={onHotelCardClick}
-            // {...hotel}
+          onHotelCardClick={onHotelCardClick} 
+            
           />
         ))}
       {renderVisibilityButtons(

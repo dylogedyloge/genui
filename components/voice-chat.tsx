@@ -38,17 +38,25 @@ INSTRUCTIONS:
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(
     new WavStreamPlayer({ sampleRate: 24000 })
   );
+  // const clientRef = useRef<RealtimeClient>(
+  //   new RealtimeClient(
+  //     USE_LOCAL_RELAY_SERVER_URL
+  //       ? { url: USE_LOCAL_RELAY_SERVER_URL }
+  //       : {
+  //           // apiKey: apiKey,
+  //           // dangerouslyAllowAPIKeyInBrowser: true,
+  //           url: "/api/voice-proxy", // Point to our proxy endpoint
+  //           dangerouslyAllowAPIKeyInBrowser: false,
+  //         }
+  //   )
+  // );
   const clientRef = useRef<RealtimeClient>(
-    new RealtimeClient(
-      USE_LOCAL_RELAY_SERVER_URL
-        ? { url: USE_LOCAL_RELAY_SERVER_URL }
-        : {
-            // apiKey: apiKey,
-            // dangerouslyAllowAPIKeyInBrowser: true,
-            url: "/api/voice-proxy", // Point to our proxy endpoint
-            dangerouslyAllowAPIKeyInBrowser: false,
-          }
-    )
+    new RealtimeClient({
+      url: process.env.NODE_ENV === 'production' 
+        ? `wss://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/voice-ws`
+        : 'ws://localhost:3000/api/voice-ws',
+      dangerouslyAllowAPIKeyInBrowser: false,
+    })
   );
 
   const clientCanvasRef = useRef<HTMLCanvasElement>(null);
