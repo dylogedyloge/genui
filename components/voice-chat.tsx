@@ -48,6 +48,7 @@ INSTRUCTIONS:
   //         }
   //   )
   // );
+
   const clientRef = useRef<RealtimeClient>(
     new RealtimeClient(
       USE_LOCAL_RELAY_SERVER_URL
@@ -59,14 +60,7 @@ INSTRUCTIONS:
           }
     )
   );
-  //   const clientRef = useRef<RealtimeClient>(
-  //   new RealtimeClient({
-  //     url: process.env.NODE_ENV === 'production'
-  //       ? `wss://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/voice`
-  //       : 'ws://localhost:3000/api/voice',
-  //     dangerouslyAllowAPIKeyInBrowser: false,
-  //   })
-  // );
+
 
 
   const clientCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -240,7 +234,7 @@ INSTRUCTIONS:
 
     client.updateSession({ instructions: instructions });
     client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
-    client.updateSession({ voice: "sage" });
+    client.updateSession({ voice: "ash" });
 
     client.on("error", (event: any) => console.error(event));
     client.on("conversation.interrupted", async () => {
