@@ -23,9 +23,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const PROXY_URL = 'http://Jungp2jf5I:866OI8O8nZ@cdn.smatrip.com:39210'; // e.g., 'https://your-proxy.com'
-const PROXY_API_KEY = 'YOUR_PROXY_API_KEY'; // if required
-  
+// Parse proxy URL components
+const PROXY_HOST = 'cdn.smatrip.com:39210';
+const PROXY_USERNAME = 'Jungp2jf5I';
+const PROXY_PASSWORD = '866OI8O8nZ';
+const PROXY_AUTH = `Basic ${Buffer.from(`${PROXY_USERNAME}:${PROXY_PASSWORD}`).toString('base64')}`;
+
 export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api/voice')) {
     const upgrade = request.headers.get('upgrade');
@@ -35,11 +38,10 @@ export function middleware(request: NextRequest) {
         'Connection': 'Upgrade',
         'Sec-WebSocket-Protocol': 'realtime',
         'X-Forwarded-Host': request.headers.get('host') || '',
-        'X-Proxy-URL': PROXY_URL,
-        'X-Proxy-API-Key': PROXY_API_KEY,
+        'Proxy-Authorization': PROXY_AUTH,
+        'X-Proxy-Host': PROXY_HOST
       });
 
-      // Clone the request headers
       request.headers.forEach((value, key) => {
         if (!headers.has(key)) {
           headers.set(key, value);
@@ -56,4 +58,4 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: '/api/voice'
-};    
+}; 
