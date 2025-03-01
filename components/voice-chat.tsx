@@ -48,14 +48,25 @@ INSTRUCTIONS:
   //         }
   //   )
   // );
-    const clientRef = useRef<RealtimeClient>(
-    new RealtimeClient({
-      url: process.env.NODE_ENV === 'production'
-        ? `wss://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/voice`
-        : 'ws://localhost:3000/api/voice',
-      dangerouslyAllowAPIKeyInBrowser: false,
-    })
+  const clientRef = useRef<RealtimeClient>(
+    new RealtimeClient(
+      USE_LOCAL_RELAY_SERVER_URL
+        ? { url: USE_LOCAL_RELAY_SERVER_URL }
+        : {
+            apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+            dangerouslyAllowAPIKeyInBrowser: true,
+            debug: true
+          }
+    )
   );
+  //   const clientRef = useRef<RealtimeClient>(
+  //   new RealtimeClient({
+  //     url: process.env.NODE_ENV === 'production'
+  //       ? `wss://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/voice`
+  //       : 'ws://localhost:3000/api/voice',
+  //     dangerouslyAllowAPIKeyInBrowser: false,
+  //   })
+  // );
 
 
   const clientCanvasRef = useRef<HTMLCanvasElement>(null);
