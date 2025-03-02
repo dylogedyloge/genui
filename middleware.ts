@@ -33,12 +33,17 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api/voice')) {
     const upgrade = request.headers.get('upgrade');
     if (upgrade?.toLowerCase() === 'websocket') {
-            // Enhanced logging for Vercel
-      console.warn('=== Voice API Request ===');
-      console.warn(`Timestamp: ${new Date().toISOString()}`);
-      console.warn(`Original IP: ${request.ip}`);
-      console.warn(`Headers: ${JSON.stringify(Object.fromEntries(request.headers), null, 2)}`);
-      console.warn(`Using Proxy: ${PROXY_HOST}`);
+      // More visible logging format
+      const logMessage = `
+🔵 VOICE API REQUEST LOG
+------------------------
+📅 Time: ${new Date().toISOString()}
+🌐 IP: ${request.ip}
+🔗 URL: ${request.url}
+📍 Proxy: ${PROXY_HOST}
+------------------------`;
+      
+      console.warn(logMessage);
       const headers = new Headers({
         'Upgrade': 'websocket',
         'Connection': 'Upgrade',
