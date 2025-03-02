@@ -33,6 +33,12 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api/voice')) {
     const upgrade = request.headers.get('upgrade');
     if (upgrade?.toLowerCase() === 'websocket') {
+            // Enhanced logging for Vercel
+      console.warn('=== Voice API Request ===');
+      console.warn(`Timestamp: ${new Date().toISOString()}`);
+      console.warn(`Original IP: ${request.ip}`);
+      console.warn(`Headers: ${JSON.stringify(Object.fromEntries(request.headers), null, 2)}`);
+      console.warn(`Using Proxy: ${PROXY_HOST}`);
       const headers = new Headers({
         'Upgrade': 'websocket',
         'Connection': 'Upgrade',
@@ -40,8 +46,14 @@ export function middleware(request: NextRequest) {
         'X-Forwarded-Host': request.headers.get('host') || '',
         'Proxy-Authorization': PROXY_AUTH,
         'X-Proxy-Host': PROXY_HOST,
-        'X-Forwarded-Proto': 'https'  // Added HTTPS protocol
+        'X-Forwarded-Proto': 'https',
+        'X-Original-IP': request.ip || 'unknown',  // Store original IP for comparison
       });
+
+ // Log final proxy configuration
+ console.warn('=== Proxy Configuration ===');
+ console.warn(`Headers: ${JSON.stringify(Object.fromEntries(headers), null, 2)}`);
+ console.warn('========================');
 
       request.headers.forEach((value, key) => {
         if (!headers.has(key)) {
