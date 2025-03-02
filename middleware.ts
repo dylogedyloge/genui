@@ -24,7 +24,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Parse proxy URL components
-const PROXY_HOST = 'cdn.smatrip.com:39210';
+const PROXY_HOST = 'http://cdn.smatrip.com:39210';
 const PROXY_USERNAME = 'Jungp2jf5I';
 const PROXY_PASSWORD = '866OI8O8nZ';
 const PROXY_AUTH = `Basic ${Buffer.from(`${PROXY_USERNAME}:${PROXY_PASSWORD}`).toString('base64')}`;
@@ -39,7 +39,8 @@ export function middleware(request: NextRequest) {
         'Sec-WebSocket-Protocol': 'realtime',
         'X-Forwarded-Host': request.headers.get('host') || '',
         'Proxy-Authorization': PROXY_AUTH,
-        'X-Proxy-Host': PROXY_HOST
+        'X-Proxy-Host': PROXY_HOST,
+        'X-Forwarded-Proto': 'https'  // Added HTTPS protocol
       });
 
       request.headers.forEach((value, key) => {
