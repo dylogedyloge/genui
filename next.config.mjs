@@ -23,7 +23,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/api/voice',
+        source: '/api/ws-proxy',
         headers: [
           { key: 'Upgrade', value: 'websocket' },
           { key: 'Connection', value: 'Upgrade' },

@@ -348,58 +348,68 @@ import Image from "next/image";
 import { formatPersianTime } from "@/utils/time-helpers";
 import { useTheme } from "next-themes";
 
+import { createProxiedWebSocket } from '@/lib/ws-proxy-client';
+import { proxiedFetch } from '@/lib/fetch-proxy-client';
+
+
+const OriginalWebSocket = global.WebSocket;
+global.WebSocket = createProxiedWebSocket as any;
+
+const originalFetch = global.fetch;
+global.fetch = proxiedFetch as any;
+
 // Proxy URL configuration
 const PROXY_URL = "http://Jungp2jf5I:866OI8O8nZ@cdn.smatrip.com:39210";
 const USE_LOCAL_RELAY_SERVER_URL: string | undefined = void 0;
 
 // Override global fetch to use proxy
-const originalFetch = global.fetch;
-global.fetch = async (url: RequestInfo | URL, options?: RequestInit) => {
-  // Only proxy requests that are likely to be OpenAI API calls
-  if (typeof url === 'string' && (url.includes('openai.com') || url.includes('api.openai.com'))) {
-    console.log(`Proxying request to: ${url} via ${PROXY_URL}`);
+// const originalFetch = global.fetch;
+// global.fetch = async (url: RequestInfo | URL, options?: RequestInit) => {
+//   // Only proxy requests that are likely to be OpenAI API calls
+//   if (typeof url === 'string' && (url.includes('openai.com') || url.includes('api.openai.com'))) {
+//     console.log(`Proxying request to: ${url} via ${PROXY_URL}`);
     
-    // Create new request options with proxy headers
-    const proxyOptions: RequestInit = {
-      ...options,
-      headers: {
-        ...options?.headers,
-        // Add any additional headers your proxy might need
-      },
-    };
+//     // Create new request options with proxy headers
+//     const proxyOptions: RequestInit = {
+//       ...options,
+//       headers: {
+//         ...options?.headers,
+//         // Add any additional headers your proxy might need
+//       },
+//     };
     
-    // Use the proxy URL instead
-    return originalFetch(`${PROXY_URL}/${url.replace(/^https?:\/\//, '')}`, proxyOptions);
-  }
+//     // Use the proxy URL instead
+//     return originalFetch(`${PROXY_URL}/${url.replace(/^https?:\/\//, '')}`, proxyOptions);
+//   }
   
-  // For non-OpenAI requests, use the original fetch
-  return originalFetch(url, options);
-};
+//   // For non-OpenAI requests, use the original fetch
+//   return originalFetch(url, options);
+// };
 
 // Override WebSocket to use proxy if needed
-const OriginalWebSocket = global.WebSocket;
-class ProxiedWebSocket extends OriginalWebSocket {
-  constructor(url: string | URL, protocols?: string | string[]) {
-    // Only proxy WebSocket connections to OpenAI
-    if (typeof url === 'string' && (url.includes('openai.com') || url.includes('api.openai.com'))) {
-      console.log(`Proxying WebSocket to: ${url} via ${PROXY_URL}`);
+// const OriginalWebSocket = global.WebSocket;
+// class ProxiedWebSocket extends OriginalWebSocket {
+//   constructor(url: string | URL, protocols?: string | string[]) {
+//     // Only proxy WebSocket connections to OpenAI
+//     if (typeof url === 'string' && (url.includes('openai.com') || url.includes('api.openai.com'))) {
+//       console.log(`Proxying WebSocket to: ${url} via ${PROXY_URL}`);
       
-      // Create proxy URL for WebSocket
-      // Note: This approach might need adjustment based on your proxy's WebSocket support
-      const proxyUrl = url.replace(
-        /^wss?:\/\/(.*)/,
-        `wss://${PROXY_URL.replace(/^https?:\/\//, '')}/$1`
-      );
+//       // Create proxy URL for WebSocket
+//       // Note: This approach might need adjustment based on your proxy's WebSocket support
+//       const proxyUrl = url.replace(
+//         /^wss?:\/\/(.*)/,
+//         `wss://${PROXY_URL.replace(/^https?:\/\//, '')}/$1`
+//       );
       
-      super(proxyUrl, protocols);
-    } else {
-      super(url, protocols);
-    }
-  }
-}
+//       super(proxyUrl, protocols);
+//     } else {
+//       super(url, protocols);
+//     }
+//   }
+// }
 
 // Replace the global WebSocket constructor
-global.WebSocket = ProxiedWebSocket as any;
+// global.WebSocket = ProxiedWebSocket as any;
 
 const VoiceChat = () => {
   const { setTheme } = useTheme();
@@ -408,10 +418,10 @@ const VoiceChat = () => {
   // Set dark theme when component mounts
   useEffect(() => {
     setTheme("dark");
-    // Optional: Cleanup function to reset theme when component unmounts
+    // Cleanup function
     return () => {
       setTheme("light");
-      // Restore original fetch and WebSocket when component unmounts
+      // Restore original WebSocket when component unmounts
       global.fetch = originalFetch;
       global.WebSocket = OriginalWebSocket;
     };
@@ -436,16 +446,26 @@ INSTRUCTIONS:
   );
 
   // Use the standard client reference with our globally proxied fetch/WebSocket
+  // const clientRef = useRef<RealtimeClient>(
+  //   new RealtimeClient(
+  //     USE_LOCAL_RELAY_SERVER_URL
+  //       ? { url: USE_LOCAL_RELAY_SERVER_URL }
+  //       : {
+  //           apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  //           dangerouslyAllowAPIKeyInBrowser: true,
+  //           debug: true
+  //         }
+  //   )
+  // );
   const clientRef = useRef<RealtimeClient>(
-    new RealtimeClient(
-      USE_LOCAL_RELAY_SERVER_URL
-        ? { url: USE_LOCAL_RELAY_SERVER_URL }
-        : {
-            apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-            dangerouslyAllowAPIKeyInBrowser: true,
-            debug: true
-          }
-    )
+    new RealtimeClient({
+      url: window.location.protocol === 'https:' 
+        ? `wss://${window.location.host}/api/ws-proxy`
+        : `ws://${window.location.host}/api/ws-proxy`,
+      apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+      dangerouslyAllowAPIKeyInBrowser: true,
+      debug: true
+    })
   );
 
   const clientCanvasRef = useRef<HTMLCanvasElement>(null);
