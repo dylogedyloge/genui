@@ -348,18 +348,10 @@ import Image from "next/image";
 import { formatPersianTime } from "@/utils/time-helpers";
 import { useTheme } from "next-themes";
 
-import { createProxiedWebSocket } from '@/lib/ws-proxy-client';
-import { proxiedFetch } from '@/lib/fetch-proxy-client';
 
 
-const OriginalWebSocket = global.WebSocket;
-global.WebSocket = createProxiedWebSocket as any;
 
-const originalFetch = global.fetch;
-global.fetch = proxiedFetch as any;
 
-// Proxy URL configuration
-const PROXY_URL = "http://Jungp2jf5I:866OI8O8nZ@cdn.smatrip.com:39210";
 const USE_LOCAL_RELAY_SERVER_URL: string | undefined = void 0;
 
 // Override global fetch to use proxy
@@ -421,9 +413,6 @@ const VoiceChat = () => {
     // Cleanup function
     return () => {
       setTheme("light");
-      // Restore original WebSocket when component unmounts
-      global.fetch = originalFetch;
-      global.WebSocket = OriginalWebSocket;
     };
   }, [setTheme]);
   
@@ -446,27 +435,27 @@ INSTRUCTIONS:
   );
 
   // Use the standard client reference with our globally proxied fetch/WebSocket
-  // const clientRef = useRef<RealtimeClient>(
-  //   new RealtimeClient(
-  //     USE_LOCAL_RELAY_SERVER_URL
-  //       ? { url: USE_LOCAL_RELAY_SERVER_URL }
-  //       : {
-  //           apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-  //           dangerouslyAllowAPIKeyInBrowser: true,
-  //           debug: true
-  //         }
-  //   )
-  // );
   const clientRef = useRef<RealtimeClient>(
-    new RealtimeClient({
-      url: window.location.protocol === 'https:' 
-        ? `wss://${window.location.host}/api/ws-proxy`
-        : `ws://${window.location.host}/api/ws-proxy`,
-      apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-      dangerouslyAllowAPIKeyInBrowser: true,
-      debug: true
-    })
+    new RealtimeClient(
+      USE_LOCAL_RELAY_SERVER_URL
+        ? { url: USE_LOCAL_RELAY_SERVER_URL }
+        : {
+            apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+            dangerouslyAllowAPIKeyInBrowser: true,
+            debug: true
+          }
+    )
   );
+  // const clientRef = useRef<RealtimeClient>(
+  //   new RealtimeClient({
+  //     url: window.location.protocol === 'https:' 
+  //       ? `wss://${window.location.host}/api/ws-proxy`
+  //       : `ws://${window.location.host}/api/ws-proxy`,
+  //     apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  //     dangerouslyAllowAPIKeyInBrowser: true,
+  //     debug: true
+  //   })
+  // );
 
   const clientCanvasRef = useRef<HTMLCanvasElement>(null);
   const serverCanvasRef = useRef<HTMLCanvasElement>(null);
