@@ -18,7 +18,10 @@ export async function GET(req: NextRequest) {
         'Sec-WebSocket-Protocol': 'realtime',
         'Proxy-Authorization': `Basic ${proxyAuth}`,
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'OpenAI-Beta': 'realtime=v1'
+        'OpenAI-Beta': 'realtime=v1',
+        'Host': new URL(targetUrl).host,
+        'X-Forwarded-Host': new URL(proxyUrl).host,
+        'X-Proxy-URL': proxyUrl
       }
     });
 
