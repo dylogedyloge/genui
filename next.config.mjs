@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["api.atripa.ir"],
+    domains: ["api.atripa.com"],
     remotePatterns: [
       {
         protocol: "https",

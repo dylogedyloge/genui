@@ -58,14 +58,37 @@ export interface CityData {
 }
 
 export interface Hotel {
-  id: string; // Unique identifier for the hotel
-  hotelName: string; // Name of the hotel
-  location: string; // Location of the hotel
-  checkIn: string; // Check-in date
-  checkOut: string; // Check-out date
-  roomType: string; // Room type (e.g., "Deluxe", "Suite")
-  price: number; // Price per night in local currency (e.g., Toman)
-  rating: number; // Hotel rating (e.g., out of 5 stars)
+  id: string;
+  hotelName: string;
+  location: string;
+  checkIn: string;
+  checkOut: string;
+  roomType: string;
+  price: number;
+  rating: number;
+  images: Array<{
+    image: string;
+    alt: string;
+    caption: string | null;
+  }>;
+  address: string;
+  star: number;
+  type: string;
+  rooms: Array<{
+    room_type_name: string;
+    room_type_capacity: number;
+    rate_plans: Array<{
+      name: string;
+      cancelable: number;
+      meal_type_included: string;
+      prices: {
+        total_price: number;
+        inventory: number;
+        has_off: boolean;
+      };
+    }>;
+  }>;
+  amenities?: string[];
 }
 
 // Tool Invocation for displaying flight, or hotel details

@@ -224,8 +224,8 @@ const HotelCard = ({
           </div>
             <Button
               onClick={handleOpenDetailsAccordion}
-              variant="default"
-              className="w-full mt-4"
+              variant="outline"
+              className="w-full mt-4 text-foreground"
             >
               {isAccordionOpen ? "بستن جزئیات" : "مشاهده جزئیات"}
             </Button>
