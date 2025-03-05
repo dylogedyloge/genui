@@ -5,8 +5,6 @@ const nextConfig = {
       fullUrl: true,
     },
   },
-
-
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -17,13 +15,13 @@ const nextConfig = {
     return config;
   },
   experimental: {
-    serverComponentsExternalPackages: ['ws'],
-    // serverActions: true,
+    serverComponentsExternalPackages: ['ws', 'socket.io', 'socket.io-client'],
   },
+  // Socket.io headers configuration
   async headers() {
     return [
       {
-        source: '/api/ws-proxy',
+        source: '/api/socket',
         headers: [
           { key: 'Upgrade', value: 'websocket' },
           { key: 'Connection', value: 'Upgrade' },
