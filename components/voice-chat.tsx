@@ -87,9 +87,13 @@ INSTRUCTIONS:
     setIsConnected(true);
     setItems(client.conversation.getItems());
 
+    console.log('Attempting to connect to OpenAI...');
+
     await wavRecorder.begin();
     await wavStreamPlayer.connect();
     await client.connect();
+
+    console.log('Connected to OpenAI WebSocket');
 
     if (client.getTurnDetectionType() === "server_vad") {
       await wavRecorder.record((data) => client.appendInputAudio(data.mono));
@@ -286,6 +290,27 @@ INSTRUCTIONS:
   useEffect(() => {
     const wavStreamPlayer = wavStreamPlayerRef.current;
     const client = clientRef.current;
+
+    // Add error logging
+    client.on("error", (event: any) => {
+      console.error('OpenAI WebSocket Error:', event);
+      console.log('Connection Details:', {
+        url: event?.target?.url,
+        readyState: event?.target?.readyState,
+        timestamp: new Date().toISOString()
+      });
+    });
+
+
+    // Add connection status logging
+    client.on("open", () => {
+      console.log('WebSocket Connection Established');
+      // You can use an IP checking service to verify the IP
+      fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => console.log('Current IP:', data.ip))
+        .catch(err => console.error('Failed to check IP:', err));
+    });
 
     client.updateSession({ instructions: instructions });
     client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
