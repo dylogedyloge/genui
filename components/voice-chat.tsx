@@ -13,6 +13,9 @@ import { setupProxy } from "@/utils/proxy-helper";
 
 const USE_LOCAL_RELAY_SERVER_URL: string | undefined = void 0;
 
+// Setup proxy before creating the client
+setupProxy();
+
 const VoiceChat = () => {
   const { setTheme } = useTheme();
   const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || "";
