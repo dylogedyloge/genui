@@ -291,8 +291,8 @@ INSTRUCTIONS:
     const wavStreamPlayer = wavStreamPlayerRef.current;
     const client = clientRef.current;
 
-    // Add error logging
-    client.on("error", (event: any) => {
+     // Enhanced error logging
+     client.on("error", (event: any) => {
       console.error('OpenAI WebSocket Error:', event);
       console.log('Connection Details:', {
         url: event?.target?.url,
@@ -306,7 +306,7 @@ INSTRUCTIONS:
     client.on("open", () => {
       console.log('WebSocket Connection Established');
       // You can use an IP checking service to verify the IP
-      fetch('https://api.ipify.org?format=json')
+      fetch('https://api.ipify.org?format=json') 
         .then(response => response.json())
         .then(data => console.log('Current IP:', data.ip))
         .catch(err => console.error('Failed to check IP:', err));
