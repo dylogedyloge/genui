@@ -13,8 +13,6 @@ import { setupProxy } from "@/utils/proxy-helper";
 
 const USE_LOCAL_RELAY_SERVER_URL: string | undefined = void 0;
 
-// Setup proxy before creating the client
-setupProxy();
 
 const VoiceChat = () => {
   const { setTheme } = useTheme();
@@ -66,7 +64,7 @@ INSTRUCTIONS:
         : {
             apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
             dangerouslyAllowAPIKeyInBrowser: true,
-            debug: true
+            debug: false
           }
     )
   );
@@ -77,26 +75,33 @@ INSTRUCTIONS:
 
   const [items, setItems] = useState<ItemType[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [connectionState, setConnectionState] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
+  const maxReconnectAttempts = 3;
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
   const connectConversation = useCallback(async () => {
-    const client = clientRef.current;
-    const wavRecorder = wavRecorderRef.current;
-    const wavStreamPlayer = wavStreamPlayerRef.current;
+    try {
+      setConnectionState('connecting');
+      const client = clientRef.current;
+      const wavRecorder = wavRecorderRef.current;
+      const wavStreamPlayer = wavStreamPlayerRef.current;
 
-    startTimeRef.current = new Date().toISOString();
-    setIsConnected(true);
-    setItems(client.conversation.getItems());
+      await wavRecorder.begin();
+      await wavStreamPlayer.connect();
+      await client.connect();
 
-    console.log('Attempting to connect to OpenAI...');
+      setConnectionState('connected');
+      setIsConnected(true);
+      setItems(client.conversation.getItems());
 
-    await wavRecorder.begin();
-    await wavStreamPlayer.connect();
-    await client.connect();
-
-    console.log('Connected to OpenAI WebSocket');
-
-    if (client.getTurnDetectionType() === "server_vad") {
-      await wavRecorder.record((data) => client.appendInputAudio(data.mono));
+      if (client.getTurnDetectionType() === "server_vad") {
+        await wavRecorder.record((data) => client.appendInputAudio(data.mono));
+      }
+    } catch (error) {
+      setConnectionState('error');
+      console.error('Connection failed:', error);
+      setConnectionError(error instanceof Error ? error.message : 'An unknown error occurred');
     }
   }, []);
 
@@ -112,6 +117,40 @@ INSTRUCTIONS:
     const wavStreamPlayer = wavStreamPlayerRef.current;
     await wavStreamPlayer.interrupt();
   }, []);
+
+
+  // Reconnection logic
+  const attemptReconnection = useCallback(async () => {
+    if (reconnectAttempts < maxReconnectAttempts) {
+      setReconnectAttempts(prev => prev + 1);
+      try {
+        await connectConversation();
+        setReconnectAttempts(0); // Reset on successful connection
+      } catch (error) {
+        console.error(`Reconnection attempt ${reconnectAttempts + 1} failed:`, error);
+        // Try again after exponential backoff
+        setTimeout(attemptReconnection, Math.pow(2, reconnectAttempts) * 1000);
+      }
+    } else {
+      setConnectionError('Maximum reconnection attempts reached. Please try again later.');
+      setConnectionState('error');
+    }
+  }, [reconnectAttempts, connectConversation]);
+
+  useEffect(() => {
+    const client = clientRef.current;
+
+    client.on("close", (event: any) => {
+      if (connectionState === 'connected') {
+        setConnectionState('error');
+        attemptReconnection();
+      }
+    });
+
+    return () => {
+      client.off("close");
+    };
+  }, [connectionState, attemptReconnection]);
 
   const changeTurnEndType = async (value: string) => {
     const client = clientRef.current;
@@ -287,31 +326,143 @@ INSTRUCTIONS:
     };
   }, []);
 
+  // useEffect(() => {
+  //   // Setup proxy first
+  //   setupProxy();
+
+  //   const wavStreamPlayer = wavStreamPlayerRef.current;
+  //   const client = clientRef.current;
+
+  //   // Consolidated error handler
+  //   const handleError = (event: any) => {
+  //     console.error('OpenAI WebSocket Error:', event);
+  //     const errorMessage = event?.message || 'Connection failed';
+  //     setConnectionError(errorMessage);
+  //     setIsConnected(false);
+      
+  //     // Attempt to reconnect after 5 seconds
+  //     setTimeout(() => {
+  //       if (!isConnected) {
+  //         connectConversation().catch(console.error);
+  //       }
+  //     }, 5000);
+  //   };
+
+  //   client.on("error", handleError);
+  //   client.on("close", handleError);
+
+  //       // connection status logging
+  //       client.on("open", async () => {
+  //         console.log('🟢 WebSocket Connection Established');
+  //         setConnectionError(null);
+          
+  //         try {
+  //           console.log('🔍 Checking IP address...');
+  //           // Use a different IP check service and bypass proxy
+  //           const response = await fetch('https://ifconfig.me/ip', {
+  //             method: 'GET',
+  //             headers: {
+  //               'bypass-proxy': 'true',
+  //               'Accept': 'text/plain'
+  //             }
+  //           });
+            
+  //           if (!response.ok) {
+  //             throw new Error(`HTTP error! status: ${response.status}`);
+  //           }
+            
+  //           const ip = await response.text();
+  //           console.log('🌐 Current Connection IP:', ip);
+  //         } catch (err) {
+  //           // Try alternative IP service if first one fails
+  //           try {
+  //             const response = await fetch('https://icanhazip.com', {
+  //               method: 'GET',
+  //               headers: {
+  //                 'bypass-proxy': 'true',
+  //                 'Accept': 'text/plain'
+  //               }
+  //             });
+  //             const ip = await response.text();
+  //             console.log('🌐 Current Connection IP:', ip.trim());
+  //           } catch (fallbackErr) {
+  //             console.warn('⚠️ IP Check Failed:', err instanceof Error ? err.message : 'Failed to fetch IP');
+  //           }
+  //         }
+  //       });
+
+  //   client.updateSession({ instructions: instructions });
+  //   client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
+  //   client.updateSession({ voice: "ash" });
   useEffect(() => {
+    // Setup proxy first
+    setupProxy();
+    console.log('🔄 Initial setup started...');
+
     const wavStreamPlayer = wavStreamPlayerRef.current;
     const client = clientRef.current;
 
-     // Enhanced error logging
-     client.on("error", (event: any) => {
-      console.error('OpenAI WebSocket Error:', event);
-      console.log('Connection Details:', {
-        url: event?.target?.url,
-        readyState: event?.target?.readyState,
-        timestamp: new Date().toISOString()
-      });
+    // Consolidated error handler
+    const handleError = (event: any) => {
+      console.error('❌ OpenAI WebSocket Error:', event);
+      const errorMessage = event?.message || 'Connection failed';
+      setConnectionError(errorMessage);
+      setIsConnected(false);
+      
+      // Attempt to reconnect after 5 seconds
+      setTimeout(() => {
+        if (!isConnected) {
+          connectConversation().catch(error => 
+            console.error('❌ Reconnection failed:', error)
+          );
+        }
+      }, 5000);
+    };
+
+    // Remove duplicate error handlers
+    client.off("error");
+    client.off("close");
+    client.off("open");
+
+    // Add handlers in correct order
+    client.on("error", handleError);
+    client.on("close", handleError);
+
+    client.on("open", async () => {
+      console.log('🟢 WebSocket Connection Established');
+      setConnectionError(null);
+      setIsConnected(true);
+      
+      try {
+        console.log('🔍 Initiating IP check...');
+        const response = await fetch('https://ifconfig.me/ip', {
+          method: 'GET',
+          headers: {
+            'Accept': 'text/plain'
+          }
+        });
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const ip = await response.text();
+        console.log('🌐 Current Connection IP:', ip.trim());
+      } catch (err) {
+        console.log('⚠️ First IP check failed, trying backup service...');
+        try {
+          const response = await fetch('https://icanhazip.com', {
+            method: 'GET',
+            headers: {
+              'Accept': 'text/plain'
+            }
+          });
+          const ip = await response.text();
+          console.log('🌐 Current Connection IP:', ip.trim());
+        } catch (fallbackErr) {
+          console.error('❌ All IP checks failed');
+        }
+      }
     });
 
-
-    // Add connection status logging
-    client.on("open", () => {
-      console.log('WebSocket Connection Established');
-      // You can use an IP checking service to verify the IP
-      fetch('https://api.ipify.org?format=json') 
-        .then(response => response.json())
-        .then(data => console.log('Current IP:', data.ip))
-        .catch(err => console.error('Failed to check IP:', err));
-    });
-
+    // Rest of the setup
     client.updateSession({ instructions: instructions });
     client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
     client.updateSession({ voice: "ash" });
@@ -352,6 +503,16 @@ INSTRUCTIONS:
 
   return (
     <div data-component="VoiceChat" dir="rtl" className="flex flex-col h-full">
+      {connectionError && (
+        <div className="bg-destructive/10 text-destructive px-4 py-2 rounded-md mb-4">
+          {connectionError}
+        </div>
+      )}
+      {connectionState === 'connecting' && (
+        <div className="bg-muted px-4 py-2 rounded-md mb-4">
+          Connecting to voice service...
+        </div>
+      )}
       {/* Conversation Display */}
       <div
         className="flex-1 w-full overflow-y-auto p-4 rounded-lg  bg-background space-y-4"
