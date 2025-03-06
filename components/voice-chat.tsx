@@ -46,17 +46,7 @@ INSTRUCTIONS:
   );
 
   // Use the standard client reference with our globally proxied fetch/WebSocket
-  // const clientRef = useRef<RealtimeClient>(
-  //   new RealtimeClient(
-  //     USE_LOCAL_RELAY_SERVER_URL
-  //       ? { url: USE_LOCAL_RELAY_SERVER_URL }
-  //       : {
-  //           apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-  //           dangerouslyAllowAPIKeyInBrowser: true,
-  //           debug: true,
-  //         }
-  //   )
-  // );
+  // WITHOUT PROXY
   const clientRef = useRef<RealtimeClient>(
     new RealtimeClient(
       USE_LOCAL_RELAY_SERVER_URL
@@ -64,10 +54,22 @@ INSTRUCTIONS:
         : {
             apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
             dangerouslyAllowAPIKeyInBrowser: true,
-            debug: false
+            debug: true,
           }
     )
   );
+  // WITH PROXY
+  // const clientRef = useRef<RealtimeClient>(
+  //   new RealtimeClient(
+  //     USE_LOCAL_RELAY_SERVER_URL
+  //       ? { url: USE_LOCAL_RELAY_SERVER_URL }
+  //       : {
+  //           apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  //           dangerouslyAllowAPIKeyInBrowser: true,
+  //           debug: false
+  //         }
+  //   )
+  // );
 
   const clientCanvasRef = useRef<HTMLCanvasElement>(null);
   const serverCanvasRef = useRef<HTMLCanvasElement>(null);
