@@ -3,13 +3,15 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import { RealtimeClient } from "@openai/realtime-api-beta";
 import { ItemType } from "@openai/realtime-api-beta/dist/lib/client.js";
 import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index";
-import { Mic, MicOff } from "lucide-react";
+import { Loader2, Mic, MicOff } from "lucide-react";
 import { Button } from "./shadcn/button";
 import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import { formatPersianTime } from "@/utils/time-helpers";
 import { useTheme } from "next-themes";
 import { setupProxy } from "@/utils/proxy-helper";
+import { tools } from "@/ai/tools";
+
 
 const USE_LOCAL_RELAY_SERVER_URL: string | undefined = void 0;
 
@@ -54,7 +56,7 @@ INSTRUCTIONS:
         : {
             apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
             dangerouslyAllowAPIKeyInBrowser: true,
-            debug: false
+            debug: true
           }
     )
   );
@@ -97,7 +99,7 @@ INSTRUCTIONS:
 
   const disconnectConversation = useCallback(async () => {
     setIsConnected(false);
-
+ 
     const client = clientRef.current;
     client.disconnect();
 
@@ -456,6 +458,8 @@ INSTRUCTIONS:
     client.updateSession({ instructions: instructions });
     client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
     client.updateSession({ voice: "ash" });
+ 
+
 
     client.on("error", (event: any) => console.error(event));
     client.on("conversation.interrupted", async () => {
@@ -499,8 +503,8 @@ INSTRUCTIONS:
         </div>
       )}
       {connectionState === 'connecting' && (
-        <div className="bg-muted px-4 py-2 rounded-md mb-4">
-          Connecting to voice service...
+        <div className="flex justify-center items-center">
+          <Loader2 className="w-4 h-4 animate-spin"/>
         </div>
       )}
       {/* Conversation Display */}
