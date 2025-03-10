@@ -573,6 +573,7 @@ INSTRUCTIONS:
           }`}
         >
           {isConnected ? <MicOff /> : <Mic />}
+          tools
         </Button>
         <div className="w-[40%]">
           <canvas ref={serverCanvasRef} className="w-full h-16" />
