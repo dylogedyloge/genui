@@ -12,9 +12,7 @@ import { useTheme } from "next-themes";
 import { setupProxy } from "@/utils/proxy-helper";
 import { tools } from "@/ai/tools";
 
-
 const USE_LOCAL_RELAY_SERVER_URL: string | undefined = void 0;
-
 
 const VoiceChat = () => {
   const { setTheme } = useTheme();
@@ -35,9 +33,11 @@ INSTRUCTIONS:
 - به زبان فارسی صحبت کنید
 - لطفاً پاسخ‌های خود را به صورت صوتی و مفید ارائه دهید
 - پاسخ‌ها باید کوتاه و مفید باشند و حداکثر 400 کاراکتر داشته باشند
-- برای جستجو و رزرو هتل یا پرواز، به کاربر بگویید: "لطفا از چت متنی برای جستجوی پرواز یا هتل استفاده کنید"
+- برای جستجو و رزرو هتل یا پرواز از ابزارهای مربوطه استفاده کنید
 - به سوالات عمومی در مورد سفر، هتل و پرواز پاسخ دهید
 - می‌توانید از کاربر سؤال بپرسید
+- برای جستجوی پرواز از ابزار displayFlightCard استفاده کنید
+- برای جستجوی هتل از ابزار displayHotelCard استفاده کنید
 `;
 
   const wavRecorderRef = useRef<WavRecorder>(
@@ -47,8 +47,6 @@ INSTRUCTIONS:
     new WavStreamPlayer({ sampleRate: 24000 })
   );
 
-
-
   const clientRef = useRef<RealtimeClient>(
     new RealtimeClient(
       USE_LOCAL_RELAY_SERVER_URL
@@ -56,7 +54,7 @@ INSTRUCTIONS:
         : {
             apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
             dangerouslyAllowAPIKeyInBrowser: true,
-            debug: true
+            debug: false,
           }
     )
   );
@@ -68,13 +66,15 @@ INSTRUCTIONS:
   const [items, setItems] = useState<ItemType[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
-  const [connectionState, setConnectionState] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
+  const [connectionState, setConnectionState] = useState<
+    "disconnected" | "connecting" | "connected" | "error"
+  >("disconnected");
   const maxReconnectAttempts = 3;
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
   const connectConversation = useCallback(async () => {
     try {
-      setConnectionState('connecting');
+      setConnectionState("connecting");
       const client = clientRef.current;
       const wavRecorder = wavRecorderRef.current;
       const wavStreamPlayer = wavStreamPlayerRef.current;
@@ -83,7 +83,7 @@ INSTRUCTIONS:
       await wavStreamPlayer.connect();
       await client.connect();
 
-      setConnectionState('connected');
+      setConnectionState("connected");
       setIsConnected(true);
       setItems(client.conversation.getItems());
 
@@ -91,15 +91,17 @@ INSTRUCTIONS:
         await wavRecorder.record((data) => client.appendInputAudio(data.mono));
       }
     } catch (error) {
-      setConnectionState('error');
-      console.error('Connection failed:', error);
-      setConnectionError(error instanceof Error ? error.message : 'An unknown error occurred');
+      setConnectionState("error");
+      console.error("Connection failed:", error);
+      setConnectionError(
+        error instanceof Error ? error.message : "An unknown error occurred"
+      );
     }
   }, []);
 
   const disconnectConversation = useCallback(async () => {
     setIsConnected(false);
- 
+
     const client = clientRef.current;
     client.disconnect();
 
@@ -110,22 +112,26 @@ INSTRUCTIONS:
     await wavStreamPlayer.interrupt();
   }, []);
 
-
   // Reconnection logic
   const attemptReconnection = useCallback(async () => {
     if (reconnectAttempts < maxReconnectAttempts) {
-      setReconnectAttempts(prev => prev + 1);
+      setReconnectAttempts((prev) => prev + 1);
       try {
         await connectConversation();
         setReconnectAttempts(0); // Reset on successful connection
       } catch (error) {
-        console.error(`Reconnection attempt ${reconnectAttempts + 1} failed:`, error);
+        console.error(
+          `Reconnection attempt ${reconnectAttempts + 1} failed:`,
+          error
+        );
         // Try again after exponential backoff
         setTimeout(attemptReconnection, Math.pow(2, reconnectAttempts) * 1000);
       }
     } else {
-      setConnectionError('Maximum reconnection attempts reached. Please try again later.');
-      setConnectionState('error');
+      setConnectionError(
+        "Maximum reconnection attempts reached. Please try again later."
+      );
+      setConnectionState("error");
     }
   }, [reconnectAttempts, connectConversation]);
 
@@ -133,8 +139,8 @@ INSTRUCTIONS:
     const client = clientRef.current;
 
     client.on("close", (event: any) => {
-      if (connectionState === 'connected') {
-        setConnectionState('error');
+      if (connectionState === "connected") {
+        setConnectionState("error");
         attemptReconnection();
       }
     });
@@ -181,12 +187,11 @@ INSTRUCTIONS:
     const serverCanvas = serverCanvasRef.current;
     let serverCtx: CanvasRenderingContext2D | null = null;
 
-
     const drawWave = (
       ctx: CanvasRenderingContext2D,
       values: Float32Array,
       color: string,
-      role: 'user' | 'ai' = 'user'
+      role: "user" | "ai" = "user"
     ) => {
       const width = ctx.canvas.width;
       const height = ctx.canvas.height;
@@ -211,18 +216,16 @@ INSTRUCTIONS:
             safeX,
             safeHeight - safeBarHeight
           );
-          if (role === 'user') {
+          if (role === "user") {
             // Dark shades of gray for user
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');    // Slightly lighter dark gray
-            gradient.addColorStop(0.5, 'rgba(20, 20, 23, 0.9)');  // Mid dark gray
-            gradient.addColorStop(1, 'rgb(9, 9, 11, 1)');         // Very dark gray
+            gradient.addColorStop(0, "rgba(255, 255, 255, 0.4)"); // Slightly lighter dark gray
+            gradient.addColorStop(0.5, "rgba(20, 20, 23, 0.9)"); // Mid dark gray
+            gradient.addColorStop(1, "rgb(9, 9, 11, 1)"); // Very dark gray
           } else {
             // Light shades of gray for AI
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');     // Light gray (pure white)
-            gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.7)'); // 70% opacity white
-            gradient.addColorStop(1, 'rgba(255, 255, 255, 0.4)');   // 40% opacity white
-            
-            
+            gradient.addColorStop(0, "rgba(255, 255, 255, 1)"); // Light gray (pure white)
+            gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.7)"); // 70% opacity white
+            gradient.addColorStop(1, "rgba(255, 255, 255, 0.4)"); // 40% opacity white
           }
           return gradient;
         } catch (error) {
@@ -292,7 +295,12 @@ INSTRUCTIONS:
             const result = wavRecorder.recording
               ? wavRecorder.getFrequencies("voice")
               : { values: new Float32Array([0]) };
-              drawWave(clientCtx, result.values, getColor("text-foreground/50"), 'user');
+            drawWave(
+              clientCtx,
+              result.values,
+              getColor("text-foreground/50"),
+              "user"
+            );
           }
         }
         if (serverCanvas) {
@@ -305,7 +313,12 @@ INSTRUCTIONS:
             const result = wavStreamPlayer.analyser
               ? wavStreamPlayer.getFrequencies("voice")
               : { values: new Float32Array([0]) };
-              drawWave(serverCtx, result.values, getColor("text-foreground"), 'ai');
+            drawWave(
+              serverCtx,
+              result.values,
+              getColor("text-foreground"),
+              "ai"
+            );
           }
         }
         window.requestAnimationFrame(render);
@@ -331,7 +344,7 @@ INSTRUCTIONS:
   //     const errorMessage = event?.message || 'Connection failed';
   //     setConnectionError(errorMessage);
   //     setIsConnected(false);
-      
+
   //     // Attempt to reconnect after 5 seconds
   //     setTimeout(() => {
   //       if (!isConnected) {
@@ -347,7 +360,7 @@ INSTRUCTIONS:
   //       client.on("open", async () => {
   //         console.log('🟢 WebSocket Connection Established');
   //         setConnectionError(null);
-          
+
   //         try {
   //           console.log('🔍 Checking IP address...');
   //           // Use a different IP check service and bypass proxy
@@ -358,11 +371,11 @@ INSTRUCTIONS:
   //               'Accept': 'text/plain'
   //             }
   //           });
-            
+
   //           if (!response.ok) {
   //             throw new Error(`HTTP error! status: ${response.status}`);
   //           }
-            
+
   //           const ip = await response.text();
   //           console.log('🌐 Current Connection IP:', ip);
   //         } catch (err) {
@@ -389,23 +402,60 @@ INSTRUCTIONS:
   useEffect(() => {
     // Setup proxy first
     // setupProxy();
-    console.log('🔄 Initial setup started...');
+    console.log("🔄 Initial setup started...");
 
     const wavStreamPlayer = wavStreamPlayerRef.current;
     const client = clientRef.current;
 
+    // Convert tools to the format expected by RealtimeClient
+    const toolDefinitions = Object.entries(tools).map(([name, tool]) => {
+      // Get the schema shape
+      const schema = tool.parameters._def.shape();
+
+      // Convert Zod schema to JSON Schema format
+      const properties: Record<string, any> = {};
+      const required: string[] = [];
+
+      Object.entries(schema).forEach(([key, value]) => {
+        properties[key] = {
+          type:
+            value._def.typeName === "ZodString"
+              ? "string"
+              : value._def.typeName === "ZodNumber"
+              ? "number"
+              : "object",
+        };
+
+        // Check if the field is required
+        if (!("isOptional" in value._def)) {
+          required.push(key);
+        }
+      });
+
+      return {
+        type: "function" as const,
+        name,
+        description: tool.description || `Tool for ${name}`,
+        parameters: {
+          type: "object",
+          properties,
+          required,
+        },
+      };
+    });
+
     // Consolidated error handler
     const handleError = (event: any) => {
-      console.error('❌ OpenAI WebSocket Error:', event);
-      const errorMessage = event?.message || 'Connection failed';
+      console.error("❌ OpenAI WebSocket Error:", event);
+      const errorMessage = event?.message || "Connection failed";
       setConnectionError(errorMessage);
       setIsConnected(false);
-      
+
       // Attempt to reconnect after 5 seconds
       setTimeout(() => {
         if (!isConnected) {
-          connectConversation().catch(error => 
-            console.error('❌ Reconnection failed:', error)
+          connectConversation().catch((error) =>
+            console.error("❌ Reconnection failed:", error)
           );
         }
       }, 5000);
@@ -421,45 +471,140 @@ INSTRUCTIONS:
     client.on("close", handleError);
 
     client.on("open", async () => {
-      console.log('🟢 WebSocket Connection Established');
+      console.log("🟢 WebSocket Connection Established");
       setConnectionError(null);
       setIsConnected(true);
-      
+
       try {
-        console.log('🔍 Initiating IP check...');
-        const response = await fetch('https://ifconfig.me/ip', {
-          method: 'GET',
+        console.log("🔍 Initiating IP check...");
+        const response = await fetch("https://ifconfig.me/ip", {
+          method: "GET",
           headers: {
-            'Accept': 'text/plain'
-          }
+            Accept: "text/plain",
+          },
         });
-        
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
         const ip = await response.text();
-        console.log('🌐 Current Connection IP:', ip.trim());
+        console.log("🌐 Current Connection IP:", ip.trim());
       } catch (err) {
-        console.log('⚠️ First IP check failed, trying backup service...');
+        console.log("⚠️ First IP check failed, trying backup service...");
         try {
-          const response = await fetch('https://icanhazip.com', {
-            method: 'GET',
+          const response = await fetch("https://icanhazip.com", {
+            method: "GET",
             headers: {
-              'Accept': 'text/plain'
-            }
+              Accept: "text/plain",
+            },
           });
           const ip = await response.text();
-          console.log('🌐 Current Connection IP:', ip.trim());
+          console.log("🌐 Current Connection IP:", ip.trim());
         } catch (fallbackErr) {
-          console.error('❌ All IP checks failed');
+          console.error("❌ All IP checks failed");
         }
       }
     });
 
-    // Rest of the setup
-    client.updateSession({ instructions: instructions });
-    client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
-    client.updateSession({ voice: "ash" });
- 
+    // // Rest of the setup
+    // client.updateSession({ instructions: instructions });
+    // client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
+    // client.updateSession({ voice: "ash" });
+    // Update session with tools and other settings
+    client.updateSession({
+      instructions: instructions,
+      input_audio_transcription: { model: "whisper-1" },
+      voice: "ash",
+      tools: toolDefinitions,
+      tool_choice: "auto",
+    });
+    // Add tool handlers
+    Object.entries(tools).forEach(([name, tool]) => {
+      const shape = tool.parameters._def.shape;
+      const parameters = typeof shape === "function" ? shape() : shape;
 
+      console.log("🔧 Registering tool:", name, {
+        parameters,
+        description: tool.description,
+      });
+
+      client.addTool(
+        {
+          type: "function" as const,
+          name,
+          description: tool.description || `Tool for ${name}`,
+          parameters: {
+            type: "object" as const,
+            properties: parameters,
+            required: Object.entries(parameters)
+              .filter(([_, value]) => !("isOptional" in value._def))
+              .map(([key]) => key),
+          },
+        },
+        async (args: Parameters<typeof tool.execute>[0]) => {
+          try {
+            console.log(`🚀 Executing tool ${name} with args:`, args);
+            // Type assertion based on the tool name
+            if (name === "displayFlightCard") {
+              const result = await (
+                tool as typeof tools.displayFlightCard
+              ).execute(
+                args as Parameters<typeof tools.displayFlightCard.execute>[0],
+                {
+                  abortSignal: undefined,
+                }
+              );
+              console.log(`✅ ${name} execution result:`, result);
+              return result;
+            } else if (name === "displayHotelCard") {
+              const result = await (
+                tool as typeof tools.displayHotelCard
+              ).execute(
+                args as Parameters<typeof tools.displayHotelCard.execute>[0],
+                {
+                  abortSignal: undefined,
+                }
+              );
+              console.log(`✅ ${name} execution result:`, result);
+              return result;
+            }
+            throw new Error(`Unknown tool: ${name}`);
+          } catch (error) {
+            console.error(`Error executing tool ${name}:`, error);
+            throw error;
+          }
+        }
+      );
+    });
+    // Object.entries(tools).forEach(([name, tool]) => {
+    //   const shape = tool.parameters._def.shape;
+    //   const parameters = typeof shape === 'function' ? shape() : shape;
+
+    //   client.addTool(
+    //     {
+    //       type: "function" as const,
+    //       name,
+    //       description: tool.description || `Tool for ${name}`,
+    //       parameters: {
+    //         type: "object" as const,
+    //         properties: parameters,
+    //         required: Object.entries(parameters)
+    //           .filter(([_, value]) => !('isOptional' in value._def))
+    //           .map(([key]) => key)
+    //       }
+    //     },
+    //     async (args: Parameters<typeof tool.execute>[0]) => {
+    //       try {
+    //         const result = await tool.execute(args, {
+    //           abortSignal: undefined
+    //         });
+    //         return result;
+    //       } catch (error) {
+    //         console.error(`Error executing tool ${name}:`, error);
+    //         throw error;
+    //       }
+    //     }
+    //   );
+    // });
 
     client.on("error", (event: any) => console.error(event));
     client.on("conversation.interrupted", async () => {
@@ -477,6 +622,28 @@ INSTRUCTIONS:
       if (delta?.audio) {
         wavStreamPlayer.add16BitPCM(delta.audio, item.id);
       }
+
+      // Handle tool calls and results
+      if (item.tool_calls?.length > 0) {
+        console.log("🛠️ Tool calls detected:", {
+          toolCalls: item.tool_calls,
+          arguments: item.tool_calls.map((call: any) => {
+            try {
+              return JSON.parse(call.function.arguments);
+            } catch (e) {
+              return call.function.arguments;
+            }
+          }),
+        });
+        // Tool calls are handled automatically by the client
+        // Results will be included in the next response
+      }
+
+      // Log tool results if any
+      if (item.tool_outputs?.length > 0) {
+        console.log("🔄 Tool execution results:", item.tool_outputs);
+      }
+
       if (item.status === "completed" && item.formatted.audio?.length) {
         const wavFile = await WavRecorder.decode(
           item.formatted.audio,
@@ -502,9 +669,9 @@ INSTRUCTIONS:
           {connectionError}
         </div>
       )}
-      {connectionState === 'connecting' && (
+      {connectionState === "connecting" && (
         <div className="flex justify-center items-center">
-          <Loader2 className="w-4 h-4 animate-spin"/>
+          <Loader2 className="w-4 h-4 animate-spin" />
         </div>
       )}
       {/* Conversation Display */}
