@@ -263,32 +263,32 @@ const HotelCard = ({
                       {
                         label: "نام هتل",
                         value: hotelName,
-                        icon: <Building className="w-4 h-4" />,
+                        icon: <Building className="w-4 h-4 text-muted-foreground" />,
                       },
                       {
                         label: "درجه هتل",
                         value: `${star} ستاره`,
-                        icon: <Star className="w-4 h-4" />,
+                        icon: <Star className="w-4 h-4 text-muted-foreground" />,
                       },
                       {
                         label: "آدرس",
                         value: address,
-                        icon: <MapPin className="w-4 h-4" />,
+                        icon: <MapPin className="w-4 h-4 text-muted-foreground" />,
                       },
                       {
                         label: "نوع",
                         value: type,
-                        icon: <Hotel className="w-4 h-4" />,
+                        icon: <Hotel className="w-4 h-4 text-muted-foreground" />,
                       },
                       {
                         label: "تاریخ ورود",
                         value: checkIn,
-                        icon: <Calendar className="w-4 h-4" />,
+                        icon: <Calendar className="w-4 h-4 text-muted-foreground" />,
                       },
                       {
                         label: "تاریخ خروج",
                         value: checkOut,
-                        icon: <Calendar className="w-4 h-4" />,
+                        icon: <Calendar className="w-4 h-4 text-muted-foreground" />,
                       },
                     ].map((item) => (
                       <motion.div
@@ -326,7 +326,7 @@ const HotelCard = ({
                         key={index}
                         className="border-b border-gray-200 dark:border-gray-700 pb-4"
                       >
-                        <h3 className="text-sm font-semibold mb-2">
+                        <h3 className="text-sm font-semibold mb-2 text-muted-foreground">
                           {room.room_type_name}
                         </h3>
                         <div className="space-y-2">

@@ -521,7 +521,6 @@ INSTRUCTIONS:
     Object.entries(tools).forEach(([name, tool]) => {
       const shape = tool.parameters._def.shape;
       const parameters = typeof shape === "function" ? shape() : shape;
-
       console.log("🔧 Registering tool:", name, {
         parameters,
         description: tool.description,

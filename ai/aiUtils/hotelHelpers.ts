@@ -129,6 +129,64 @@ export const constructHotelApiUrl = (
 };
 
 // Normalize hotel data from API responses
+// export const normalizeHotelData = (
+//   rawData: any,
+//   isDomestic: boolean,
+//   location: string,
+//   checkIn: string,
+//   checkOut: string
+// ): NormalizedHotel[] => {
+//   // First check if we have valid data
+//   if (!rawData?.data?.data || !Array.isArray(rawData.data.data)) {
+//     console.error("Invalid hotel data structure:", rawData);
+//     return [];
+//   }
+
+//   // Filter out null values from the data array
+//   const validData = rawData.data.data.filter((hotel: any) => hotel !== null);
+//   if (isDomestic) {
+//     return validData.map((hotel: any) => ({
+//       id: hotel.id?.toString() || `hotel_${Math.random()}`,
+//       hotelName: hotel.name || "Unknown Hotel",
+//       location: location,
+//       checkIn: DateService.toJalali(checkIn),
+//       checkOut: DateService.toJalali(checkOut),
+//       roomType: hotel.rooms?.[0]?.room_type_name || "Standard",
+//       price:
+//         hotel.min_price ||
+//         hotel.rooms?.[0]?.rate_plans?.[0]?.prices?.total_price ||
+//         0,
+//       rating: hotel.star_rating || 0,
+//       imageUrl: hotel.image_url || "",
+//       amenities: hotel.amenities || [],
+//       // Add these new fields
+//       images: hotel.images || [],
+//       address: hotel.address || "",
+//       star: hotel.star || 0,
+//       type: hotel.type || "هتل",
+//       rooms: hotel.rooms || [],
+//     }));
+//   }
+//   // International hotels (keeping the existing logic but with safety checks)
+//   return rawData.data.results.map((hotel: any) => ({
+//     id: hotel.id?.toString() || `hotel_${Math.random()}`,
+//     hotelName: hotel.name || "Unknown Hotel",
+//     location: location,
+//     checkIn: DateService.toJalali(checkIn),
+//     checkOut: DateService.toJalali(checkOut),
+//     roomType: hotel.rooms?.["1"]?.name || "Standard",
+//     price: hotel.fare?.total || 0,
+//     rating: hotel.star_rating || 0,
+//     imageUrl: hotel.image_url || "",
+//     amenities: hotel.amenities || [],
+//     // Add these new fields
+//     images: hotel.images || [],
+//     address: hotel.address || "",
+//     star: hotel.star || 0,
+//     type: hotel.type || "Hotel",
+//     rooms: hotel.rooms || [],
+//   }));
+// };
 export const normalizeHotelData = (
   rawData: any,
   isDomestic: boolean,
@@ -136,15 +194,14 @@ export const normalizeHotelData = (
   checkIn: string,
   checkOut: string
 ): NormalizedHotel[] => {
-  // First check if we have valid data
-  if (!rawData?.data?.data || !Array.isArray(rawData.data.data)) {
-    console.error("Invalid hotel data structure:", rawData);
-    return [];
-  }
-
-  // Filter out null values from the data array
-  const validData = rawData.data.data.filter((hotel: any) => hotel !== null);
   if (isDomestic) {
+    // Check for domestic data structure
+    if (!rawData?.data?.data || !Array.isArray(rawData.data.data)) {
+      console.error("Invalid domestic hotel data structure:", rawData);
+      return [];
+    }
+
+    const validData = rawData.data.data.filter((hotel: any) => hotel !== null);
     return validData.map((hotel: any) => ({
       id: hotel.id?.toString() || `hotel_${Math.random()}`,
       hotelName: hotel.name || "Unknown Hotel",
@@ -159,7 +216,6 @@ export const normalizeHotelData = (
       rating: hotel.star_rating || 0,
       imageUrl: hotel.image_url || "",
       amenities: hotel.amenities || [],
-      // Add these new fields
       images: hotel.images || [],
       address: hotel.address || "",
       star: hotel.star || 0,
@@ -167,24 +223,29 @@ export const normalizeHotelData = (
       rooms: hotel.rooms || [],
     }));
   }
-  // International hotels (keeping the existing logic but with safety checks)
+
+  // International hotels
+  if (!rawData?.data?.results || !Array.isArray(rawData.data.results)) {
+    console.error("Invalid international hotel data structure:", rawData);
+    return [];
+  }
+
   return rawData.data.results.map((hotel: any) => ({
     id: hotel.id?.toString() || `hotel_${Math.random()}`,
     hotelName: hotel.name || "Unknown Hotel",
     location: location,
     checkIn: DateService.toJalali(checkIn),
     checkOut: DateService.toJalali(checkOut),
-    roomType: hotel.rooms?.["1"]?.name || "Standard",
-    price: hotel.fare?.total || 0,
+    roomType: hotel.rooms?.[0]?.name || "Standard",
+    price: hotel.price?.total || hotel.min_price || 0,
     rating: hotel.star_rating || 0,
-    imageUrl: hotel.image_url || "",
+    imageUrl: hotel.image_url || hotel.images?.[0]?.image || "",
     amenities: hotel.amenities || [],
-    // Add these new fields
     images: hotel.images || [],
     address: hotel.address || "",
     star: hotel.star || 0,
     type: hotel.type || "Hotel",
-    rooms: hotel.rooms || [],
+    rooms: Array.isArray(hotel.rooms) ? hotel.rooms : [],
   }));
 };
 
