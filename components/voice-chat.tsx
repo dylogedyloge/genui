@@ -11,10 +11,33 @@ import { formatPersianTime } from "@/utils/time-helpers";
 import { useTheme } from "next-themes";
 import { setupProxy } from "@/utils/proxy-helper";
 import { tools } from "@/ai/tools";
+import FlightCard from "@/components/cards/flight-card";
+import HotelCard from "@/components/cards/hotel-card";
+import FlightCardSkeleton from "@/components/skeletons/flight-card-skeleton";
+import HotelCardSkeleton from "@/components/skeletons/hotel-card-skeleton";
+import { Flight, Hotel, CityData } from "@/types/chat";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import DateService from "@/services/date-service";
 
 const USE_LOCAL_RELAY_SERVER_URL: string | undefined = void 0;
 
 const VoiceChat = () => {
+  const [flights, setFlights] = useState<{
+    flights: Flight[];
+    departureCityData: CityData;
+    destinationCityData: CityData;
+  } | null>(null);
+
+  const [hotels, setHotels] = useState<{
+    hotels: Hotel[];
+    message: string;
+    cityData: CityData;
+  } | null>(null);
+
+  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
+  const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
+  const [visibleFlights, setVisibleFlights] = useState(2);
+  const [visibleHotels, setVisibleHotels] = useState(2);
   const { setTheme } = useTheme();
   const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || "";
 
@@ -27,18 +50,53 @@ const VoiceChat = () => {
     };
   }, [setTheme]);
 
+  const handleFlightCardClick = (flightInfo: Flight) => {
+    setSelectedFlight(flightInfo);
+  };
+
+  const handleHotelCardClick = (hotelInfo: Hotel) => {
+    setSelectedHotel(hotelInfo);
+  };
+
+  const showMoreFlights = () => {
+    setVisibleFlights((prev) => prev + 2);
+  };
+
+  const showLessFlights = () => {
+    setVisibleFlights(Math.max(2, visibleFlights - 2));
+  };
+
+  const showMoreHotels = () => {
+    setVisibleHotels((prev) => prev + 2);
+  };
+
+  const showLessHotels = () => {
+    setVisibleHotels(Math.max(2, visibleHotels - 2));
+  };
+
+  const { gregorian: tomorrowDateGregorian, jalali: tomorrowDateJalali } = 
+  DateService.getTomorrow();
+
   const instructions = `SYSTEM SETTINGS:
-------
-INSTRUCTIONS:
-- به زبان فارسی صحبت کنید
-- لطفاً پاسخ‌های خود را به صورت صوتی و مفید ارائه دهید
-- پاسخ‌ها باید کوتاه و مفید باشند و حداکثر 400 کاراکتر داشته باشند
-- برای جستجو و رزرو هتل یا پرواز از ابزارهای مربوطه استفاده کنید
-- به سوالات عمومی در مورد سفر، هتل و پرواز پاسخ دهید
-- می‌توانید از کاربر سؤال بپرسید
-- برای جستجوی پرواز از ابزار displayFlightCard استفاده کنید
-- برای جستجوی هتل از ابزار displayHotelCard استفاده کنید
-`;
+  ------
+  INSTRUCTIONS:
+  - به زبان فارسی صحبت کنید
+  - لطفاً پاسخ‌های خود را به صورت صوتی و مفید ارائه دهید
+  - پاسخ‌ها باید کوتاه و مفید باشند و حداکثر 400 کاراکتر داشته باشند
+  - برای جستجو و رزرو هتل یا پرواز از ابزارهای مربوطه استفاده کنید
+  - به سوالات عمومی در مورد سفر، هتل و پرواز پاسخ دهید
+  - می‌توانید از کاربر سؤال بپرسید
+  - برای جستجوی پرواز از ابزار displayFlightCard استفاده کنید
+  - برای جستجوی هتل از ابزار displayHotelCard استفاده کنید
+  - هنگام استفاده از ابزار displayFlightCard، اطلاعات مسافران را به صورت زیر ارسال کنید:
+    * از کلمات مفرد استفاده کنید: adult (بزرگسال)، child (کودک)، infant (نوزاد)
+    * مثال صحیح: {"passengers": {"adult": 2, "child": 1, "infant": 1}}
+    * از کلمات جمع مانند adults، children یا infants استفاده نکنید
+  - تاریخ فردا ${tomorrowDateGregorian} (میلادی) و ${tomorrowDateJalali} (شمسی) است. از این برای تفسیر تاریخ‌های نسبی استفاده کنید.
+  - تمام تاریخ‌ها در پاسخ‌ها باید به فرمت شمسی باشند (مثلاً 1404/07/23).
+  - تمام تاریخ‌هایی که به ابزارها ارسال می‌شوند باید به فرمت میلادی باشند (مثلاً 2025-10-15).
+  - توجه داشته باشید که تمام قیمت‌ها به ریال هستند.
+  `;
 
   const wavRecorderRef = useRef<WavRecorder>(
     new WavRecorder({ sampleRate: 24000 })
@@ -505,10 +563,6 @@ INSTRUCTIONS:
       }
     });
 
-    // // Rest of the setup
-    // client.updateSession({ instructions: instructions });
-    // client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
-    // client.updateSession({ voice: "ash" });
     // Update session with tools and other settings
     client.updateSession({
       instructions: instructions,
@@ -542,29 +596,171 @@ INSTRUCTIONS:
         async (args: Parameters<typeof tool.execute>[0]) => {
           try {
             console.log(`🚀 Executing tool ${name} with args:`, args);
+
             // Type assertion based on the tool name
             if (name === "displayFlightCard") {
-              const result = await (
-                tool as typeof tools.displayFlightCard
-              ).execute(
-                args as Parameters<typeof tools.displayFlightCard.execute>[0],
-                {
-                  abortSignal: undefined,
+              // Type guard to ensure we're working with FlightTool args
+              // First check if this is a flight args object by checking for departureCity
+              if ("departureCity" in args) {
+                // Now we can safely access flight-specific properties
+                const flightArgs = args as {
+                  departureCity: string;
+                  destinationCity: string;
+                  date: string;
+                  passengers?:
+                    | {
+                        adult: number;
+                        child: number;
+                        infant: number;
+                      }
+                    | number;
+                };
+
+                // Log the original arguments to help with debugging
+                console.log(
+                  `📝 Original flight args:`,
+                  JSON.stringify(flightArgs)
+                );
+
+                // Create a properly formatted passengers object that matches the text chat format
+                let formattedPassengers = {
+                  adult: 1,
+                  child: 0,
+                  infant: 0,
+                };
+
+                // Handle case where passengers is a number (total passengers)
+                if (typeof flightArgs.passengers === "number") {
+                  console.log(
+                    `⚠️ Passengers provided as a single number: ${flightArgs.passengers}`
+                  );
+                  formattedPassengers.adult = flightArgs.passengers;
                 }
-              );
-              console.log(`✅ ${name} execution result:`, result);
-              return result;
+                // Handle case where passengers is an object
+                else if (
+                  typeof flightArgs.passengers === "object" &&
+                  flightArgs.passengers !== null
+                ) {
+                  // Log the raw passengers object to debug
+                  console.log(
+                    `🔍 Raw passengers object:`,
+                    flightArgs.passengers
+                  );
+
+                  // Only handle singular property names
+                  formattedPassengers = {
+                    adult:
+                      typeof flightArgs.passengers.adult === "string"
+                        ? parseInt(
+                            flightArgs.passengers.adult as unknown as string,
+                            10
+                          )
+                        : flightArgs.passengers.adult ?? 1,
+
+                    child:
+                      typeof flightArgs.passengers.child === "string"
+                        ? parseInt(
+                            flightArgs.passengers.child as unknown as string,
+                            10
+                          )
+                        : flightArgs.passengers.child ?? 0,
+
+                    infant:
+                      typeof flightArgs.passengers.infant === "string"
+                        ? parseInt(
+                            flightArgs.passengers.infant as unknown as string,
+                            10
+                          )
+                        : flightArgs.passengers.infant ?? 0,
+                  };
+                }
+
+                // Ensure all values are valid numbers
+                if (isNaN(formattedPassengers.adult))
+                  formattedPassengers.adult = 1;
+                if (isNaN(formattedPassengers.child))
+                  formattedPassengers.child = 0;
+                if (isNaN(formattedPassengers.infant))
+                  formattedPassengers.infant = 0;
+
+                // Create a new args object with the properly formatted passengers
+                const formattedArgs = {
+                  departureCity: flightArgs.departureCity,
+                  destinationCity: flightArgs.destinationCity,
+                  date: flightArgs.date,
+                  passengers: formattedPassengers,
+                };
+
+                console.log(
+                  `🔄 Formatted args for ${name}:`,
+                  JSON.stringify(formattedArgs)
+                );
+
+                // Execute the tool with the properly formatted arguments
+                const result = await (
+                  tool as typeof tools.displayFlightCard
+                ).execute(
+                  formattedArgs as Parameters<
+                    typeof tools.displayFlightCard.execute
+                  >[0],
+                  {
+                    abortSignal: undefined,
+                  }
+                );
+                console.log(`✅ ${name} execution result:`, result);
+                // Update the flights state with the result
+                if (
+                  result &&
+                  Array.isArray(result.flights) &&
+                  result.departureCityData &&
+                  result.destinationCityData
+                ) {
+                  setFlights({
+                    flights: result.flights as Flight[],
+                    departureCityData: result.departureCityData as CityData,
+                    destinationCityData: result.destinationCityData as CityData,
+                  });
+                }
+                else {
+                  console.warn("⚠️ Flight result missing required properties:", result);
+                }
+                return result;
+              } else {
+                throw new Error(
+                  `Invalid arguments for ${name}: missing required properties`
+                );
+              }
             } else if (name === "displayHotelCard") {
-              const result = await (
-                tool as typeof tools.displayHotelCard
-              ).execute(
-                args as Parameters<typeof tools.displayHotelCard.execute>[0],
-                {
-                  abortSignal: undefined,
+              // Check if this is a hotel args object by checking for location
+              if ("location" in args) {
+                // No need to modify hotel args, just execute the tool
+                const result = await (
+                  tool as typeof tools.displayHotelCard
+                ).execute(
+                  args as Parameters<typeof tools.displayHotelCard.execute>[0],
+                  {
+                    abortSignal: undefined,
+                  }
+                );
+                console.log(`✅ ${name} execution result:`, result);
+                // Update the hotels state with the result
+                if (result && Array.isArray(result.hotels) && 
+                result.cityData) {
+                  setHotels({
+                    hotels: result.hotels as Hotel[],
+                    message: result.message || "",
+                    cityData: result.cityData as CityData
+                  });
                 }
-              );
-              console.log(`✅ ${name} execution result:`, result);
-              return result;
+                else {
+                  console.warn("⚠️ Hotel result missing required properties:", result);
+                }
+                return result;
+              } else {
+                throw new Error(
+                  `Invalid arguments for ${name}: missing required properties`
+                );
+              }
             }
             throw new Error(`Unknown tool: ${name}`);
           } catch (error) {
@@ -574,36 +770,6 @@ INSTRUCTIONS:
         }
       );
     });
-    // Object.entries(tools).forEach(([name, tool]) => {
-    //   const shape = tool.parameters._def.shape;
-    //   const parameters = typeof shape === 'function' ? shape() : shape;
-
-    //   client.addTool(
-    //     {
-    //       type: "function" as const,
-    //       name,
-    //       description: tool.description || `Tool for ${name}`,
-    //       parameters: {
-    //         type: "object" as const,
-    //         properties: parameters,
-    //         required: Object.entries(parameters)
-    //           .filter(([_, value]) => !('isOptional' in value._def))
-    //           .map(([key]) => key)
-    //       }
-    //     },
-    //     async (args: Parameters<typeof tool.execute>[0]) => {
-    //       try {
-    //         const result = await tool.execute(args, {
-    //           abortSignal: undefined
-    //         });
-    //         return result;
-    //       } catch (error) {
-    //         console.error(`Error executing tool ${name}:`, error);
-    //         throw error;
-    //       }
-    //     }
-    //   );
-    // });
 
     client.on("error", (event: any) => console.error(event));
     client.on("conversation.interrupted", async () => {
@@ -674,6 +840,102 @@ INSTRUCTIONS:
         </div>
       )}
       {/* Conversation Display */}
+      {flights && flights.flights.length > 0 && (
+        <div className="mt-4 px-4">
+          <h3 className="text-lg font-semibold mb-2">پروازهای یافت شده</h3>
+          <div className="grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
+            {flights.flights.slice(0, visibleFlights).map((flight: Flight) => (
+              <FlightCard
+                key={flight.id}
+                fareSourceCode={""}
+                isClosed={false}
+                visaRequirements={[]}
+                fares={{
+                  adult: {
+                    price: 0,
+                    count: 0,
+                    total_price: 0,
+                  },
+                  total_price: 0,
+                }}
+                cabin={{ persian: "" }}
+                segments={[]}
+                returnSegments={[]}
+                {...flight}
+                refundable={flight.refundable ?? false}
+                departureCityData={flights.departureCityData}
+                destinationCityData={flights.destinationCityData}
+                with_tour={flight.with_tour ?? false}
+                isDomestic={
+                  flights.departureCityData.isDomestic &&
+                  flights.destinationCityData.isDomestic
+                }
+              />
+            ))}
+
+            {/* Show more/less buttons for flights */}
+            <div className="col-span-full flex justify-center mt-4 gap-2">
+              {visibleFlights < flights.flights.length && (
+                <Button variant="secondary" onClick={showMoreFlights}>
+                  <ChevronDown />
+                  بیشتر
+                </Button>
+              )}
+              {visibleFlights > 2 && (
+                <Button variant="secondary" onClick={showLessFlights}>
+                  <ChevronUp />
+                  کمتر
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Display hotel cards if available */}
+      {hotels && hotels.hotels.length > 0 && (
+        <div className="mt-4 px-4">
+          <h3 className="text-lg font-semibold mb-2">هتل‌های یافت شده</h3>
+          <div className="grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
+            {hotels.hotels.slice(0, visibleHotels).map((hotel: Hotel) => (
+              <HotelCard
+                key={hotel.id}
+                id={hotel.id}
+                hotelName={hotel.hotelName}
+                location={hotel.location}
+                checkIn={hotel.checkIn}
+                checkOut={hotel.checkOut}
+                roomType={hotel.roomType}
+                price={hotel.price}
+                rating={hotel.rating}
+                images={hotel.images}
+                address={hotel.address}
+                star={hotel.star}
+                type={hotel.type}
+                rooms={hotel.rooms}
+                amenities={hotel.amenities}
+                onHotelCardClick={handleHotelCardClick}
+              />
+            ))}
+
+            {/* Show more/less buttons for hotels */}
+            <div className="col-span-full flex justify-center mt-4 gap-2">
+              {visibleHotels < hotels.hotels.length && (
+                <Button variant="secondary" onClick={showMoreHotels}>
+                  <ChevronDown />
+                  بیشتر
+                </Button>
+              )}
+              {visibleHotels > 2 && (
+                <Button variant="secondary" onClick={showLessHotels}>
+                  <ChevronUp />
+                  کمتر
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <div
         className="flex-1 w-full overflow-y-auto p-4 rounded-lg  bg-background space-y-4"
         data-conversation-content
@@ -739,7 +1001,6 @@ INSTRUCTIONS:
           }`}
         >
           {isConnected ? <MicOff /> : <Mic />}
-          tools
         </Button>
         <div className="w-[40%]">
           <canvas ref={serverCanvasRef} className="w-full h-16" />
