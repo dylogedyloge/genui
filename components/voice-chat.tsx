@@ -74,8 +74,8 @@ const VoiceChat = () => {
     setVisibleHotels(Math.max(2, visibleHotels - 2));
   };
 
-  const { gregorian: tomorrowDateGregorian, jalali: tomorrowDateJalali } = 
-  DateService.getTomorrow();
+  const { gregorian: tomorrowDateGregorian, jalali: tomorrowDateJalali } =
+    DateService.getTomorrow();
 
   const instructions = `SYSTEM SETTINGS:
   ------
@@ -389,74 +389,7 @@ const VoiceChat = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   // Setup proxy first
-  //   setupProxy();
 
-  //   const wavStreamPlayer = wavStreamPlayerRef.current;
-  //   const client = clientRef.current;
-
-  //   // Consolidated error handler
-  //   const handleError = (event: any) => {
-  //     console.error('OpenAI WebSocket Error:', event);
-  //     const errorMessage = event?.message || 'Connection failed';
-  //     setConnectionError(errorMessage);
-  //     setIsConnected(false);
-
-  //     // Attempt to reconnect after 5 seconds
-  //     setTimeout(() => {
-  //       if (!isConnected) {
-  //         connectConversation().catch(console.error);
-  //       }
-  //     }, 5000);
-  //   };
-
-  //   client.on("error", handleError);
-  //   client.on("close", handleError);
-
-  //       // connection status logging
-  //       client.on("open", async () => {
-  //         console.log('🟢 WebSocket Connection Established');
-  //         setConnectionError(null);
-
-  //         try {
-  //           console.log('🔍 Checking IP address...');
-  //           // Use a different IP check service and bypass proxy
-  //           const response = await fetch('https://ifconfig.me/ip', {
-  //             method: 'GET',
-  //             headers: {
-  //               'bypass-proxy': 'true',
-  //               'Accept': 'text/plain'
-  //             }
-  //           });
-
-  //           if (!response.ok) {
-  //             throw new Error(`HTTP error! status: ${response.status}`);
-  //           }
-
-  //           const ip = await response.text();
-  //           console.log('🌐 Current Connection IP:', ip);
-  //         } catch (err) {
-  //           // Try alternative IP service if first one fails
-  //           try {
-  //             const response = await fetch('https://icanhazip.com', {
-  //               method: 'GET',
-  //               headers: {
-  //                 'bypass-proxy': 'true',
-  //                 'Accept': 'text/plain'
-  //               }
-  //             });
-  //             const ip = await response.text();
-  //             console.log('🌐 Current Connection IP:', ip.trim());
-  //           } catch (fallbackErr) {
-  //             console.warn('⚠️ IP Check Failed:', err instanceof Error ? err.message : 'Failed to fetch IP');
-  //           }
-  //         }
-  //       });
-
-  //   client.updateSession({ instructions: instructions });
-  //   client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
-  //   client.updateSession({ voice: "ash" });
   useEffect(() => {
     // Setup proxy first
     // setupProxy();
@@ -720,9 +653,11 @@ const VoiceChat = () => {
                     departureCityData: result.departureCityData as CityData,
                     destinationCityData: result.destinationCityData as CityData,
                   });
-                }
-                else {
-                  console.warn("⚠️ Flight result missing required properties:", result);
+                } else {
+                  console.warn(
+                    "⚠️ Flight result missing required properties:",
+                    result
+                  );
                 }
                 return result;
               } else {
@@ -744,16 +679,17 @@ const VoiceChat = () => {
                 );
                 console.log(`✅ ${name} execution result:`, result);
                 // Update the hotels state with the result
-                if (result && Array.isArray(result.hotels) && 
-                result.cityData) {
+                if (result && Array.isArray(result.hotels) && result.cityData) {
                   setHotels({
                     hotels: result.hotels as Hotel[],
                     message: result.message || "",
-                    cityData: result.cityData as CityData
+                    cityData: result.cityData as CityData,
                   });
-                }
-                else {
-                  console.warn("⚠️ Hotel result missing required properties:", result);
+                } else {
+                  console.warn(
+                    "⚠️ Hotel result missing required properties:",
+                    result
+                  );
                 }
                 return result;
               } else {
@@ -828,7 +764,11 @@ const VoiceChat = () => {
   }, [instructions]);
 
   return (
-    <div data-component="VoiceChat" dir="rtl" className="flex flex-col h-full">
+    <div
+      data-component="VoiceChat"
+      dir="rtl"
+      className="flex flex-col h-full overflow-hidden"
+    >
       {connectionError && (
         <div className="bg-destructive/10 text-destructive px-4 py-2 rounded-md mb-4">
           {connectionError}
@@ -839,107 +779,9 @@ const VoiceChat = () => {
           <Loader2 className="w-4 h-4 animate-spin" />
         </div>
       )}
-      {/* Conversation Display */}
-      {flights && flights.flights.length > 0 && (
-        <div className="mt-4 px-4">
-          <h3 className="text-lg font-semibold mb-2">پروازهای یافت شده</h3>
-          <div className="grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
-            {flights.flights.slice(0, visibleFlights).map((flight: Flight) => (
-              <FlightCard
-                key={flight.id}
-                fareSourceCode={""}
-                isClosed={false}
-                visaRequirements={[]}
-                fares={{
-                  adult: {
-                    price: 0,
-                    count: 0,
-                    total_price: 0,
-                  },
-                  total_price: 0,
-                }}
-                cabin={{ persian: "" }}
-                segments={[]}
-                returnSegments={[]}
-                {...flight}
-                refundable={flight.refundable ?? false}
-                departureCityData={flights.departureCityData}
-                destinationCityData={flights.destinationCityData}
-                with_tour={flight.with_tour ?? false}
-                isDomestic={
-                  flights.departureCityData.isDomestic &&
-                  flights.destinationCityData.isDomestic
-                }
-              />
-            ))}
-
-            {/* Show more/less buttons for flights */}
-            <div className="col-span-full flex justify-center mt-4 gap-2">
-              {visibleFlights < flights.flights.length && (
-                <Button variant="secondary" onClick={showMoreFlights}>
-                  <ChevronDown />
-                  بیشتر
-                </Button>
-              )}
-              {visibleFlights > 2 && (
-                <Button variant="secondary" onClick={showLessFlights}>
-                  <ChevronUp />
-                  کمتر
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Display hotel cards if available */}
-      {hotels && hotels.hotels.length > 0 && (
-        <div className="mt-4 px-4">
-          <h3 className="text-lg font-semibold mb-2">هتل‌های یافت شده</h3>
-          <div className="grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
-            {hotels.hotels.slice(0, visibleHotels).map((hotel: Hotel) => (
-              <HotelCard
-                key={hotel.id}
-                id={hotel.id}
-                hotelName={hotel.hotelName}
-                location={hotel.location}
-                checkIn={hotel.checkIn}
-                checkOut={hotel.checkOut}
-                roomType={hotel.roomType}
-                price={hotel.price}
-                rating={hotel.rating}
-                images={hotel.images}
-                address={hotel.address}
-                star={hotel.star}
-                type={hotel.type}
-                rooms={hotel.rooms}
-                amenities={hotel.amenities}
-                onHotelCardClick={handleHotelCardClick}
-              />
-            ))}
-
-            {/* Show more/less buttons for hotels */}
-            <div className="col-span-full flex justify-center mt-4 gap-2">
-              {visibleHotels < hotels.hotels.length && (
-                <Button variant="secondary" onClick={showMoreHotels}>
-                  <ChevronDown />
-                  بیشتر
-                </Button>
-              )}
-              {visibleHotels > 2 && (
-                <Button variant="secondary" onClick={showLessHotels}>
-                  <ChevronUp />
-                  کمتر
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-      <div
-        className="flex-1 w-full overflow-y-auto p-4 rounded-lg  bg-background space-y-4"
-        data-conversation-content
-      >
+      
+      {/* Main scrollable content area containing all messages and cards */}
+      <div className="flex-1 overflow-y-auto p-4 rounded-lg bg-background space-y-4">
         {items.map((item, index) => {
           const isMessageItem = "status" in item && "role" in item;
 
@@ -971,6 +813,104 @@ const VoiceChat = () => {
                           ""
                         : "در حال پردازش..."}
                     </ReactMarkdown>
+                    
+                    {/* Display flight cards within the AI message */}
+                    {index === items.length - 1 && flights && flights.flights.length > 0 && (
+                      <div className="mt-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {flights.flights.slice(0, visibleFlights).map((flight: Flight) => (
+                            <FlightCard
+                              key={flight.id}
+                              fareSourceCode={""}
+                              isClosed={false}
+                              visaRequirements={[]}
+                              fares={{
+                                adult: {
+                                  price: 0,
+                                  count: 0,
+                                  total_price: 0,
+                                },
+                                total_price: 0,
+                              }}
+                              cabin={{ persian: "" }}
+                              segments={[]}
+                              returnSegments={[]}
+                              {...flight}
+                              refundable={flight.refundable ?? false}
+                              departureCityData={flights.departureCityData}
+                              destinationCityData={flights.destinationCityData}
+                              with_tour={flight.with_tour ?? false}
+                              isDomestic={
+                                flights.departureCityData.isDomestic &&
+                                flights.destinationCityData.isDomestic
+                              }
+                              onFlightCardClick={handleFlightCardClick}
+                            />
+                          ))}
+
+                          {/* Show more/less buttons for flights */}
+                          <div className="col-span-full flex justify-center mt-4 gap-2">
+                            {visibleFlights < flights.flights.length && (
+                              <Button variant="secondary" onClick={showMoreFlights}>
+                                <ChevronDown />
+                                بیشتر
+                              </Button>
+                            )}
+                            {visibleFlights > 2 && (
+                              <Button variant="secondary" onClick={showLessFlights}>
+                                <ChevronUp />
+                                کمتر
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Display hotel cards within the AI message */}
+                    {index === items.length - 1 && hotels && hotels.hotels.length > 0 && (
+                      <div className="mt-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {hotels.hotels.slice(0, visibleHotels).map((hotel: Hotel) => (
+                            <HotelCard
+                              key={hotel.id}
+                              id={hotel.id}
+                              hotelName={hotel.hotelName}
+                              location={hotel.location}
+                              checkIn={hotel.checkIn}
+                              checkOut={hotel.checkOut}
+                              roomType={hotel.roomType}
+                              price={hotel.price}
+                              rating={hotel.rating}
+                              images={hotel.images}
+                              address={hotel.address}
+                              star={hotel.star}
+                              type={hotel.type}
+                              rooms={hotel.rooms}
+                              amenities={hotel.amenities}
+                              onHotelCardClick={handleHotelCardClick}
+                            />
+                          ))}
+
+                          {/* Show more/less buttons for hotels */}
+                          <div className="col-span-full flex justify-center mt-4 gap-2">
+                            {visibleHotels < hotels.hotels.length && (
+                              <Button variant="secondary" onClick={showMoreHotels}>
+                                <ChevronDown />
+                                بیشتر
+                              </Button>
+                            )}
+                            {visibleHotels > 2 && (
+                              <Button variant="secondary" onClick={showLessHotels}>
+                                <ChevronUp />
+                                کمتر
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
                     <p className="text-xs text-muted-foreground prose-sm text-left my-1">
                       {formatPersianTime(new Date())}
                     </p>
@@ -988,7 +928,10 @@ const VoiceChat = () => {
           );
         })}
       </div>
-      <div className="flex items-baseline justify-center w-full px-8 py-4 gap-4">
+      
+      {/* Remove the separate flight and hotel card sections that were here before */}
+      
+      <div className="flex items-baseline w-full px-8 py-4 gap-4 bg-background">
         <div className="w-[40%]">
           <canvas ref={clientCanvasRef} className="w-full h-16" />
         </div>
