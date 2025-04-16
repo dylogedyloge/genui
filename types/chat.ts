@@ -34,6 +34,7 @@ export interface Flight {
   status?: "On Time" | "Delayed" | "Cancelled"; // Flight status
   departureCityData: any;
   destinationCityData: any;
+  onFlightCardClick?: (flight: Flight) => void;
 }
 
 export interface CityData {

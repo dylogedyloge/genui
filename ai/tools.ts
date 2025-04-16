@@ -155,9 +155,10 @@ export const HotelTool = createTool({
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
+          // "Cache-Control": "no-cache", // Removed this line to fix CORS issue
+          "X-Requested-With": "XMLHttpRequest",
         },
-        cache: "no-store",
+        cache: "no-store", // Keep this if you still want to suggest no caching
       });
       console.log("apiUrl in tools", apiUrl);
 

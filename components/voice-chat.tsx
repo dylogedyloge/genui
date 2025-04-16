@@ -21,6 +21,8 @@ import DateService from "@/services/date-service";
 
 const USE_LOCAL_RELAY_SERVER_URL: string | undefined = void 0;
 
+
+
 const VoiceChat = () => {
   const [flights, setFlights] = useState<{
     flights: Flight[];
@@ -38,6 +40,11 @@ const VoiceChat = () => {
   const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
   const [visibleFlights, setVisibleFlights] = useState(2);
   const [visibleHotels, setVisibleHotels] = useState(2);
+  const [loadingFlights, setLoadingFlights] = useState(false);
+  const [loadingHotels, setLoadingHotels] = useState(false);
+
+
+
   const { setTheme } = useTheme();
   const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || "";
 
@@ -88,6 +95,11 @@ const VoiceChat = () => {
   - می‌توانید از کاربر سؤال بپرسید
   - برای جستجوی پرواز از ابزار displayFlightCard استفاده کنید
   - برای جستجوی هتل از ابزار displayHotelCard استفاده کنید
+  - هنگام نمایش نتایجه جستجوی پرواز یا هتل:
+    * فقط از ابزار مربوطه استفاده کنید و نتایجه را نمایش دهید
+    * هیچ پیام متنی یا صوتی ارسال نکنید
+    * از توضیح جزئیات پروازها یا هتل‌ها خودداری کنید
+    * اگر کاربر درباره خرید بلیط یا رزرو هتل سوال کرد، پاسخ دهید: "پرواز/هتل مورد نظر خود را انتخاب کنید و از سایت آتریپا خرید کنید"
   - هنگام استفاده از ابزار displayFlightCard، اطلاعات مسافران را به صورت زیر ارسال کنید:
     * از کلمات مفرد استفاده کنید: adult (بزرگسال)، child (کودک)، infant (نوزاد)
     * مثال صحیح: {"passengers": {"adult": 2, "child": 1, "infant": 1}}
@@ -110,10 +122,10 @@ const VoiceChat = () => {
       USE_LOCAL_RELAY_SERVER_URL
         ? { url: USE_LOCAL_RELAY_SERVER_URL }
         : {
-            apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-            dangerouslyAllowAPIKeyInBrowser: true,
-            debug: false,
-          }
+          apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+          dangerouslyAllowAPIKeyInBrowser: true,
+          debug: false,
+        }
     )
   );
 
@@ -413,8 +425,8 @@ const VoiceChat = () => {
             value._def.typeName === "ZodString"
               ? "string"
               : value._def.typeName === "ZodNumber"
-              ? "number"
-              : "object",
+                ? "number"
+                : "object",
         };
 
         // Check if the field is required
@@ -541,12 +553,12 @@ const VoiceChat = () => {
                   destinationCity: string;
                   date: string;
                   passengers?:
-                    | {
-                        adult: number;
-                        child: number;
-                        infant: number;
-                      }
-                    | number;
+                  | {
+                    adult: number;
+                    child: number;
+                    infant: number;
+                  }
+                  | number;
                 };
 
                 // Log the original arguments to help with debugging
@@ -585,25 +597,25 @@ const VoiceChat = () => {
                     adult:
                       typeof flightArgs.passengers.adult === "string"
                         ? parseInt(
-                            flightArgs.passengers.adult as unknown as string,
-                            10
-                          )
+                          flightArgs.passengers.adult as unknown as string,
+                          10
+                        )
                         : flightArgs.passengers.adult ?? 1,
 
                     child:
                       typeof flightArgs.passengers.child === "string"
                         ? parseInt(
-                            flightArgs.passengers.child as unknown as string,
-                            10
-                          )
+                          flightArgs.passengers.child as unknown as string,
+                          10
+                        )
                         : flightArgs.passengers.child ?? 0,
 
                     infant:
                       typeof flightArgs.passengers.infant === "string"
                         ? parseInt(
-                            flightArgs.passengers.infant as unknown as string,
-                            10
-                          )
+                          flightArgs.passengers.infant as unknown as string,
+                          10
+                        )
                         : flightArgs.passengers.infant ?? 0,
                   };
                 }
@@ -717,6 +729,7 @@ const VoiceChat = () => {
     });
 
     // Enhanced conversation update handling
+    // First, modify the conversation update handler in the useEffect
     client.on("conversation.updated", async ({ item, delta }: any) => {
       const items = client.conversation.getItems();
 
@@ -724,25 +737,33 @@ const VoiceChat = () => {
         wavStreamPlayer.add16BitPCM(delta.audio, item.id);
       }
 
-      // Handle tool calls and results
+      // Handle tool calls and set loading states
       if (item.tool_calls?.length > 0) {
-        console.log("🛠️ Tool calls detected:", {
-          toolCalls: item.tool_calls,
-          arguments: item.tool_calls.map((call: any) => {
-            try {
-              return JSON.parse(call.function.arguments);
-            } catch (e) {
-              return call.function.arguments;
-            }
-          }),
+        item.tool_calls.forEach((call: any) => {
+          if (call.function.name === "displayFlightCard") {
+            setLoadingFlights(true);
+          } else if (call.function.name === "displayHotelCard") {
+            setLoadingHotels(true);
+          }
         });
-        // Tool calls are handled automatically by the client
-        // Results will be included in the next response
       }
 
-      // Log tool results if any
+      // Clear loading states and update results when tool execution completes
       if (item.tool_outputs?.length > 0) {
         console.log("🔄 Tool execution results:", item.tool_outputs);
+        // Store the results in the item itself instead of global state
+        item.tool_outputs.forEach((output: any) => {
+          const result = output.output;
+          if (result) {
+            if (result.flights) {
+              item.flightResults = result;
+              setLoadingFlights(false);
+            } else if (result.hotels) {
+              item.hotelResults = result;
+              setLoadingHotels(false);
+            }
+          }
+        });
       }
 
       if (item.status === "completed" && item.formatted.audio?.length) {
@@ -779,158 +800,130 @@ const VoiceChat = () => {
           <Loader2 className="w-4 h-4 animate-spin" />
         </div>
       )}
-      
+
       {/* Main scrollable content area containing all messages and cards */}
       <div className="flex-1 overflow-y-auto p-4 rounded-lg bg-background space-y-4">
         {items.map((item, index) => {
           const isMessageItem = "status" in item && "role" in item;
 
-          return (
-            <div
-              key={index}
-              className={`flex ${
-                isMessageItem && item.role === "assistant"
-                  ? "justify-end"
-                  : "justify-start"
-              }`}
-            >
-              {isMessageItem && item.role === "user" ? (
-                <div className="max-w-[80%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
-                  <ReactMarkdown className="prose-sm text-sm">
-                    {item.formatted?.transcript || item.formatted?.text || ""}
-                  </ReactMarkdown>
-                  <p className="text-xs text-muted-foreground text-left my-1">
-                    {formatPersianTime(new Date())}
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className="max-w-[80%] p-2 rounded-lg bg-primary text-primary-foreground rounded-tl-none">
-                    <ReactMarkdown className="prose-sm text-sm">
-                      {"status" in item && item.status === "completed"
-                        ? item.formatted?.transcript ||
-                          item.formatted?.text ||
-                          ""
-                        : "در حال پردازش..."}
-                    </ReactMarkdown>
-                    
-                    {/* Display flight cards within the AI message */}
-                    {index === items.length - 1 && flights && flights.flights.length > 0 && (
-                      <div className="mt-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {flights.flights.slice(0, visibleFlights).map((flight: Flight) => (
-                            <FlightCard
-                              key={flight.id}
-                              fareSourceCode={""}
-                              isClosed={false}
-                              visaRequirements={[]}
-                              fares={{
-                                adult: {
-                                  price: 0,
-                                  count: 0,
-                                  total_price: 0,
-                                },
-                                total_price: 0,
-                              }}
-                              cabin={{ persian: "" }}
-                              segments={[]}
-                              returnSegments={[]}
-                              {...flight}
-                              refundable={flight.refundable ?? false}
-                              departureCityData={flights.departureCityData}
-                              destinationCityData={flights.destinationCityData}
-                              with_tour={flight.with_tour ?? false}
-                              isDomestic={
-                                flights.departureCityData.isDomestic &&
-                                flights.destinationCityData.isDomestic
-                              }
-                              onFlightCardClick={handleFlightCardClick}
-                            />
-                          ))}
-
-                          {/* Show more/less buttons for flights */}
-                          <div className="col-span-full flex justify-center mt-4 gap-2">
-                            {visibleFlights < flights.flights.length && (
-                              <Button variant="secondary" onClick={showMoreFlights}>
-                                <ChevronDown />
-                                بیشتر
-                              </Button>
-                            )}
-                            {visibleFlights > 2 && (
-                              <Button variant="secondary" onClick={showLessFlights}>
-                                <ChevronUp />
-                                کمتر
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Display hotel cards within the AI message */}
-                    {index === items.length - 1 && hotels && hotels.hotels.length > 0 && (
-                      <div className="mt-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {hotels.hotels.slice(0, visibleHotels).map((hotel: Hotel) => (
-                            <HotelCard
-                              key={hotel.id}
-                              id={hotel.id}
-                              hotelName={hotel.hotelName}
-                              location={hotel.location}
-                              checkIn={hotel.checkIn}
-                              checkOut={hotel.checkOut}
-                              roomType={hotel.roomType}
-                              price={hotel.price}
-                              rating={hotel.rating}
-                              images={hotel.images}
-                              address={hotel.address}
-                              star={hotel.star}
-                              type={hotel.type}
-                              rooms={hotel.rooms}
-                              amenities={hotel.amenities}
-                              onHotelCardClick={handleHotelCardClick}
-                            />
-                          ))}
-
-                          {/* Show more/less buttons for hotels */}
-                          <div className="col-span-full flex justify-center mt-4 gap-2">
-                            {visibleHotels < hotels.hotels.length && (
-                              <Button variant="secondary" onClick={showMoreHotels}>
-                                <ChevronDown />
-                                بیشتر
-                              </Button>
-                            )}
-                            {visibleHotels > 2 && (
-                              <Button variant="secondary" onClick={showLessHotels}>
-                                <ChevronUp />
-                                کمتر
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <p className="text-xs text-muted-foreground prose-sm text-left my-1">
-                      {formatPersianTime(new Date())}
-                    </p>
+          // Only render if there are flights or hotels to show
+          if (index === items.length - 1) {
+            return (
+              <div key={index}>
+                {/* Show skeletons during loading */}
+                {loadingFlights && (
+                  <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
+                    {[...Array(2)].map((_, i) => (
+                      <FlightCardSkeleton key={i} />
+                    ))}
                   </div>
-                  <Image
-                    src="/logo1-dark.png"
-                    width={100}
-                    height={100}
-                    alt="logo"
-                    className="w-6 h-8 mr-4"
-                  />
-                </>
-              )}
-            </div>
-          );
+                )}
+
+                {loadingHotels && (
+                  <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
+                    {[...Array(2)].map((_, i) => (
+                      <HotelCardSkeleton key={i} />
+                    ))}
+                  </div>
+                )}
+
+                {/* Display flight cards */}
+                {flights && flights.flights.length > 0 && (
+                  <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4 sm:w-2/3 mx-auto">
+                    {flights.flights.slice(0, visibleFlights).map((flight: Flight) => (
+                      <FlightCard
+                        key={flight.id}
+                        fareSourceCode={""}
+                        isClosed={false}
+                        visaRequirements={[]}
+                        fares={{
+                          adult: {
+                            price: 0,
+                            count: 0,
+                            total_price: 0,
+                          },
+                          total_price: 0,
+                        }}
+                        cabin={{ persian: "" }}
+                        segments={[]}
+                        returnSegments={[]}
+                        {...flight}
+                        refundable={flight.refundable ?? false}
+                        departureCityData={flights.departureCityData}
+                        destinationCityData={flights.destinationCityData}
+                        with_tour={flight.with_tour ?? false}
+                        isDomestic={
+                          flights.departureCityData.isDomestic &&
+                          flights.destinationCityData.isDomestic
+                        }
+                        onFlightCardClick={handleFlightCardClick}
+                      />
+                    ))}
+                    {/* Show more/less buttons for flights */}
+                    <div className="col-span-full flex justify-center mt-4 gap-2">
+                      {visibleFlights < flights.flights.length && (
+                        <Button variant="secondary" onClick={showMoreFlights}>
+                          <ChevronDown />
+                          بیشتر
+                        </Button>
+                      )}
+                      {visibleFlights > 2 && (
+                        <Button variant="secondary" onClick={showLessFlights}>
+                          <ChevronUp />
+                          کمتر
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Display hotel cards */}
+                {hotels && hotels.hotels.length > 0 && (
+                  <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4 sm:w-2/3 mx-auto">
+                    {hotels.hotels.slice(0, visibleHotels).map((hotel: Hotel) => (
+                      <HotelCard
+                        key={hotel.id}
+                        id={hotel.id}
+                        hotelName={hotel.hotelName}
+                        location={hotel.location}
+                        checkIn={hotel.checkIn}
+                        checkOut={hotel.checkOut}
+                        roomType={hotel.roomType}
+                        price={hotel.price}
+                        rating={hotel.rating}
+                        images={hotel.images}
+                        address={hotel.address}
+                        star={hotel.star}
+                        type={hotel.type}
+                        rooms={hotel.rooms}
+                        amenities={hotel.amenities}
+                        onHotelCardClick={handleHotelCardClick}
+                      />
+                    ))}
+                    {/* Show more/less buttons for hotels */}
+                    <div className="col-span-full flex justify-center mt-4 gap-2">
+                      {visibleHotels < hotels.hotels.length && (
+                        <Button variant="secondary" onClick={showMoreHotels}>
+                          <ChevronDown />
+                          بیشتر
+                        </Button>
+                      )}
+                      {visibleHotels > 2 && (
+                        <Button variant="secondary" onClick={showLessHotels}>
+                          <ChevronUp />
+                          کمتر
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          }
+          return null;
         })}
       </div>
-      
-      {/* Remove the separate flight and hotel card sections that were here before */}
-      
+
       <div className="flex items-baseline w-full px-8 py-4 gap-4 bg-background">
         <div className="w-[40%]">
           <canvas ref={clientCanvasRef} className="w-full h-16" />
@@ -939,9 +932,8 @@ const VoiceChat = () => {
           variant={isConnected ? "destructive" : "default"}
           size="icon"
           onClick={isConnected ? disconnectConversation : connectConversation}
-          className={`w-12 h-12 rounded-full ${
-            isConnected ? "animate-pulse" : ""
-          }`}
+          className={`w-12 h-12 rounded-full ${isConnected ? "animate-pulse" : ""
+            }`}
         >
           {isConnected ? <MicOff /> : <Mic />}
         </Button>

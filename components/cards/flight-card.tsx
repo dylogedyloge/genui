@@ -5,7 +5,7 @@ import { Button } from "@/components/shadcn/button";
 import { Avatar } from "../shadcn/avatar";
 import Image from "next/image";
 import moment from "moment-jalaali";
-import type { CityData } from "@/types/chat";
+import type { CityData, Flight } from "@/types/chat";
 import { useEffect, useState } from "react";
 import {
   Accordion,
@@ -149,7 +149,7 @@ interface FlightProps {
   departureCityData: CityData | null;
   destinationCityData: CityData | null;
   isDomestic: boolean;
-  // onFlightCardClick: (flightInfo: Flight) => void;
+  onFlightCardClick: (flightInfo: Flight) => void;
 }
 
 const convertToJalali = (

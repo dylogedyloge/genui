@@ -1,3 +1,4 @@
+
 import ReactMarkdown from "react-markdown";
 import { AnimatePresence } from "framer-motion";
 
@@ -21,7 +22,6 @@ import {
   CityData,
 } from "@/types/chat";
 import Image from "next/image";
-import SelectedFlightAndHotelDetails from "../selected-card-details/selected-flight-and-hotel-details";
 
 /**
  * Type Guards to check the type of `result` based on the toolName
@@ -249,7 +249,7 @@ const renderFlightCards = (
       {flights.flights
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((flight: Flight) => (
-          <FlightCard
+          <FlightCard onFlightCardClick={onFlightCardClick}
             fareSourceCode={""}
             isClosed={false}
             visaRequirements={[]}
