@@ -321,9 +321,9 @@ const FlightCard: React.FC<FlightProps> = ({
     };
 
     const generalInformation = {
-      ticket: true,
-      accommodation: false,
-      itinerary: false,
+      isTicket: true,
+      isAccommodation: false,
+      isItinerary: false,
       isInternational: false,
     };
 
@@ -361,9 +361,9 @@ const FlightCard: React.FC<FlightProps> = ({
     const firstSegment = segments[0];
 
     const generalInformation = {
-      ticket: true,
-      accommodation: false,
-      itinerary: false,
+      isTicket: true,
+      isAccommodation: false,
+      isItinerary: false,
       isInternational: true,
     };
 
