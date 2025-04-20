@@ -93,7 +93,7 @@ interface FlightData {
     };
     total_price: number;
   };
-  cabin: {
+  cobin: {
     persian: string;
   };
   segments: FlightSegment[];
@@ -106,7 +106,7 @@ interface BaggageRule {
 
 interface FlightProps {
   id: number;
-  fareSourceCode: string;
+  fare_source_code: string;
   isClosed: boolean;
   visaRequirements: any;
   fares: {
@@ -117,14 +117,17 @@ interface FlightProps {
     };
     total_price: number;
   };
-  cabin: { persian: string };
   segments: FlightSegment[];
   returnSegments: FlightSegment[];
   airline: string;
+  airline_persian:string,
   flightNumber: string;
   departure: string;
   destination: string;
-  departureTime: string;
+  departure_date: string;
+  arrival_date: string;
+  departure_time: string;
+  destination_time: string;
   arrivalTime: string;
   price: number;
   airlineLogo: string;
@@ -189,18 +192,19 @@ const convertToJalali = (
 
 const FlightCard: React.FC<FlightProps> = ({
   id,
-  fareSourceCode,
+  fare_source_code,
   isClosed,
   visaRequirements,
   fares,
-  cabin,
   segments,
   returnSegments,
   airline,
+  airline_persian,
   flightNumber,
   departure,
   destination,
-  departureTime,
+  departure_date,
+      departure_time,
   arrivalTime,
   price,
   airlineLogo,
@@ -238,44 +242,6 @@ const FlightCard: React.FC<FlightProps> = ({
   const [isLoadingRefund, setIsLoadingRefund] = useState(false);
 
   const handleFlightCardClick = () => {
-    // const flightInfo = {
-    //   id,
-    //   fareSourceCode,
-    //   isClosed,
-    //   visaRequirements,
-    //   fares,
-    //   cabin,
-    //   segments,
-    //   returnSegments,
-    //   airline,
-    //   flightNumber,
-    //   departure,
-    //   destination,
-    //   departureTime,
-    //   arrivalTime,
-    //   price,
-    //   airlineLogo,
-    //   type,
-    //   capacity,
-    //   sellingType,
-    //   aircraft,
-    //   baggage,
-    //   flightClass,
-    //   cobin,
-    //   persian_type,
-    //   refundable,
-    //   child_price,
-    //   infant_price,
-    //   departure_terminal,
-    //   refund_rules,
-    //   destination_terminal,
-    //   flight_duration,
-    //   cobin_persian,
-    //   with_tour,
-    //   tag,
-    //   departureCityData,
-    //   destinationCityData,
-    // };
 
     if (isDomestic) {
       handleDomesticFlightPurchase();
@@ -286,36 +252,35 @@ const FlightCard: React.FC<FlightProps> = ({
   // Function to handle card click
   const handleDomesticFlightPurchase = () => {
     const transformedFlightInfo = {
+      fare_source_code,
       type,
       capacity,
-      airline: airline.toLowerCase(),
+      airline,
       sellingType,
       id,
       aircraft,
       class: flightClass,
       cobin,
+      cobin_persian,
       persian_type,
       refundable,
       adult_price: price,
       child_price,
       infant_price,
-      airline_persian: airline,
+      airline_persian,
       airline_logo: airlineLogo,
       flight_number: flightNumber.toUpperCase(),
       departure,
       departure_name: departure,
-      departure_date: departureTime.split("T")[0],
-      departure_time: departureTime.split("T")[1],
+      departure_date,
+      departure_time,
       baggage,
       departure_terminal,
       refund_rules,
       destination,
       destination_name: destination,
-      destination_time: arrivalTime.split("T")[1],
       destination_terminal,
       flight_duration,
-      arrival_date: arrivalTime.split("T")[0],
-      cobin_persian,
       with_tour,
       tag,
     };
@@ -330,12 +295,14 @@ const FlightCard: React.FC<FlightProps> = ({
     const domesticFlightInformation = {
       departure: departureCityData,
       destination: destinationCityData,
+      departureDate: departure_date, 
       personCounter: {
         adult: 1,
         child: 0,
         infant: 0,
         totalPersons: 1,
       },
+      hasSecondTicket: false,
     };
 
     window.parent.postMessage(
@@ -405,11 +372,11 @@ const FlightCard: React.FC<FlightProps> = ({
 
     const selectedIntFlight = {
       id,
-      fare_source_code: fareSourceCode,
+      fare_source_code,
       is_closed: isClosed,
       visa_requirements: visaRequirements,
       fares,
-      cabin,
+      cobin,
       segments,
       return_segments: returnSegments,
     };
@@ -436,7 +403,7 @@ const FlightCard: React.FC<FlightProps> = ({
       // Fetch baggage rules
       setIsLoadingBaggage(true);
       fetch(
-        `${API_ENDPOINTS.INTERNATIONAL.BAGGAGE}?fare_source_code=${fareSourceCode}`
+        `${API_ENDPOINTS.INTERNATIONAL.BAGGAGE}?fare_source_code=${fare_source_code}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -451,7 +418,7 @@ const FlightCard: React.FC<FlightProps> = ({
       // Fetch refund rules
       setIsLoadingRefund(true);
       fetch(
-        `${API_ENDPOINTS.INTERNATIONAL.RULES}?fare_source_code=${fareSourceCode}`
+        `${API_ENDPOINTS.INTERNATIONAL.RULES}?fare_source_code=${fare_source_code}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -463,7 +430,7 @@ const FlightCard: React.FC<FlightProps> = ({
           setIsLoadingRefund(false);
         });
     }
-  }, [isAccordionOpen, isDomestic, fareSourceCode]);
+  }, [isAccordionOpen, isDomestic, fare_source_code]);
   const getFlightSegments = () => {
     if (isDomestic) {
       return [
@@ -473,8 +440,8 @@ const FlightCard: React.FC<FlightProps> = ({
           departureCity: departureCityData?.name || departure,
           destinationCity: destinationCityData?.name || destination,
           departureTime: convertToJalali(
-            departureTime.split("T")[0],
-            departureTime.split("T")[1] || departureTime,
+            departure_time.split("T")[0],
+            departure_time.split("T")[1] || departure_time,
             isDomestic,
             true
           ),
@@ -627,7 +594,7 @@ const FlightCard: React.FC<FlightProps> = ({
             <div className="flex items-center gap-1">
               <Sofa className="text-primary" size={16} />
               <span className="text-primary font-semibold">
-                {isDomestic ? cobin_persian : cabin.persian}
+                {isDomestic ? cobin_persian : cobin_persian}
               </span>
             </div>
           </div>

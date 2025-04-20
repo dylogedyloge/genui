@@ -1,6 +1,6 @@
 
 import ReactMarkdown from "react-markdown";
-import { AnimatePresence } from "framer-motion";
+import { fetchCityData } from "@/ai/aiUtils/apiUtils";
 
 import FlightCard from "@/components/cards/flight-card";
 import HotelCard from "@/components/cards/hotel-card";
@@ -82,6 +82,49 @@ const MessageList: React.FC<MessageListProps> = ({
   const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
   const [showPassengerCounter, setShowPassengerCounter] = useState(false);
   const [passengerCounterMessage, setPassengerCounterMessage] = useState("");
+  const [cityDataMap, setCityDataMap] = useState<{
+    [key: string]: { departureCityData: CityData | null; destinationCityData: CityData | null };
+  }>({});
+  
+  // Helper to generate a unique key for each message/tool invocation
+  const getCityKey = (messageIndex: number, invocationIndex: number) =>
+    `${messageIndex}_${invocationIndex}`;
+  
+  // Fetch city data when messages change
+  useEffect(() => {
+    messages.forEach((message, messageIndex) => {
+      message.toolInvocations?.forEach(async (toolInvocation, invocationIndex) => {
+        if (
+          toolInvocation.toolName === "displayFlightCard" &&
+          toolInvocation.state === "result" &&
+          toolInvocation.result &&
+          toolInvocation.result.flights &&
+          toolInvocation.result.flights.length > 0
+        ) {
+          const firstFlight = toolInvocation.result.flights[0];
+          const depName = firstFlight.departure;
+          const destName = firstFlight.destination;
+          const key = getCityKey(messageIndex, invocationIndex);
+  
+          // Only fetch if not already fetched
+          if (!cityDataMap[key]) {
+            const [depCity, destCity] = await Promise.all([
+              fetchCityData(depName, /* API_ENDPOINTS.DOMESTIC.CITIES */ "/api/domestic-cities", true),
+              fetchCityData(destName, /* API_ENDPOINTS.DOMESTIC.CITIES */ "/api/domestic-cities", true),
+            ]);
+            setCityDataMap(prev => ({
+              ...prev,
+              [key]: {
+                departureCityData: depCity,
+                destinationCityData: destCity,
+              },
+            }));
+          }
+        }
+      });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -158,7 +201,11 @@ const MessageList: React.FC<MessageListProps> = ({
                         case "displayFlightCard":
                           if (isFlightArray(result)) {
                             return renderFlightCards(
-                              result,
+                              {
+                                ...result,
+                                departureCityData: cityDataMap[getCityKey(messageIndex, invocationIndex)]?.departureCityData ?? result.departureCityData,
+                                destinationCityData: cityDataMap[getCityKey(messageIndex, invocationIndex)]?.destinationCityData ?? result.destinationCityData,
+                              },
                               messageIndex,
                               invocationIndex,
                               visibilityControls.flights,
@@ -250,7 +297,6 @@ const renderFlightCards = (
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((flight: Flight) => (
           <FlightCard onFlightCardClick={onFlightCardClick}
-            fareSourceCode={""}
             isClosed={false}
             visaRequirements={[]}
             fares={{
@@ -261,7 +307,7 @@ const renderFlightCards = (
               },
               total_price: 0,
             }}
-            cabin={{ persian: "" }}
+            
             segments={[]}
             returnSegments={[]}
             key={flight.id}

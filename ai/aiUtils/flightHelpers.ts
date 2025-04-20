@@ -79,10 +79,19 @@ export const transformFlightData = (flightData: any, isDomestic: boolean) => {
     // Handle domestic flights
     const list = flightData.data?.list || [];
     return list.map((flight: any) => ({
-      airline: flight.airline_persian,
+      fare_source_code: flight.fare_source_code,
+      cobin: flight.cobin,
+      cobin_persian: flight.cobin_persian,
+      departure_date: flight.departure_date,
+      arrival_date: flight.arrival_date,
+      departure_time: flight.departure_time,
+      destination_time: flight.destination_time,
+      id: flight.id,
+      airline_persian: flight.airline_persian,
+      airline: flight.airline,
       flightNumber: flight.flight_number,
-      departureTime: `${flight.departure_date}- ${flight.departure_time}`,
-      arrivalTime: `${flight.arrival_date}- ${flight.destination_time}`,
+      departureTime: `${flight.departure_date}T${flight.departure_time}`,
+      arrivalTime: `${flight.arrival_date}T${flight.destination_time}`,
       price: flight.adult_price,
       departure: flight.departure_name,
       destination: flight.destination_name,
@@ -92,9 +101,7 @@ export const transformFlightData = (flightData: any, isDomestic: boolean) => {
       type: flight.type,
       capacity: flight.capacity,
       sellingType: flight.sellingType,
-      id: flight.id,
       flightClass: flight.class,
-      cobin: flight.cobin,
       persian_type: flight.persian_type,
       refundable: flight.refundable,
       child_price: flight.child_price,
@@ -103,7 +110,6 @@ export const transformFlightData = (flightData: any, isDomestic: boolean) => {
       refund_rules: flight.refund_rules,
       destination_terminal: flight.destination_terminal,
       flight_duration: flight.flight_duration,
-      cobin_persian: flight.cobin_persian,
       with_tour: flight.with_tour,
       tag: flight.tag,
     }));
@@ -111,13 +117,15 @@ export const transformFlightData = (flightData: any, isDomestic: boolean) => {
 
   // Handle international flights
   const list = flightData.data?.results?.list || [];
+  console.log(list)
   return list.map((flight: any) => ({
     id: flight.id,
-    fareSourceCode: flight.fare_source_code,
+    fare_source_code: flight.fare_source_code,
     isClosed: flight.is_closed,
     visaRequirements: flight.visa_requirements,
     fares: flight.fares,
-    cabin: flight.cabin,
+    cobin: flight.cobin,
+    cobin_persian:flight.cobin_persian,
     airline: flight.segments[0]?.airline?.persian || "",
     flightNumber: flight.segments[0]?.flight_number || "",
     departureTime:
