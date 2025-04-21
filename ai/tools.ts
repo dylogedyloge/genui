@@ -58,7 +58,6 @@ export const FlightTool = createTool({
         date,
         passengers
       );
-      console.log("apiUrl:", apiUrl);
 
       // Fetch flight data
       const flightResponse = await fetch(apiUrl, {
@@ -92,6 +91,7 @@ export const FlightTool = createTool({
         flights,
         departureCityData: { isDomestic },
         destinationCityData: { isDomestic },
+        passengers: passengers || { adult: 1, child: 0, infant: 0 }
       };
     } catch (error) {
       console.error("Error fetching flight data:", error);

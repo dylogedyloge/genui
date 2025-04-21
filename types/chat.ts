@@ -35,6 +35,11 @@ export interface Flight {
   departureCityData: any;
   destinationCityData: any;
   onFlightCardClick?: (flight: Flight) => void;
+  passengers?: {
+    adult: number;
+    child: number;
+    infant: number;
+  };
 }
 
 export interface CityData {

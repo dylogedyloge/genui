@@ -1,9 +1,11 @@
-
 import ReactMarkdown from "react-markdown";
-import { fetchCityData } from "@/ai/aiUtils/apiUtils";
-
 import FlightCard from "@/components/cards/flight-card";
 import HotelCard from "@/components/cards/hotel-card";
+
+import { fetchCityData } from "@/ai/aiUtils/apiUtils";
+import { API_ENDPOINTS } from "@/endpoints/endpoints";
+
+
 
 import FlightCardSkeleton from "@/components/skeletons/flight-card-skeleton";
 import HotelCardSkeleton from "@/components/skeletons/hotel-card-skeleton";
@@ -36,6 +38,11 @@ interface FlightResult {
   flights: Flight[];
   departureCityData: CityData;
   destinationCityData: CityData;
+  passengers?: {
+    adult: number;
+    child: number;
+    infant: number;
+  };
 }
 
 // 2. Update type guard function
@@ -90,41 +97,26 @@ const MessageList: React.FC<MessageListProps> = ({
   const getCityKey = (messageIndex: number, invocationIndex: number) =>
     `${messageIndex}_${invocationIndex}`;
   
-  // Fetch city data when messages change
-  useEffect(() => {
-    messages.forEach((message, messageIndex) => {
-      message.toolInvocations?.forEach(async (toolInvocation, invocationIndex) => {
-        if (
-          toolInvocation.toolName === "displayFlightCard" &&
-          toolInvocation.state === "result" &&
-          toolInvocation.result &&
-          toolInvocation.result.flights &&
-          toolInvocation.result.flights.length > 0
-        ) {
-          const firstFlight = toolInvocation.result.flights[0];
-          const depName = firstFlight.departure;
-          const destName = firstFlight.destination;
-          const key = getCityKey(messageIndex, invocationIndex);
+    // Function to fetch city data
+    const fetchCitiesData = async (departure: string, destination: string, messageIndex: number, invocationIndex: number) => {
+      const [depCity, destCity] = await Promise.all([
+        fetchCityData(departure, API_ENDPOINTS.DOMESTIC.CITIES, true),
+        fetchCityData(destination, API_ENDPOINTS.DOMESTIC.CITIES, true)
+      ]);
   
-          // Only fetch if not already fetched
-          if (!cityDataMap[key]) {
-            const [depCity, destCity] = await Promise.all([
-              fetchCityData(depName, /* API_ENDPOINTS.DOMESTIC.CITIES */ "/api/domestic-cities", true),
-              fetchCityData(destName, /* API_ENDPOINTS.DOMESTIC.CITIES */ "/api/domestic-cities", true),
-            ]);
-            setCityDataMap(prev => ({
-              ...prev,
-              [key]: {
-                departureCityData: depCity,
-                destinationCityData: destCity,
-              },
-            }));
-          }
+      setCityDataMap(prev => ({
+        ...prev,
+        [getCityKey(messageIndex, invocationIndex)]: {
+          departureCityData: depCity,
+          destinationCityData: destCity
         }
-      });
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
+      }));
+  
+      console.log("amir", depCity)
+      return { departureCityData: depCity, destinationCityData: destCity };
+    };
+
+
 
   useEffect(() => {
     if (inputRef.current) {

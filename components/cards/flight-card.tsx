@@ -153,6 +153,11 @@ interface FlightProps {
   destinationCityData: CityData | null;
   isDomestic: boolean;
   onFlightCardClick: (flightInfo: Flight) => void;
+  passengers?: {
+    adult: number;
+    child: number;
+    infant: number;
+  };
 }
 
 const convertToJalali = (
@@ -229,6 +234,7 @@ const FlightCard: React.FC<FlightProps> = ({
   departureCityData,
   destinationCityData,
   isDomestic,
+  passengers,
 
   
 }: FlightProps) => {
@@ -250,37 +256,70 @@ const FlightCard: React.FC<FlightProps> = ({
     }
   };
   // Function to handle card click
-  const handleDomesticFlightPurchase = () => {
+  const handleDomesticFlightPurchase = async () => {
+    // Fetch full city data if not available
+    const fetchFullCityData = async (cityName: string) => {
+      try {
+        const response = await fetch(`${API_ENDPOINTS.DOMESTIC.CITIES}?search=${cityName}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data.data.results) && data.data.results.length > 0) {
+            return data.data.results[0];
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching city data:", error);
+      }
+      return null;
+    };
+
+    // Get full city data
+    // Get full city data with fallback
+    const fullDepartureCityData = departureCityData?.name 
+        ? departureCityData 
+        : await fetchFullCityData(departure.trim());
+    
+    if (!fullDepartureCityData) {
+        console.error(`Failed to get data for departure city: ${departure}`);
+        // You may want to add a fallback here, like:
+        // return { ...basic flight info without city data };
+    }
+    const fullDestinationCityData = destinationCityData?.name 
+      ? destinationCityData 
+      : await fetchFullCityData(destination);
+
     const transformedFlightInfo = {
       fare_source_code,
       type,
       capacity,
-      airline,
+      airline: airline.toLowerCase(),
       sellingType,
       id,
       aircraft,
       class: flightClass,
       cobin,
-      cobin_persian,
       persian_type,
       refundable,
       adult_price: price,
       child_price,
       infant_price,
-      airline_persian,
+      airline_persian: airline,
       airline_logo: airlineLogo,
       flight_number: flightNumber.toUpperCase(),
       departure,
       departure_name: departure,
-      departure_date,
-      departure_time,
+      departure_date: departure_time.split("T")[0],
+      departure_time: departure_time.split("T")[1],
       baggage,
       departure_terminal,
       refund_rules,
       destination,
       destination_name: destination,
+      destination_time: arrivalTime.split("T")[1],
       destination_terminal,
       flight_duration,
+      arrival_date: arrivalTime.split("T")[0],
+      cobin_persian,
       with_tour,
       tag,
     };
@@ -291,16 +330,52 @@ const FlightCard: React.FC<FlightProps> = ({
       isItinerary: false,
       isInternational: false,
     };
-
     const domesticFlightInformation = {
-      departure: departureCityData,
-      destination: destinationCityData,
-      departureDate: departure_date, 
+      departure: fullDepartureCityData ? {
+        id: fullDepartureCityData.id,
+        name: fullDepartureCityData.name,
+        english_name: fullDepartureCityData.english_name,
+        iata: fullDepartureCityData.iata,
+        latitude: fullDepartureCityData.latitude,
+        longitude: fullDepartureCityData.longitude,
+        description: fullDepartureCityData.description,
+        is_province_capital: fullDepartureCityData.is_province_capital,
+        is_country_capital: fullDepartureCityData.is_country_capital,
+        usage_flight: fullDepartureCityData.usage_flight,
+        usage_accommodation: fullDepartureCityData.usage_accommodation,
+        country: fullDepartureCityData.country,
+        province: fullDepartureCityData.province,
+        flight: fullDepartureCityData.flight,
+        accommodation: fullDepartureCityData.accommodation,
+        has_plan: fullDepartureCityData.has_plan,
+        parto_id: fullDepartureCityData.parto_id
+      } : null,
+      destination: fullDestinationCityData ? {
+        id: fullDestinationCityData.id,
+        name: fullDestinationCityData.name,
+        english_name: fullDestinationCityData.english_name,
+        iata: fullDestinationCityData.iata,
+        latitude: fullDestinationCityData.latitude,
+        longitude: fullDestinationCityData.longitude,
+        description: fullDestinationCityData.description,
+        is_province_capital: fullDestinationCityData.is_province_capital,
+        is_country_capital: fullDestinationCityData.is_country_capital,
+        usage_flight: fullDestinationCityData.usage_flight,
+        usage_accommodation: fullDestinationCityData.usage_accommodation,
+        country: fullDestinationCityData.country,
+        province: fullDestinationCityData.province,
+        flight: fullDestinationCityData.flight,
+        accommodation: fullDestinationCityData.accommodation,
+        has_plan: fullDestinationCityData.has_plan,
+        parto_id: fullDestinationCityData.parto_id
+      } : null,
+      departureDate: departure_time.split("T")[0],
+      returnDate: null,
       personCounter: {
-        adult: 1,
-        child: 0,
-        infant: 0,
-        totalPersons: 1,
+        adult: passengers?.adult || 1,
+        child: passengers?.child || 0,
+        infant: passengers?.infant || 0,
+        totalPersons: (passengers?.adult || 1) + (passengers?.child || 0) + (passengers?.infant || 0),
       },
       hasSecondTicket: false,
     };
@@ -316,12 +391,9 @@ const FlightCard: React.FC<FlightProps> = ({
       },
       "*"
     );
-    console.log("transformedFlightInfo",transformedFlightInfo);
-    console.log("generalInformation",generalInformation);
-    console.log("domesticFlightInformation",domesticFlightInformation);
-
-
-    
+    console.log("transformedFlightInfo", transformedFlightInfo);
+    console.log("generalInformation", generalInformation);
+    console.log("domesticFlightInformation", domesticFlightInformation);
   };
 
   const handleInternationalFlightPurchase = () => {
