@@ -833,7 +833,6 @@ const VoiceChat = () => {
                     {flights.flights.slice(0, visibleFlights).map((flight: Flight) => (
                       <FlightCard
                         key={flight.id}
-                        fareSourceCode={""}
                         isClosed={false}
                         visaRequirements={[]}
                         fares={{
@@ -844,7 +843,6 @@ const VoiceChat = () => {
                           },
                           total_price: 0,
                         }}
-                        cabin={{ persian: "" }}
                         segments={[]}
                         returnSegments={[]}
                         {...flight}
