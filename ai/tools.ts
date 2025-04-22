@@ -85,13 +85,12 @@ export const FlightTool = createTool({
       const flightData = await flightResponse.json();
 
       // Transform flight data into a consistent format
-      const flights = transformFlightData(flightData, isDomestic);
+      const flights = transformFlightData(flightData, isDomestic,passengers);
 
       return {
         flights,
         departureCityData: { isDomestic },
         destinationCityData: { isDomestic },
-        passengers: passengers || { adult: 1, child: 0, infant: 0 }
       };
     } catch (error) {
       console.error("Error fetching flight data:", error);

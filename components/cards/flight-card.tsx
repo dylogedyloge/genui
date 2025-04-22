@@ -234,7 +234,7 @@ const FlightCard: React.FC<FlightProps> = ({
   departureCityData,
   destinationCityData,
   isDomestic,
-  passengers,
+  passengers = { adult: 1, child: 0, infant: 0 },
 
   
 }: FlightProps) => {
@@ -257,6 +257,7 @@ const FlightCard: React.FC<FlightProps> = ({
   };
   // Function to handle card click
   const handleDomesticFlightPurchase = async () => {
+   
     // Fetch full city data if not available
     const fetchFullCityData = async (cityName: string) => {
       try {
@@ -281,8 +282,6 @@ const FlightCard: React.FC<FlightProps> = ({
     
     if (!fullDepartureCityData) {
         console.error(`Failed to get data for departure city: ${departure}`);
-        // You may want to add a fallback here, like:
-        // return { ...basic flight info without city data };
     }
     const fullDestinationCityData = destinationCityData?.name 
       ? destinationCityData 
@@ -330,6 +329,7 @@ const FlightCard: React.FC<FlightProps> = ({
       isItinerary: false,
       isInternational: false,
     };
+    
     const domesticFlightInformation = {
       departure: fullDepartureCityData ? {
         id: fullDepartureCityData.id,
@@ -372,10 +372,10 @@ const FlightCard: React.FC<FlightProps> = ({
       departureDate: departure_time.split("T")[0],
       returnDate: null,
       personCounter: {
-        adult: passengers?.adult || 1,
-        child: passengers?.child || 0,
-        infant: passengers?.infant || 0,
-        totalPersons: (passengers?.adult || 1) + (passengers?.child || 0) + (passengers?.infant || 0),
+        adult: passengers.adult,
+        child: passengers.child,
+        infant: passengers.infant,
+        totalPersons: passengers.adult + passengers.child + passengers.infant,
       },
       hasSecondTicket: false,
     };

@@ -48,7 +48,6 @@ export const determineFlightType = async (
     destinationId: internationalDestinationData.id,
   };
 };
-
 // Function to construct the API URL based on flight type
 export const constructApiUrl = (
   isDomestic: boolean,
@@ -57,6 +56,7 @@ export const constructApiUrl = (
   date: string,
   passengers: { adult: number; child: number; infant: number } | undefined
 ) => {
+  
   const baseUrl = isDomestic
     ? API_ENDPOINTS.DOMESTIC.FLIGHTS
     : `${API_ENDPOINTS.INTERNATIONAL.FLIGHTS}/`;
@@ -68,13 +68,18 @@ export const constructApiUrl = (
   return `${baseUrl}?departure=${departureId}&destination=${destinationId}&date=${date}${passengerParams}&round_trip=false`;
 };
 
+
+
+
 // Function to transform flight data into a consistent format
-export const transformFlightData = (flightData: any, isDomestic: boolean) => {
+export const transformFlightData = (flightData: any, isDomestic: boolean, passengers: { adult: number; child: number; infant: number } | undefined) => {
   if (!flightData?.data) {
     console.error("Invalid flight data structure:", flightData);
     return [];
   }
-
+  
+  const actualPassengers = passengers || { adult: 1, child: 0, infant: 0 };
+  console.log("Passengers object used for transformation:", actualPassengers);
   if (isDomestic) {
     // Handle domestic flights
     const list = flightData.data?.list || [];
@@ -112,7 +117,10 @@ export const transformFlightData = (flightData: any, isDomestic: boolean) => {
       flight_duration: flight.flight_duration,
       with_tour: flight.with_tour,
       tag: flight.tag,
-    }));
+      passengers: actualPassengers,
+    }
+    
+  ));
   }
 
   // Handle international flights
@@ -163,5 +171,6 @@ export const transformFlightData = (flightData: any, isDomestic: boolean) => {
         capacity: segment.capacity,
       })) || [],
     returnSegments: flight.return_segments || [],
+    passengers: actualPassengers,
   }));
 };

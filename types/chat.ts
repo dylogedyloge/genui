@@ -3,16 +3,19 @@ export interface ChatInterfaceProps {}
 // Define the structure of the Flight, or Hotel
 export interface Flight {
   id: number; // Unique identifier
-  airline: string; // Airline name (e.g. "هواپیمایی ماهان")
+  airline: string; // Airline name (e.g. "Mahan Air")
+  airline_persian: string; // Persian airline name (e.g. "هواپیمایی ماهان")
   flightNumber: string; // Flight number (e.g. "W5-1080")
   departure: string; // Departure city name
   destination: string; // Destination city name
-  departureTime: string; // Departure date and time
-  arrivalTime: string; // Arrival date and time
-  price: number; // Price in Rials
+  departureTime: string; // Combined Departure date and time (e.g., "YYYY-MM-DDTHH:mm:ss")
+  arrivalTime: string; // Combined Arrival date and time (e.g., "YYYY-MM-DDTHH:mm:ss")
+  departure_date: string; // Departure date (e.g., "YYYY-MM-DD")
+  arrival_date: string; // Arrival date (e.g., "YYYY-MM-DD")
+  departure_time: string; // Departure time (e.g., "HH:mm:ss")
+  destination_time: string; // Arrival time (e.g., "HH:mm:ss")
+  price: number; // Price in Rials (usually adult price)
   airlineLogo: string; // URL to airline logo image
-
-  // Additional properties found in codebase
   type: string; // Flight type (e.g. "charter")
   capacity: number; // Available seats
   sellingType: string; // Selling type (e.g. "All")
@@ -20,21 +23,27 @@ export interface Flight {
   baggage: string; // Baggage allowance
   flightClass: string; // Flight class
   cobin: string; // Cabin class (e.g. "Economy")
+  cobin_persian: string; // Persian cabin class
   persian_type: string; // Persian flight type
   refundable: boolean | null; // Whether flight is refundable
   child_price: number; // Child ticket price
   infant_price: number; // Infant ticket price
   departure_terminal: string; // Departure terminal
-  refund_rules: any[]; // Refund policy rules
   destination_terminal: string; // Arrival terminal
+  refund_rules: any[]; // Refund policy rules
   flight_duration: string; // Duration of flight
-  cobin_persian: string; // Persian cabin class
   with_tour: boolean | null; // Whether flight includes tour
   tag: string; // Additional tag info
+  fare_source_code: string; // Fare source code
+  isClosed?: boolean; // Optional: If applicable for international flights
+  visaRequirements?: any; // Optional: If applicable for international flights
+  fares?: any; // Optional: Detailed fare breakdown if available
+  segments?: any[]; // Optional: For international flights with segments
+  returnSegments?: any[]; // Optional: For international flights with segments
   status?: "On Time" | "Delayed" | "Cancelled"; // Flight status
-  departureCityData: any;
-  destinationCityData: any;
-  onFlightCardClick?: (flight: Flight) => void;
+  departureCityData: CityData; // Ensure CityData type is correctly imported/defined
+  destinationCityData: CityData; // Ensure CityData type is correctly imported/defined
+  onFlightCardClick?: (flight: Flight) => void; // Callback prop
   passengers?: {
     adult: number;
     child: number;

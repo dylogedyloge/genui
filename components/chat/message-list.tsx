@@ -38,7 +38,7 @@ interface FlightResult {
   flights: Flight[];
   departureCityData: CityData;
   destinationCityData: CityData;
-  passengers?: {
+  passengers?: { // This top-level passengers might be redundant now but keep for structure
     adult: number;
     child: number;
     infant: number;
@@ -273,49 +273,49 @@ const MessageList: React.FC<MessageListProps> = ({
  * Helper functions for rendering tool responses
  */
 const renderFlightCards = (
-  flights: {
-    flights: Flight[];
-    departureCityData: CityData;
-    destinationCityData: CityData;
-  },
+  result: FlightResult, // result contains { flights: Flight[], passengers?: {...}, ... }
   messageIndex: number,
   invocationIndex: number,
   visibilityControl: VisibilityControl,
   onFlightCardClick: (flightInfo: Flight) => void
 ) => {
+  // Ensure city data exists before rendering, or provide defaults
+  const departureCityData = result.departureCityData || { isDomestic: true }; // Provide a default or handle appropriately
+  const destinationCityData = result.destinationCityData || { isDomestic: true }; // Provide a default or handle appropriately
+
+  const defaultFares = {
+    adult: { price: 0, count: 0, total_price: 0 },
+    child: { price: 0, count: 0, total_price: 0 }, // Add defaults if needed
+    infant: { price: 0, count: 0, total_price: 0 }, // Add defaults if needed
+    total_price: 0,
+    // Add any other expected properties within fares with default values
+  };
+
   return (
     <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
-      {flights.flights
+      {result.flights
         .slice(0, visibilityControl.map[messageIndex]?.[invocationIndex] || 2)
         .map((flight: Flight) => (
-          <FlightCard onFlightCardClick={onFlightCardClick}
-            isClosed={false}
-            visaRequirements={[]}
-            fares={{
-              adult: {
-                price: 0,
-                count: 0,
-                total_price: 0,
-              },
-              total_price: 0,
-            }}
-            
-            segments={[]}
-            returnSegments={[]}
-            key={flight.id}
-            {...flight}
-            refundable={flight.refundable ?? false}
-            departureCityData={flights.departureCityData}
-            destinationCityData={flights.destinationCityData}
+          <FlightCard
+            key={flight.id} 
+            {...flight} 
+            isClosed={flight.isClosed ?? false}
+            visaRequirements={flight.visaRequirements ?? []}
+            fares={flight.fares ?? defaultFares}
+            segments={flight.segments ?? []}
+            returnSegments={flight.returnSegments ?? []}
             with_tour={flight.with_tour ?? false}
+            onFlightCardClick={onFlightCardClick}
+            departureCityData={departureCityData}
+            destinationCityData={destinationCityData}
             isDomestic={
-              flights.departureCityData.isDomestic &&
-              flights.destinationCityData.isDomestic
+              departureCityData.isDomestic &&
+              destinationCityData.isDomestic
             }
           />
         ))}
       {renderVisibilityButtons(
-        flights.flights.length,
+        result.flights.length,
         messageIndex,
         invocationIndex,
         visibilityControl
