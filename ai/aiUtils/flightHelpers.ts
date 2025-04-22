@@ -54,9 +54,9 @@ export const constructApiUrl = (
   departureId: string | number,
   destinationId: string | number,
   date: string,
-  passengers: { adult: number; child: number; infant: number } | undefined
+  passengers: { adult: number; child: number; infant: number } | undefined,
+  cabinType?: { id: number; name: string; value: string }
 ) => {
-  
   const baseUrl = isDomestic
     ? API_ENDPOINTS.DOMESTIC.FLIGHTS
     : `${API_ENDPOINTS.INTERNATIONAL.FLIGHTS}/`;
@@ -64,22 +64,25 @@ export const constructApiUrl = (
   const passengerParams = passengers
     ? `&adult=${passengers.adult}&child=${passengers.child}&infant=${passengers.infant}`
     : "";
+  const cabinTypeParam =
+    !isDomestic && cabinType ? `&cabin=${cabinType.value}` : "";
 
-  return `${baseUrl}?departure=${departureId}&destination=${destinationId}&date=${date}${passengerParams}&round_trip=false`;
+  return `${baseUrl}?departure=${departureId}&destination=${destinationId}&date=${date}${passengerParams}$cabin_type=${cabinTypeParam}&round_trip=false`;
 };
 
-
-
-
 // Function to transform flight data into a consistent format
-export const transformFlightData = (flightData: any, isDomestic: boolean, passengers: { adult: number; child: number; infant: number } | undefined) => {
+export const transformFlightData = (
+  flightData: any,
+  isDomestic: boolean,
+  passengers: { adult: number; child: number; infant: number } | undefined,
+  cabinType?: { id: number; name: string; value: string }
+) => {
   if (!flightData?.data) {
     console.error("Invalid flight data structure:", flightData);
     return [];
   }
-  
+
   const actualPassengers = passengers || { adult: 1, child: 0, infant: 0 };
-  console.log("Passengers object used for transformation:", actualPassengers);
   if (isDomestic) {
     // Handle domestic flights
     const list = flightData.data?.list || [];
@@ -118,14 +121,11 @@ export const transformFlightData = (flightData: any, isDomestic: boolean, passen
       with_tour: flight.with_tour,
       tag: flight.tag,
       passengers: actualPassengers,
-    }
-    
-  ));
+    }));
   }
 
   // Handle international flights
   const list = flightData.data?.results?.list || [];
-  console.log(list)
   return list.map((flight: any) => ({
     id: flight.id,
     fare_source_code: flight.fare_source_code,
@@ -133,7 +133,7 @@ export const transformFlightData = (flightData: any, isDomestic: boolean, passen
     visaRequirements: flight.visa_requirements,
     fares: flight.fares,
     cobin: flight.cobin,
-    cobin_persian:flight.cobin_persian,
+    cobin_persian: flight.cobin_persian,
     airline: flight.segments[0]?.airline?.persian || "",
     flightNumber: flight.segments[0]?.flight_number || "",
     departureTime:
@@ -172,5 +172,6 @@ export const transformFlightData = (flightData: any, isDomestic: boolean, passen
       })) || [],
     returnSegments: flight.return_segments || [],
     passengers: actualPassengers,
+    cabinType: cabinType || { id: 1, name: "Economy", value: "economy" },
   }));
 };

@@ -275,7 +275,7 @@ const FlightCard: React.FC<FlightProps> = ({
       return null;
     };
 
-    // Get full city data
+    
     // Get full city data with fallback
     const fullDepartureCityData = departureCityData?.name 
         ? departureCityData 
@@ -414,6 +414,12 @@ const FlightCard: React.FC<FlightProps> = ({
       isInternational: true,
     };
 
+    const cabinTypeFromProps = cobin ? {
+      id: cobin === "economy" ? 1 : cobin === "business" ? 2 : cobin === "first" ? 3 : 1,
+      name: cobin_persian || (cobin === "economy" ? "Economy" : cobin === "business" ? "Business" : cobin === "first" ? "First" : "Economy"),
+      value: cobin || "economy"
+    } : { id: 1, name: "Economy", value: "economy" };
+
     const intFlightInformation = {
       departure: {
         id: departureCityData?.id,
@@ -442,16 +448,12 @@ const FlightCard: React.FC<FlightProps> = ({
       departureDate: firstSegment.departure_date,
       returnDate: null,
       personCounter: {
-        adult: 1,
-        child: 0,
-        infant: 0,
-        totalPersons: 1,
+        adult: passengers.adult,
+        child: passengers.child,
+        infant: passengers.infant,
+        totalPersons: passengers.adult + passengers.child + passengers.infant,
       },
-      cabinType: {
-        id: 1,
-        name: "Economy",
-        value: "economy"
-      },
+      cabinType: cabinTypeFromProps,
       isDirect: segments.length === 1,
     };
 

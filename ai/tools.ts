@@ -17,6 +17,13 @@ export const FlightTool = createTool({
     departureCity: z.string(),
     destinationCity: z.string(),
     date: z.string(),
+    cabinType: z
+      .object({
+        id: z.number(),
+        name: z.string(),
+        value: z.string(),
+      })
+      .optional(),
     passengers: z
       .object({
         adult: z.number(),
@@ -29,6 +36,7 @@ export const FlightTool = createTool({
     departureCity,
     destinationCity,
     date,
+    cabinType,
     passengers,
   }) {
     if (!date) {
@@ -45,10 +53,24 @@ export const FlightTool = createTool({
       };
     }
 
+    const { isDomestic } = await determineFlightType(
+      departureCity,
+      destinationCity
+    );
+    if (!isDomestic && !cabinType) {
+      return {
+        message: "لطفا نوع پروازتان را انتخاب کنید",
+        showCabinTypeSelector: true,
+        flights: [],
+      };
+    }
+
     try {
       // Determine flight type and get city IDs
-      const { isDomestic, departureId, destinationId } =
-        await determineFlightType(departureCity, destinationCity);
+      const { departureId, destinationId } = await determineFlightType(
+        departureCity,
+        destinationCity
+      );
 
       // Construct the API URL
       const apiUrl = constructApiUrl(
@@ -67,14 +89,12 @@ export const FlightTool = createTool({
           : {
               Accept: "application/json",
               "Content-Type": "application/json",
-              // Add any other required headers
               "X-Requested-With": "XMLHttpRequest",
               "Cache-Control": "no-cache",
             },
         cache: "no-store",
         credentials: "include",
       });
-      console.log("apiUrl in tools", apiUrl);
 
       if (!flightResponse.ok) {
         throw new Error(
@@ -85,12 +105,18 @@ export const FlightTool = createTool({
       const flightData = await flightResponse.json();
 
       // Transform flight data into a consistent format
-      const flights = transformFlightData(flightData, isDomestic,passengers);
+      const flights = transformFlightData(
+        flightData,
+        isDomestic,
+        passengers,
+        cabinType
+      );
 
       return {
         flights,
         departureCityData: { isDomestic },
         destinationCityData: { isDomestic },
+        cabinType,
       };
     } catch (error) {
       console.error("Error fetching flight data:", error);
@@ -181,10 +207,11 @@ export const HotelTool = createTool({
         // hotels,
         // cityData: { isDomestic: cityData.isDomestic },
         hotels: hotels,
-        message: hotels.length > 0 
-          ? `${hotels.length} هتل در ${location} پیدا شد.`
-          : `متاسفانه هتلی در ${location} پیدا نشد.`,
-        cityData: { isDomestic: cityData.isDomestic }
+        message:
+          hotels.length > 0
+            ? `${hotels.length} هتل در ${location} پیدا شد.`
+            : `متاسفانه هتلی در ${location} پیدا نشد.`,
+        cityData: { isDomestic: cityData.isDomestic },
       };
     } catch (error) {
       console.error("Error fetching hotel data:", error);

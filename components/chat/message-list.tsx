@@ -10,6 +10,7 @@ import { API_ENDPOINTS } from "@/endpoints/endpoints";
 import FlightCardSkeleton from "@/components/skeletons/flight-card-skeleton";
 import HotelCardSkeleton from "@/components/skeletons/hotel-card-skeleton";
 import PassengerCounter from "@/components/passenger-counter/passenger-counter";
+import CabinTypeSelector from "@/components/cabin-type-selector/cabin-type-selector";
 
 import { formatPersianTime } from "@/utils/time-helpers";
 import { Button } from "@/components/shadcn/button";
@@ -42,6 +43,14 @@ interface FlightResult {
     adult: number;
     child: number;
     infant: number;
+  };
+  showCabinTypeSelector?: boolean;
+  showPassengerCounter?: boolean;
+  message?: string;
+  cabinType?: {
+    id: number;
+    name: string;
+    value: string;
   };
 }
 
@@ -89,9 +98,36 @@ const MessageList: React.FC<MessageListProps> = ({
   const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
   const [showPassengerCounter, setShowPassengerCounter] = useState(false);
   const [passengerCounterMessage, setPassengerCounterMessage] = useState("");
+  const [showCabinTypeSelector, setShowCabinTypeSelector] = useState(false);
+  const [cabinTypeSelectorMessage, setCabinTypeSelectorMessage] = useState("لطفا نوع پروازتان را انتخاب کنید");
   const [cityDataMap, setCityDataMap] = useState<{
     [key: string]: { departureCityData: CityData | null; destinationCityData: CityData | null };
   }>({});
+
+
+  useEffect(() => {
+    // Check if any tool invocation has showCabinTypeSelector or showPassengerCounter
+    messages.forEach(message => {
+      message.toolInvocations?.forEach(toolInvocation => {
+        if (toolInvocation.state === "result") {
+          // Check if result is a FlightResult before accessing flight-specific properties
+          if (isFlightArray(toolInvocation.result) && toolInvocation.result.showCabinTypeSelector) {
+            setShowCabinTypeSelector(true);
+            if (toolInvocation.result.message) {
+              setCabinTypeSelectorMessage(toolInvocation.result.message);
+            }
+          }
+          // Check if result is a FlightResult before accessing passenger counter
+          if (isFlightArray(toolInvocation.result) && toolInvocation.result.showPassengerCounter) {
+            setShowPassengerCounter(true);
+            if (toolInvocation.result.message) {
+              setPassengerCounterMessage(toolInvocation.result.message);
+            }
+          }
+        }
+      });
+    });
+  }, [messages]);
   
   // Helper to generate a unique key for each message/tool invocation
   const getCityKey = (messageIndex: number, invocationIndex: number) =>
@@ -111,8 +147,6 @@ const MessageList: React.FC<MessageListProps> = ({
           destinationCityData: destCity
         }
       }));
-  
-      console.log("amir", depCity)
       return { departureCityData: depCity, destinationCityData: destCity };
     };
 
@@ -146,6 +180,18 @@ const MessageList: React.FC<MessageListProps> = ({
     // You can use a function like `retryFlightTool(passengers)`
     console.log("Selected passengers:", passengers);
     // Example: retryFlightTool(passengers);
+  };
+  const handleCabinTypeSelected = (cabinType: {
+    id: number;
+    name: string;
+    value: string;
+  }) => {
+    // Hide the CabinTypeSelector component
+    setShowCabinTypeSelector(false);
+  
+    // Call the FlightTool again with the selected cabin type
+    console.log("Selected cabin type:", cabinType);
+    // Example: retryFlightTool(cabinType);
   };
 
   return (
@@ -249,15 +295,12 @@ const MessageList: React.FC<MessageListProps> = ({
           <PassengerCounter onPassengersSelected={handlePassengersSelected} />
         </div>
       )}
-      {/* Conditionally render the selected flight details with text transition animation */}
-      {/* <AnimatePresence>
-        {(selectedFlight || selectedHotel) && (
-          <SelectedFlightAndHotelDetails
-            selectedFlight={selectedFlight}
-            selectedHotel={selectedHotel}
-          />
-        )}
-      </AnimatePresence> */}
+      {showCabinTypeSelector && (
+        <div className="max-w-[80%] p-3 rounded-lg bg-secondary text-secondary-foreground">
+          <p>{cabinTypeSelectorMessage}</p>
+          <CabinTypeSelector onSelect={handleCabinTypeSelected} />
+        </div>
+      )}
       {error && (
         <div className="flex justify-center">
           <Button variant="destructive" size="sm" onClick={() => reload()}>
