@@ -67,7 +67,7 @@ export const constructApiUrl = (
   const cabinTypeParam =
     !isDomestic && cabinType ? `&cabin=${cabinType.value}` : "";
 
-  return `${baseUrl}?departure=${departureId}&destination=${destinationId}&date=${date}${passengerParams}$cabin_type=${cabinTypeParam}&round_trip=false`;
+  return `${baseUrl}?departure=${departureId}&destination=${destinationId}&date=${date}${passengerParams}&round_trip=false`;
 };
 
 // Function to transform flight data into a consistent format
