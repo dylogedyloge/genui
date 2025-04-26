@@ -425,7 +425,7 @@ const FlightCard: React.FC<FlightProps> = ({
         id: departureCityData?.id,
         subs: [],
         name: firstSegment.departure.terminal?.name?.trim() || "",
-        english_name: firstSegment.departure.terminal?.name || "",
+        english_name: departureCityData?.english_name || "",
         code: firstSegment.departure.terminal?.code || "",
         city: firstSegment.departure.city?.persian?.trim() || "",
         english_city: firstSegment.departure.city?.english || "",
@@ -437,7 +437,7 @@ const FlightCard: React.FC<FlightProps> = ({
         id: destinationCityData?.id,
         subs: [],
         name: firstSegment.destination.terminal?.name?.trim() || "",
-        english_name: firstSegment.destination.terminal?.name || "",
+        english_name: destinationCityData?.english_name || "",
         code: firstSegment.destination.terminal?.code || "",
         city: firstSegment.destination.city?.persian?.trim() || "",
         english_city: firstSegment.destination.city?.english || "",
@@ -462,10 +462,16 @@ const FlightCard: React.FC<FlightProps> = ({
       fare_source_code,
       is_closed: isClosed,
       visa_requirements: visaRequirements,
+      total_return_flight_duration: null,
+      total_flight_duration: firstSegment.flight_duration,
       fares,
-      cobin,
+      cabin: {
+        english: cabinTypeFromProps.name,
+        persian: cobin_persian,
+      },
       segments,
       return_segments: returnSegments,
+      tag,
     };
 
     window.parent.postMessage(
