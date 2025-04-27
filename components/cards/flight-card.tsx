@@ -723,7 +723,10 @@ const FlightCard: React.FC<FlightProps> = ({
               <AccordionContent>
                 <Tabs defaultValue="details" className="w-full">
                   <TabsList className="grid w-full grid-cols-3 mb-4">
-                    <TabsTrigger value="details">جزئیات پرواز</TabsTrigger>
+                    <TabsTrigger value="details">
+                      <Plane className="w-4 h-4 sm:hidden" />
+                      <span className="hidden sm:inline">جزئیات پرواز</span>
+                    </TabsTrigger>
                     <TabsTrigger
                       value="baggage-rules"
                       disabled={isLoadingBaggage}
@@ -731,7 +734,10 @@ const FlightCard: React.FC<FlightProps> = ({
                       {isLoadingBaggage ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        "قوانین بار"
+                        <>
+                          <Luggage className="w-4 h-4 sm:hidden" />
+                          <span className="hidden sm:inline">قوانین بار</span>
+                        </>
                       )}
                     </TabsTrigger>
                     <TabsTrigger
@@ -741,11 +747,13 @@ const FlightCard: React.FC<FlightProps> = ({
                       {isLoadingRefund ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        "قوانین استرداد"
+                        <>
+                          <Wallet className="w-4 h-4 sm:hidden" />
+                          <span className="hidden sm:inline">قوانین استرداد</span>
+                        </>
                       )}
                     </TabsTrigger>
                   </TabsList>
-
                   <TabsContent value="details">
                     <motion.div
                       className="space-y-4"
