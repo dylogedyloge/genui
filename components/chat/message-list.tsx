@@ -205,7 +205,7 @@ const MessageList: React.FC<MessageListProps> = ({
         >
           {message.role === "user" ? (
             <>
-              <div className="max-w-[80%] p-3 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
+              <div className="max-w-[80%] px-4 p-2 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
                 <ReactMarkdown className="prose-sm text-sm">
                   {message.content || message.text}
                 </ReactMarkdown>
@@ -218,7 +218,7 @@ const MessageList: React.FC<MessageListProps> = ({
             </>
           ) : (
             <>
-              <div className="max-w-[80%] p-2 rounded-lg bg-primary text-primary-foreground rounded-tl-none">
+              <div className="max-w-[80%] p-2 rounded-lg  text-[#006363] dark:text-[#d6ffff] bg-[#006363] bg-opacity-5 font-medium rounded-tl-none">
                 <ReactMarkdown className="prose-sm text-sm">
                   {message.content || message.text}
                 </ReactMarkdown>
@@ -281,7 +281,8 @@ const MessageList: React.FC<MessageListProps> = ({
                 width={100}
                 height={100}
                 alt="logo"
-                className="w-6 h-8 mr-4 "
+                className="w-6 h-8 mr-4"
+                
               />
             </>
           )}
@@ -424,7 +425,7 @@ const renderVisibilityButtons = (
     {(visibilityControl.map[messageIndex]?.[invocationIndex] || 2) <
       itemsLength && (
       <Button
-        variant="secondary"
+        variant="outline"
         onClick={() =>
           visibilityControl.showMore(messageIndex, invocationIndex)
         }
@@ -435,7 +436,7 @@ const renderVisibilityButtons = (
     )}
     {(visibilityControl.map[messageIndex]?.[invocationIndex] || 2) > 2 && (
       <Button
-        variant="secondary"
+        variant="outline"
         onClick={() =>
           visibilityControl.showLess(messageIndex, invocationIndex)
         }
