@@ -49,13 +49,13 @@ const VoiceChat = () => {
   const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || "";
 
   // Set dark theme when component mounts
-  useEffect(() => {
-    setTheme("dark");
-    // Cleanup function
-    return () => {
-      setTheme("light");
-    };
-  }, [setTheme]);
+  // useEffect(() => {
+  //   setTheme("dark");
+  //   // Cleanup function
+  //   return () => {
+  //     setTheme("light");
+  //   };
+  // }, [setTheme]);
 
   const handleFlightCardClick = (flightInfo: Flight) => {
     setSelectedFlight(flightInfo);
