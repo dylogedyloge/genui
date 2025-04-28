@@ -396,6 +396,7 @@ const renderHotelCards = (
           type={hotel.type}
           rooms={hotel.rooms}
           amenities={hotel.amenities}
+          fare={hotel.fare}
           onHotelCardClick={onHotelCardClick}
             // key={hotel.id}
             // onHotelCardClick={onHotelCardClick}

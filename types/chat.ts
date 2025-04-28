@@ -104,6 +104,7 @@ export interface Hotel {
     }>;
   }>;
   amenities?: string[];
+  fare?:any
 }
 
 // Tool Invocation for displaying flight, or hotel details

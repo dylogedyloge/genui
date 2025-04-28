@@ -48,6 +48,7 @@ type HotelProps = {
       };
     }>;
   }>;
+  fare?: { total: number };
 };
 
 const HotelCard = ({
@@ -65,33 +66,18 @@ const HotelCard = ({
   rooms = [],
   amenities = [],
   images = [],
+  fare
 }: HotelProps) => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   // Get the first room and rate plan safely
   const firstRoom = rooms?.[0] || {};
   const firstRatePlan = firstRoom?.rate_plans?.[0] || {};
-  // const handleHotelCardClick = () => {
-  //   setIsAccordionOpen(!isAccordionOpen);
-  //   const hotelInfo = {
-  //     hotelName,
-  //     location,
-  //     checkIn,
-  //     checkOut,
-  //     roomType,
-  //     price,
-  //     rating,
-  //     address,
-  //     star,
-  //     type,
-  //     rooms,
-  //   };
-  //   onHotelCardClick(hotelInfo);
-  // };
+
   const handleOpenDetailsAccordion =() => {
     setIsAccordionOpen(!isAccordionOpen);
   };
   
-  
+  console.log("hotel data",firstRoom)
   const handleHotelCardClick = () => {
     
     const transformedHotelInfo = {
@@ -211,8 +197,15 @@ const HotelCard = ({
           </div>
 
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-primary">
+            {/* <p className="text-sm font-semibold text-primary">
               {price.toLocaleString()} ریال
+              <span className="text-xs text-muted-foreground mr-1">/ شب</span>
+            </p> */}
+            <p className="text-sm font-semibold text-primary">
+              {(typeof fare?.total === "number" && fare?.total > 0
+                ? fare.total
+                : price
+              ).toLocaleString()} ریال
               <span className="text-xs text-muted-foreground mr-1">/ شب</span>
             </p>
             {firstRatePlan.cancelable === 1 && (

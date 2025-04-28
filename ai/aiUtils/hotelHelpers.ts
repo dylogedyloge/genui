@@ -226,10 +226,11 @@ export const normalizeHotelData = (
       checkIn: DateService.toJalali(checkIn),
       checkOut: DateService.toJalali(checkOut),
       roomType: hotel.rooms?.[0]?.room_type_name || "Standard",
-      price:
-        hotel.min_price ||
-        hotel.rooms?.[0]?.rate_plans?.[0]?.prices?.total_price ||
-        0,
+      // price:
+      //   hotel.min_price ||
+      //   hotel.rooms?.[0]?.rate_plans?.[0]?.prices?.total_price ||
+      //   0,
+      price: hotel.fare?.total || hotel.price?.total || hotel.min_price || 0,
       rating: hotel.star_rating || 0,
       imageUrl: hotel.image_url || "",
       amenities: hotel.amenities || [],
@@ -238,6 +239,7 @@ export const normalizeHotelData = (
       star: hotel.star || 0,
       type: hotel.type || "هتل",
       rooms: hotel.rooms || [],
+      fare: hotel.fare || null,
     }));
   }
 
