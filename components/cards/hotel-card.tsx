@@ -215,7 +215,6 @@ const HotelCard = ({
               {price.toLocaleString()} ریال
               <span className="text-xs text-muted-foreground mr-1">/ شب</span>
             </p>
-
             {firstRatePlan.cancelable === 1 && (
               <Badge variant="outline" className="text-xs">
                 قابل کنسلی

@@ -53,44 +53,61 @@ interface NormalizedHotel {
 }
 
 // Helper function to determine city type and get city ID
-export const determineCityType = async (
-  location: string
-): Promise<CityData> => {
-  try {
-    // First try domestic cities
-    const domesticData = await fetchCityData(
-      location,
-      API_ENDPOINTS.DOMESTIC.CITIES,
-      true
-    );
+// export const determineCityType = async (
+//   location: string
+// ): Promise<CityData> => {
+//   try {
+//     // First try domestic cities
+//     const domesticData = await fetchCityData(
+//       location,
+//       API_ENDPOINTS.DOMESTIC.CITIES,
+//       true
+//     );
 
-    if (domesticData) {
-      return {
-        cityId: domesticData.id,
-        isDomestic: true,
-      };
-    }
+//     if (domesticData) {
+//       return {
+//         cityId: domesticData.id,
+//         isDomestic: true,
+//       };
+//     }
 
-    // If not domestic, try international
-    const internationalData = await fetchCityData(
-      location,
-      API_ENDPOINTS.INTERNATIONAL.CITIES,
-      false
-    );
+//     // If not domestic, try international
+//     const internationalData = await fetchCityData(
+//       location,
+//       API_ENDPOINTS.INTERNATIONAL.CITIES,
+//       false
+//     );
 
-    if (!internationalData) {
-      throw new Error(`City "${location}" not found in either database`);
-    }
+//     if (!internationalData) {
+//       throw new Error(`City "${location}" not found in either database`);
+//     }
 
-    return {
-      cityId: internationalData.id,
-      isDomestic: false,
-    };
-  } catch (error) {
-    console.error("Error determining city type:", error);
-    throw new Error("Failed to determine city type");
+//     return {
+//       cityId: internationalData.id,
+//       isDomestic: false,
+//     };
+//   } catch (error) {
+//     console.error("Error determining city type:", error);
+//     throw new Error("Failed to determine city type");
+//   }
+// };
+export async function determineCityType(location: string) {
+  // 1. Try domestic cities
+  let response = await fetch(`${API_ENDPOINTS.DOMESTIC.CITIES}?search=${location}`);
+  let data = await response.json();
+  if (data.data?.results?.length > 0) {
+    return { isDomestic: true, cityId: data.data.results[0].id };
   }
-};
+
+  // 2. Try international hotel cities (new endpoint) ONLY
+  response = await fetch(`${API_ENDPOINTS.INTERNATIONAL.HOTEL_CITIES}${encodeURIComponent(location)}`);
+  data = await response.json();
+  if (data.data?.results?.length > 0) {
+    return { isDomestic: false, cityId: data.data.results[0].parto_id };
+  }
+
+  throw new Error("City not found");
+}
 
 // Construct API URL based on city type
 export const constructHotelApiUrl = (

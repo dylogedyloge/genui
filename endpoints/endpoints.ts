@@ -10,5 +10,6 @@ export const API_ENDPOINTS = {
     BAGGAGE: "https://api.atripa.ir/api/v2/reserve/foreign/flight/baggage",
     RULES: "https://api.atripa.ir/api/v2/reserve/foreign/flight/rules",
     HOTELS: "https://api.atripa.ir/api/v2/reserve/foreign/accommodation/list",
+    HOTEL_CITIES: "https://api.atripa.ir/api/v2/basic/cities/?all=false&foreign=true&flight=false&accommodation=true&search="
   },
 };
