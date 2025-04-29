@@ -73,13 +73,13 @@ const HotelCard = ({
   const firstRoom = rooms?.[0] || {};
   const firstRatePlan = firstRoom?.rate_plans?.[0] || {};
 
-  const handleOpenDetailsAccordion =() => {
+  const handleOpenDetailsAccordion = () => {
     setIsAccordionOpen(!isAccordionOpen);
   };
-  
-  console.log("hotel data",firstRoom)
+
+  console.log("hotel data", firstRoom)
   const handleHotelCardClick = () => {
-    
+
     const transformedHotelInfo = {
       hotelName,
       type,
@@ -105,14 +105,14 @@ const HotelCard = ({
       price,
       amenities
     };
-  
+
     const generalInformation = {
       ticket: false,
       accommodation: true,
       itinerary: false,
       isInternational: false
     };
-  
+
     // Send message to parent window
     window.parent.postMessage(
       {
@@ -124,8 +124,8 @@ const HotelCard = ({
       },
       "*"
     );
-    console.log("selectedHotel",transformedHotelInfo);
-    console.log("generalInformation",generalInformation);
+    console.log("selectedHotel", transformedHotelInfo);
+    console.log("generalInformation", generalInformation);
   };
 
 
@@ -141,27 +141,32 @@ const HotelCard = ({
     >
       <div className="min-w-60 sm:w-96 shadow-md dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg">
         <div className="relative h-48 w-full">
-          <CustomCarousel images={images} hotelName={hotelName} />
+          {Array.isArray(images) && images.length > 0 && images[0]?.image ? (
+            <CustomCarousel images={images} hotelName={hotelName} />
+          ) : (
+            <img
+              src="/default-hotel-image.png"
+              alt={hotelName}
+              className="object-cover w-full h-full rounded-t-lg"
+            />
+          )}
           <div className="absolute top-2 right-2 z-20">
-            <Badge variant="secondary" className="text-xs font-medium">
-              {[...Array(star)].map((_, i) => (
-                <Star key={i} className="w-3 h-3 inline text-yellow-600" />
-              ))}
-            </Badge>
+            {star ? (
+              <Badge variant="secondary" className="text-xs font-medium">
+                {[...Array(star)].map((_, i) => (
+                  <Star key={i} className="w-3 h-3 inline text-yellow-600" />
+                ))}
+              </Badge>
+            ) : null}
           </div>
         </div>
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-primary">{hotelName}</h2>
+            <h2 className="text-md font-bold text-primary">{hotelName}</h2>
             <Badge variant="outline" className="text-xs">
               {type}
             </Badge>
           </div>
-
-          <motion.div className="flex items-center gap-2 mb-3">
-            <MapPin className="w-4 h-4 text-muted-foreground" />
-            <p className="text-xs text-muted-foreground">{address}</p>
-          </motion.div>
 
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -197,10 +202,6 @@ const HotelCard = ({
           </div>
 
           <div className="flex items-center justify-between">
-            {/* <p className="text-sm font-semibold text-primary">
-              {price.toLocaleString()} ریال
-              <span className="text-xs text-muted-foreground mr-1">/ شب</span>
-            </p> */}
             <p className="text-sm font-semibold text-primary">
               {(typeof fare?.total === "number" && fare?.total > 0
                 ? fare.total
@@ -214,13 +215,13 @@ const HotelCard = ({
               </Badge>
             )}
           </div>
-            <Button
-              onClick={handleOpenDetailsAccordion}
-              variant="outline"
-              className="w-full mt-4 text-foreground"
-            >
-              {isAccordionOpen ? "بستن جزئیات" : "مشاهده جزئیات"}
-            </Button>
+          <Button
+            onClick={handleOpenDetailsAccordion}
+            variant="outline"
+            className="w-full mt-4 text-foreground"
+          >
+            {isAccordionOpen ? "بستن جزئیات" : "مشاهده جزئیات"}
+          </Button>
         </div>
 
         <Accordion
@@ -259,7 +260,7 @@ const HotelCard = ({
                       },
                       {
                         label: "درجه هتل",
-                        value: `${star} ستاره`,
+                        value: star ? `${star} ستاره` : null,
                         icon: <Star className="w-4 h-4 text-muted-foreground" />,
                       },
                       {
@@ -282,33 +283,35 @@ const HotelCard = ({
                         value: checkOut,
                         icon: <Calendar className="w-4 h-4 text-muted-foreground" />,
                       },
-                    ].map((item) => (
-                      <motion.div
-                        key={item.label}
-                        className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2"
-                        variants={{
-                          hidden: { opacity: 0, y: 20 },
-                          visible: { opacity: 1, y: 0 },
-                        }}
-                      >
-                        <div className="flex items-center gap-2">
-                          {item.icon}
-                          <p className="text-xs font-semibold text-card-foreground">
-                            {item.label}:
+                    ]
+                      .filter(item => !!item.value)
+                      .map((item) => (
+                        <motion.div
+                          key={item.label}
+                          className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2 flex-wrap"
+                          variants={{
+                            hidden: { opacity: 0, y: 20 },
+                            visible: { opacity: 1, y: 0 },
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            {item.icon}
+                            <p className="text-xs font-semibold text-card-foreground">
+                              {item.label}:
+                            </p>
+                          </div>
+                          <p className="text-xs text-card-foreground break-words whitespace-normal max-w-[60%] text-left">
+                            {item.value}
                           </p>
-                        </div>
-                        <p className="text-xs text-card-foreground">
-                          {item.value}
-                        </p>
-                      </motion.div>
-                    ))}
+                        </motion.div>
+                      ))}
                   </motion.div>
                   <Button
-                      onClick={handleHotelCardClick}
-                      className="w-full mt-4"
-                    >
-                      خرید
-                    </Button>
+                    onClick={handleHotelCardClick}
+                    className="w-full mt-4"
+                  >
+                    خرید
+                  </Button>
                 </TabsContent>
 
                 <TabsContent value="rooms">

@@ -226,10 +226,6 @@ export const normalizeHotelData = (
       checkIn: DateService.toJalali(checkIn),
       checkOut: DateService.toJalali(checkOut),
       roomType: hotel.rooms?.[0]?.room_type_name || "Standard",
-      // price:
-      //   hotel.min_price ||
-      //   hotel.rooms?.[0]?.rate_plans?.[0]?.prices?.total_price ||
-      //   0,
       price: hotel.fare?.total || hotel.price?.total || hotel.min_price || 0,
       rating: hotel.star_rating || 0,
       imageUrl: hotel.image_url || "",
@@ -249,23 +245,55 @@ export const normalizeHotelData = (
     return [];
   }
 
-  return rawData.data.results.map((hotel: any) => ({
-    id: hotel.id?.toString() || `hotel_${Math.random()}`,
-    hotelName: hotel.name || "Unknown Hotel",
-    location: location,
-    checkIn: DateService.toJalali(checkIn),
-    checkOut: DateService.toJalali(checkOut),
-    roomType: hotel.rooms?.[0]?.name || "Standard",
-    price: hotel.price?.total || hotel.min_price || 0,
-    rating: hotel.star_rating || 0,
-    imageUrl: hotel.image_url || hotel.images?.[0]?.image || "",
-    amenities: hotel.amenities || [],
-    images: hotel.images || [],
-    address: hotel.address || "",
-    star: hotel.star || 0,
-    type: hotel.type || "Hotel",
-    rooms: Array.isArray(hotel.rooms) ? hotel.rooms : [],
-  }));
+  // return rawData.data.results.map((hotel: any) => ({
+  //   id: hotel.id?.toString() || `hotel_${Math.random()}`,
+  //   hotelName: hotel.name || "Unknown Hotel",
+  //   location: location,
+  //   checkIn: DateService.toJalali(checkIn),
+  //   checkOut: DateService.toJalali(checkOut),
+  //   roomType: hotel.rooms?.[0]?.name || "Standard",
+  //   price: hotel.price?.total || hotel.min_price || 0,
+  //   rating: hotel.star_rating || 0,
+  //   imageUrl: hotel.image_url || hotel.images?.[0]?.image || "",
+  //   amenities: hotel.amenities || [],
+  //   images: hotel.images || [],
+  //   address: hotel.address || "",
+  //   star: hotel.star || 0,
+  //   type: hotel.type || "Hotel",
+  //   rooms: Array.isArray(hotel.rooms) ? hotel.rooms : [],
+  // }));
+  return rawData.data.results.map((hotel: any) => {
+    // Flatten rooms object to array
+    let rooms: any[] = [];
+    if (hotel.rooms && typeof hotel.rooms === "object" && !Array.isArray(hotel.rooms)) {
+      rooms = Object.values(hotel.rooms).map((room: any) => ({
+        room_type_name: room?.name || "Standard",
+        room_type_capacity: room?.travelers?.adult_count
+          ? Object.values(room.travelers.adult_count)[0]
+          : 1,
+        rate_plans: [], // No rate_plans in your sample, adjust if needed
+      }));
+    }
+
+    return {
+      id: hotel.id?.toString() || `hotel_${Math.random()}`,
+      hotelName: hotel.name || "Unknown Hotel",
+      location: location,
+      checkIn: DateService.toJalali(checkIn),
+      checkOut: DateService.toJalali(checkOut),
+      roomType: rooms[0]?.room_type_name || "Standard",
+      price: hotel.fare?.total || 0, // <-- Use fare.total
+      rating: hotel.star_rating || 0,
+      imageUrl: hotel.images?.[0]?.image || "",
+      amenities: hotel.amenities || [],
+      images: hotel.images || [],
+      address: hotel.address || "",
+      star: hotel.star || 0,
+      type: hotel.type || "Hotel",
+      rooms: rooms,
+      fare: hotel.fare || null,
+    };
+  });
 };
 
 // Main hotel search function

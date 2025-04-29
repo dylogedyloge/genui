@@ -33,63 +33,6 @@ const CustomCarousel = ({ images, hotelName }: CustomCarouselProps) => {
   }, []);
 
   return (
-    // <div className="relative h-full w-full">
-    //   <div className="relative h-full w-full overflow-hidden rounded-t-lg">
-    //     {images.map((img, index) => (
-    //       <div
-    //         key={index}
-    //         className={`absolute h-full w-full transform transition-all duration-500 ease-in-out ${
-    //           index === currentIndex
-    //             ? "translate-x-0 opacity-100"
-    //             : index < currentIndex
-    //             ? "-translate-x-full opacity-0"
-    //             : "translate-x-full opacity-0"
-    //         }`}
-    //       >
-    //         <Image
-    //           src={
-    //             img.image.startsWith("http")
-    //               ? img.image
-    //               : `https://api.atripa.ir${img.image}`
-    //           }
-    //           alt={img.alt || hotelName}
-    //           fill
-    //           className="object-cover"
-    //           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-    //           priority={index === 0}
-    //         />
-    //       </div>
-    //     ))}
-    //   </div>
-
-    //   {images.length > 1 && (
-    //     <>
-    //       <button
-    //         onClick={prevSlide}
-    //         className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-2 text-white hover:bg-black/50 transition-all"
-    //       >
-    //         <ChevronLeft className="h-4 w-4" />
-    //       </button>
-    //       <button
-    //         onClick={nextSlide}
-    //         className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-2 text-white hover:bg-black/50 transition-all"
-    //       >
-    //         <ChevronRight className="h-4 w-4" />
-    //       </button>
-    //       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
-    //         {images.map((_, index) => (
-    //           <button
-    //             key={index}
-    //             onClick={() => setCurrentIndex(index)}
-    //             className={`h-1 w-1 rounded-full transition-all ${
-    //               index === currentIndex ? "bg-white" : "bg-white/50"
-    //             }`}
-    //           />
-    //         ))}
-    //       </div>
-    //     </>
-    //   )}
-    // </div>
     <div className="relative h-full w-full group">
   <div className="relative h-full w-full overflow-hidden rounded-t-lg">
     {images.map((img, index) => (
