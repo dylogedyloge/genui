@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Bed, Calendar, MapPin, Star, Coffee, Users } from "lucide-react";
 import { Badge } from "@/components/shadcn/badge";
 import { motion } from "framer-motion";
@@ -139,15 +140,17 @@ const HotelCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="min-w-60 sm:w-96 shadow-md dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg">
+      <div className="min-w-60 sm:w-96 shadow-md dark:bg-black bg-white dark:bg-grid-small-white/[0.1] bg-grid-small-black/[0.1] rounded-lg overflow-x-hidden">
         <div className="relative h-48 w-full">
           {Array.isArray(images) && images.length > 0 && images[0]?.image ? (
             <CustomCarousel images={images} hotelName={hotelName} />
           ) : (
-            <img
+            <Image
               src="/default-hotel-image.png"
               alt={hotelName}
+              fill
               className="object-cover w-full h-full rounded-t-lg"
+              priority
             />
           )}
           <div className="absolute top-2 right-2 z-20">
