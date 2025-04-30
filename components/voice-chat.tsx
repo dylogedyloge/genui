@@ -5,11 +5,7 @@ import { ItemType } from "@openai/realtime-api-beta/dist/lib/client.js";
 import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index";
 import { Loader2, Mic, MicOff } from "lucide-react";
 import { Button } from "./shadcn/button";
-import ReactMarkdown from "react-markdown";
-import Image from "next/image";
-import { formatPersianTime } from "@/utils/time-helpers";
 import { useTheme } from "next-themes";
-import { setupProxy } from "@/utils/proxy-helper";
 import { tools } from "@/ai/tools";
 import FlightCard from "@/components/cards/flight-card";
 import HotelCard from "@/components/cards/hotel-card";
@@ -403,10 +399,6 @@ const VoiceChat = () => {
 
 
   useEffect(() => {
-    // Setup proxy first
-    // setupProxy();
-    console.log("🔄 Initial setup started...");
-
     const wavStreamPlayer = wavStreamPlayerRef.current;
     const client = clientRef.current;
 
