@@ -200,12 +200,12 @@ const MessageList: React.FC<MessageListProps> = ({
         <div
           key={messageIndex}
           className={`flex ${
-            message.role === "user" ? "justify-start" : "justify-end"
+            message.role === "user" ? "justify-end" : "justify-start"
           }`}
         >
           {message.role === "user" ? (
             <>
-              <div className="max-w-[80%] px-4 p-2 rounded-lg bg-secondary text-secondary-foreground rounded-tr-none">
+              <div className="max-w-[80%] px-4 p-2 rounded-lg bg-secondary text-secondary-foreground rounded-tl-none">
                 <ReactMarkdown className="prose-sm text-sm">
                   {message.content || message.text}
                 </ReactMarkdown>
@@ -218,7 +218,15 @@ const MessageList: React.FC<MessageListProps> = ({
             </>
           ) : (
             <>
-              <div className="max-w-[80%] p-2 rounded-lg  text-[#006363] dark:text-[#d6ffff] bg-[#006363] bg-opacity-5 font-medium rounded-tl-none">
+            <Image
+                src="/logo1.png"
+                width={100}
+                height={100}
+                alt="logo"
+                className="w-6 h-8 ml-4"
+                
+              />
+              <div className="max-w-[80%] p-2 rounded-lg  text-[#006363] dark:text-[#d6ffff] bg-[#006363] bg-opacity-5 font-medium rounded-tr-none">
                 <ReactMarkdown className="prose-sm text-sm">
                   {message.content || message.text}
                 </ReactMarkdown>
@@ -276,14 +284,7 @@ const MessageList: React.FC<MessageListProps> = ({
                   }
                 )}
               </div>
-              <Image
-                src="/logo1.png"
-                width={100}
-                height={100}
-                alt="logo"
-                className="w-6 h-8 mr-4"
-                
-              />
+              
             </>
           )}
         </div>

@@ -7,13 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 // Components
 import MessageList from "./chat/message-list";
 import ChatInput from "./chat/chat-input";
-import VoiceChat from "./voice-chat";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerFooter,
-  DrawerTrigger,
-} from "@/components/shadcn/drawer";
+
 
 // Types
 import { ChatInterfaceProps } from "@/types/chat";
@@ -21,7 +15,7 @@ import { Message } from "@/types/chat";
 
 // Custom Hooks
 import { useVisibilityMap } from "@/hooks/use-visibility-map";
-import { AudioLines } from "lucide-react";
+
 
 const ChatInterface: React.FC<ChatInterfaceProps> = () => {
   const { toast } = useToast();
@@ -112,7 +106,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
         mounted={mounted}
         visibilityControls={visibilityControls}
       />
-      <Drawer>
+      {/* <Drawer>
         <DrawerTrigger>
           <AudioLines />
         </DrawerTrigger>
@@ -121,7 +115,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
             <VoiceChat />
           </div>
         </DrawerContent>
-      </Drawer>
+      </Drawer> */}
 
       <ChatInput
         input={input}
