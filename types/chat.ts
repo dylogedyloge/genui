@@ -104,7 +104,33 @@ export interface Hotel {
     }>;
   }>;
   amenities?: string[];
-  fare?:any
+  isDomestic: boolean;
+  fare?:any;
+  fare_source_code?: string;
+  hotel_id?: string; 
+  star_rating?: number; 
+  offer?: any;
+  promotion?: any;
+  non_refundable?: boolean;
+  policy?: any;
+  extra_charge?: any;
+  payment_deadline?: string;
+  available_rooms?: number;
+  cancellation_policy_text?: string;
+  cancellation_policies?: any[];
+  surcharges?: any; 
+  remarks?: any;
+  is_reserve_offline?: boolean;
+  is_blockout?: boolean;
+  is_min_stay_night?: boolean;
+  is_max_stay_night?: boolean;
+  max_stay_night?: number;
+  is_fix_stay_night?: boolean;
+  fix_stay_night?: number;
+  is_board_price?: boolean;
+  refund_type?: string;
+  transfers?: any;
+  metadata?: any;
 }
 
 // Tool Invocation for displaying flight, or hotel details
@@ -130,4 +156,26 @@ export interface VisibilityControl {
   map: Record<number, Record<number, number>>;
   showMore: (messageIndex: number, invocationIndex: number) => void;
   showLess: (messageIndex: number, invocationIndex: number) => void;
+}
+// Structure for room request in search params
+export interface RoomRequest {
+  adult: number;
+  child: number;
+  childAges: number[];
+}
+// Structure for nationality data in search params (based on sample)
+export interface NationalityData {
+  id: number;
+  name: string;
+  english_name: string;
+  iata: string;
+  parto_iata: string;
+  description: string | null;
+  nationality: string; // e.g., "IRN"
+  continental: string;
+}
+// Structure for hotel search parameters prop
+export interface HotelSearchParams {
+  rooms: RoomRequest[];
+  nationality: NationalityData;
 }

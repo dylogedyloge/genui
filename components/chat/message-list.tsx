@@ -23,6 +23,7 @@ import {
   Message,
   VisibilityControl,
   CityData,
+  HotelSearchParams,
 } from "@/types/chat";
 import Image from "next/image";
 
@@ -33,7 +34,10 @@ import Image from "next/image";
 interface HotelResult {
   hotels: Hotel[];
   message: string;
-  cityData: CityData;
+  cityData: CityData; 
+  gregorianCheckIn: string; 
+  gregorianCheckOut: string; 
+  searchParams: HotelSearchParams;
 }
 interface FlightResult {
   flights: Flight[];
@@ -376,6 +380,10 @@ const renderHotelCards = (
   visibilityControl: VisibilityControl,
   onHotelCardClick: (hotelInfo: Hotel) => void
 ) => {
+  const destinationData = result.cityData;
+  const gregorianCheckIn = result.gregorianCheckIn;
+  const gregorianCheckOut = result.gregorianCheckOut;
+  const searchParams = result.searchParams;
   return (
     <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
       {result.hotels
@@ -396,12 +404,39 @@ const renderHotelCards = (
           star={hotel.star}
           type={hotel.type}
           rooms={hotel.rooms}
+          isDomestic={hotel.isDomestic}
           amenities={hotel.amenities}
           fare={hotel.fare}
           onHotelCardClick={onHotelCardClick}
-            // key={hotel.id}
-            // onHotelCardClick={onHotelCardClick}
-            // {...hotel}
+          fare_source_code={hotel.fare_source_code}
+          hotel_id={hotel.hotel_id}
+          star_rating={hotel.star_rating}
+          offer={hotel.offer}
+          promotion={hotel.promotion}
+          non_refundable={hotel.non_refundable}
+          policy={hotel.policy}
+          extra_charge={hotel.extra_charge}
+          payment_deadline={hotel.payment_deadline}
+          available_rooms={hotel.available_rooms}
+          cancellation_policy_text={hotel.cancellation_policy_text}
+          cancellation_policies={hotel.cancellation_policies}
+          surcharges={hotel.surcharges}
+          remarks={hotel.remarks}
+          is_reserve_offline={hotel.is_reserve_offline}
+          is_blockout={hotel.is_blockout}
+          is_min_stay_night={hotel.is_min_stay_night}
+          is_max_stay_night={hotel.is_max_stay_night}
+          max_stay_night={hotel.max_stay_night}
+          is_fix_stay_night={hotel.is_fix_stay_night}
+          fix_stay_night={hotel.fix_stay_night}
+          is_board_price={hotel.is_board_price}
+          refund_type={hotel.refund_type}
+          transfers={hotel.transfers}
+          metadata={hotel.metadata}
+          destinationData={destinationData}
+            gregorianCheckIn={gregorianCheckIn}
+            gregorianCheckOut={gregorianCheckOut}
+            searchParams={searchParams}
           />
         ))}
       {renderVisibilityButtons(
