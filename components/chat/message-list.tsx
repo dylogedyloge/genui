@@ -380,6 +380,11 @@ const renderHotelCards = (
   visibilityControl: VisibilityControl,
   onHotelCardClick: (hotelInfo: Hotel) => void
 ) => {
+  console.log("cityDataMap", result.cityData);
+  console.log("result.hotels", result.hotels);
+  console.log("result.gregorianCheckIn", result.gregorianCheckIn);
+  console.log("result.gregorianCheckOut", result.gregorianCheckOut);
+  console.log("result.searchParams", result.searchParams);
   const destinationData = result.cityData;
   const gregorianCheckIn = result.gregorianCheckIn;
   const gregorianCheckOut = result.gregorianCheckOut;

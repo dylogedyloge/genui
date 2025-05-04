@@ -87,11 +87,11 @@ export const FlightTool = createTool({
         headers: isDomestic
           ? {}
           : {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-              "X-Requested-With": "XMLHttpRequest",
-              "Cache-Control": "no-cache",
-            },
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            "Cache-Control": "no-cache",
+          },
         cache: "no-store",
         credentials: "include",
       });
@@ -211,7 +211,22 @@ export const HotelTool = createTool({
           hotels.length > 0
             ? `${hotels.length} هتل در ${location} پیدا شد.`
             : `متاسفانه هتلی در ${location} پیدا نشد.`,
-        cityData: { isDomestic: cityData.isDomestic },
+        cityData: { ...cityData, isDomestic: cityData.isDomestic },
+        gregorianCheckIn: checkIn, // Assuming 'checkIn' is the Gregorian date
+        gregorianCheckOut: checkOut, // Assuming 'checkOut' is the Gregorian date
+        searchParams: {
+          // Construct the searchParams object expected by the frontend
+          rooms: [ // Assuming a single room structure for now, adjust if needed
+            {
+              adult: adultsCount,
+              child: childCount,
+              childAges: childAges,
+            },
+          ],
+          // You might need to fetch/pass nationality data here if required
+          // nationality: { ... } // Add nationality data if available/needed
+        },
+
       };
     } catch (error) {
       console.error("Error fetching hotel data:", error);
@@ -219,6 +234,19 @@ export const HotelTool = createTool({
         message:
           "متاسفم، در حال حاضر نمی‌توانیم اطلاعات هتل را به شما بدهیم. لطفاً بعداً دوباره امتحان کنید.",
         hotels: [],
+        cityData: null, // Indicate missing data
+        gregorianCheckIn: checkIn, // Still return original query params if available
+        gregorianCheckOut: checkOut,
+        searchParams: {
+           rooms: [
+             {
+               adult: adultsCount,
+               child: childCount,
+               childAges: childAges,
+             },
+           ],
+           // nationality: null // Indicate missing nationality
+        }
       };
     }
   },
