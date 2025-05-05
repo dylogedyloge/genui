@@ -55,7 +55,7 @@ export interface CityData {
   id: number;
   name: string;
   english_name: string;
-  iata: string;
+  iata: string | null;
   latitude: string;
   longitude: string;
   description: string | null;
@@ -63,13 +63,37 @@ export interface CityData {
   is_country_capital: boolean;
   usage_flight: number;
   usage_accommodation: number;
-  country: any; // Add specific type if available
-  province: any; // Add specific type if available
-  flight: any; // Add specific type if available
-  accommodation: any; // Add specific type if available
+  country: { // Define country structure
+    id: number;
+    name: string;
+    english_name: string;
+    iata: string | null;
+    parto_iata: string | null;
+    description: string | null;
+    nationality: string;
+    continental: string;
+  };
+  province: { // Define province structure
+    name: string;
+    english_name: string;
+    description: string | null; // Allow null
+  };
+  flight: boolean; // Add specific type if available
+  accommodation: boolean; // Add specific type if available
   has_plan: boolean;
-  parto_id: string;
+  parto_id: number;
   isDomestic: boolean;
+}
+
+export interface NationalityData {
+  id: number;
+  name: string;
+  english_name: string;
+  iata: string | null;
+  parto_iata: string | null;
+  description: string | null;
+  nationality: string;
+  continental: string;
 }
 
 export interface Hotel {
@@ -168,14 +192,27 @@ export interface NationalityData {
   id: number;
   name: string;
   english_name: string;
-  iata: string;
-  parto_iata: string;
+  iata: string |null;
+  parto_iata: string |null;
   description: string | null;
   nationality: string; // e.g., "IRN"
   continental: string;
 }
 // Structure for hotel search parameters prop
 export interface HotelSearchParams {
-  rooms: RoomRequest[];
-  nationality: NationalityData;
+  rooms: Array<{
+      adult: number;
+      child: number;
+      childAges: number[];
+  }>;
+  nationality: NationalityData | null; // Use the defined type
+}
+
+export interface HotelResult {
+  hotels: Hotel[];
+  message: string;
+  cityData: CityData | null; // Allow null for error cases
+  gregorianCheckIn: string;
+  gregorianCheckOut: string;
+  searchParams: HotelSearchParams | null; // Allow null for error cases
 }

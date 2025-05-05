@@ -14,73 +14,81 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../shadcn/tabs";
 import { useState } from "react";
 import { Building, Hotel, Check } from "lucide-react";
 import CustomCarousel from "../shadcn/custom-carousel";
-import type { CityData, HotelSearchParams } from "@/types/chat";
+import type { CityData, HotelSearchParams, Hotel as HotelType } from "@/types/chat";
 
-type HotelProps = {
-  id: string;
-  hotelName: string;
-  location: string;
-  checkIn: string;
-  checkOut: string;
-  roomType: string;
-  price: number;
-  images: Array<{
-    image: string;
-    alt: string;
-    caption: string | null;
-  }>;
-  rating: number;
-  imageUrl?: string;
-  amenities?: string[];
-  onHotelCardClick: (hotelInfo: any) => void;
-  address: string;
-  star: number;
-  type: string;
-  rooms: Array<{
-    room_type_name: string;
-    room_type_capacity: number;
-    rate_plans: Array<{
-      name: string;
-      cancelable: number;
-      meal_type_included: string;
-      prices: {
-        total_price: number;
-        inventory: number;
-        has_off: boolean;
-      };
-    }>;
-  }>;
-  fare?: { total: number };
-  isDomestic: boolean;
-  fare_source_code?: string;
-  hotel_id?: string; 
-  star_rating?: number;
-  offer?: any;
-  promotion?: any;
-  non_refundable?: boolean;
-  policy?: any;
-  extra_charge?: any;
-  payment_deadline?: string;
-  available_rooms?: number;
-  cancellation_policy_text?: string;
-  cancellation_policies?: any[];
-  surcharges?: any;
-  remarks?: any;
-  is_reserve_offline?: boolean;
-  is_blockout?: boolean;
-  is_min_stay_night?: boolean;
-  is_max_stay_night?: boolean;
-  max_stay_night?: number;
-  is_fix_stay_night?: boolean;
-  fix_stay_night?: number;
-  is_board_price?: boolean;
-  refund_type?: string;
-  transfers?: any;
-  metadata?: any;
-  destinationData: CityData | null; // Detailed data for the searched destination
-  gregorianCheckIn: string; // Original check-in date (YYYY-MM-DD)
-  gregorianCheckOut: string; // Original check-out date (YYYY-MM-DD)
-  searchParams: HotelSearchParams | null;
+type HotelProps = HotelType & {
+  onHotelCardClick: (hotelInfo: any) => void; // Keep this specific if needed
+  // Add the props passed from message-list
+  destinationData: CityData | null; // Use imported CityData
+  gregorianCheckIn: string;
+  gregorianCheckOut: string;
+  searchParams: HotelSearchParams | null; // Use imported HotelSearchParams
+  // Remove props already defined in HotelType from chat.ts if they are identical
+  // e.g., remove id, hotelName, location, etc., if they are in HotelType
+  // id: string;
+  // hotelName: string;
+  // location: string;
+  // checkIn: string;
+  // checkOut: string;
+  // roomType: string;
+  // price: number;
+  // images: Array<{
+  //   image: string;
+  //   alt: string;
+  //   caption: string | null;
+  // }>;
+  // rating: number;
+  // imageUrl?: string;
+  // amenities?: string[];
+  // onHotelCardClick: (hotelInfo: any) => void;
+  // address: string;
+  // star: number;
+  // type: string;
+  // rooms: Array<{
+  //   room_type_name: string;
+  //   room_type_capacity: number;
+  //   rate_plans: Array<{
+  //     name: string;
+  //     cancelable: number;
+  //     meal_type_included: string;
+  //     prices: {
+  //       total_price: number;
+  //       inventory: number;
+  //       has_off: boolean;
+  //     };
+  //   }>;
+  // }>;
+  // fare?: { total: number };
+  // isDomestic: boolean;
+  // fare_source_code?: string;
+  // hotel_id?: string; 
+  // star_rating?: number;
+  // offer?: any;
+  // promotion?: any;
+  // non_refundable?: boolean;
+  // policy?: any;
+  // extra_charge?: any;
+  // payment_deadline?: string;
+  // available_rooms?: number;
+  // cancellation_policy_text?: string;
+  // cancellation_policies?: any[];
+  // surcharges?: any;
+  // remarks?: any;
+  // is_reserve_offline?: boolean;
+  // is_blockout?: boolean;
+  // is_min_stay_night?: boolean;
+  // is_max_stay_night?: boolean;
+  // max_stay_night?: number;
+  // is_fix_stay_night?: boolean;
+  // fix_stay_night?: number;
+  // is_board_price?: boolean;
+  // refund_type?: string;
+  // transfers?: any;
+  // metadata?: any;
+  // destinationData: CityData | null; // Detailed data for the searched destination
+  // gregorianCheckIn: string; // Original check-in date (YYYY-MM-DD)
+  // gregorianCheckOut: string; // Original check-out date (YYYY-MM-DD)
+  // searchParams: HotelSearchParams | null;
 };
 
 const HotelCard = ({
@@ -292,6 +300,10 @@ const HotelCard = ({
       itinerary: false,
       isInternational: !isDomestic // Use the prop here
     };
+
+    const destinationDataToSend = { ...destinationData };
+    // Remove isDomestic property
+    delete destinationDataToSend.isDomestic;
     const intHotelInformation = {
       destination: destinationData, // Use the passed destinationData prop
       checkIn: gregorianCheckIn,   // Use the passed Gregorian check-in date
@@ -306,7 +318,16 @@ const HotelCard = ({
         }, { adult: '0', child: '0', ages: '' })
         // Clean up empty ages string
         || { adult: '0', child: '0', ages: '' },
-      nationality: searchParams?.nationality || null, // Use nationality from searchParams
+        nationality: {
+          id: 1,
+          name: "ایران",
+          english_name: "Iran",
+          iata: "IRN",
+          parto_iata: "IR",
+          description: null,
+          nationality: "IRN",
+          continental: "آسیا"
+        },
     };
     // Remove trailing comma from ages if present
     if (intHotelInformation.roomsCount.ages.endsWith(',')) {

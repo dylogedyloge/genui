@@ -24,6 +24,7 @@ import {
   VisibilityControl,
   CityData,
   HotelSearchParams,
+  NationalityData,
 } from "@/types/chat";
 import Image from "next/image";
 
@@ -34,10 +35,10 @@ import Image from "next/image";
 interface HotelResult {
   hotels: Hotel[];
   message: string;
-  cityData: CityData; 
+  cityData: CityData | null;
   gregorianCheckIn: string; 
   gregorianCheckOut: string; 
-  searchParams: HotelSearchParams;
+  searchParams: HotelSearchParams | null;
 }
 interface FlightResult {
   flights: Flight[];
@@ -69,6 +70,7 @@ function isFlightArray(result: any): result is FlightResult {
 }
 
 const isHotelArray = (result: any): result is HotelResult => {
+  console.log("[isHotelArray] Checking hotel result:", result);
   return (
     result &&
     Array.isArray(result.hotels) &&
@@ -76,6 +78,35 @@ const isHotelArray = (result: any): result is HotelResult => {
     typeof result.message === "string"
   );
 };
+// const isHotelArray = (result: any): result is HotelResult => {
+//   console.log("[isHotelArray] Checking hotel result:", result);
+
+//   const isValid = (
+//     result &&
+//     Array.isArray(result.hotels) &&
+//     // Check cityData exists and has some key properties (e.g., id, name, isDomestic)
+//     result.cityData && typeof result.cityData === 'object' && typeof result.cityData.id === 'number' && typeof result.cityData.name === 'string' && typeof result.cityData.isDomestic === 'boolean' &&
+//     typeof result.message === "string" &&
+//     typeof result.gregorianCheckIn === "string" &&
+//     typeof result.gregorianCheckOut === "string" &&
+//     // Check searchParams exists and has rooms array and nationality object/null
+//     result.searchParams && typeof result.searchParams === 'object' && Array.isArray(result.searchParams.rooms) &&
+//     (result.searchParams.nationality === null || (typeof result.searchParams.nationality === 'object' && typeof result.searchParams.nationality.id === 'number')) // Check nationality structure if not null
+//   );
+
+//   if (!isValid) {
+//     console.warn("[isHotelArray] Hotel result failed validation. Missing/incorrect fields?", {
+//         hasHotels: Array.isArray(result?.hotels),
+//         hasValidCityData: !!(result?.cityData && typeof result.cityData === 'object' && typeof result.cityData.id === 'number' && typeof result.cityData.isDomestic === 'boolean'),
+//         hasMessage: typeof result?.message === "string",
+//         hasGregorianCheckIn: typeof result?.gregorianCheckIn === "string",
+//         hasGregorianCheckOut: typeof result?.gregorianCheckOut === "string",
+//         hasValidSearchParams: !!(result?.searchParams && typeof result.searchParams === 'object' && Array.isArray(result.searchParams.rooms) && (result.searchParams.nationality === null || typeof result.searchParams.nationality === 'object')),
+//     });
+//   }
+
+//   return isValid;
+// };
 
 interface MessageListProps {
   messages: Message[];
@@ -380,15 +411,7 @@ const renderHotelCards = (
   visibilityControl: VisibilityControl,
   onHotelCardClick: (hotelInfo: Hotel) => void
 ) => {
-  console.log("cityDataMap", result.cityData);
-  console.log("result.hotels", result.hotels);
-  console.log("result.gregorianCheckIn", result.gregorianCheckIn);
-  console.log("result.gregorianCheckOut", result.gregorianCheckOut);
-  console.log("result.searchParams", result.searchParams);
-  const destinationData = result.cityData;
-  const gregorianCheckIn = result.gregorianCheckIn;
-  const gregorianCheckOut = result.gregorianCheckOut;
-  const searchParams = result.searchParams;
+
   return (
     <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4">
       {result.hotels
@@ -438,10 +461,10 @@ const renderHotelCards = (
           refund_type={hotel.refund_type}
           transfers={hotel.transfers}
           metadata={hotel.metadata}
-          destinationData={destinationData}
-            gregorianCheckIn={gregorianCheckIn}
-            gregorianCheckOut={gregorianCheckOut}
-            searchParams={searchParams}
+          destinationData={result.cityData}
+          gregorianCheckIn={result.gregorianCheckIn}
+          gregorianCheckOut={result.gregorianCheckOut}
+          searchParams={result.searchParams}
           />
         ))}
       {renderVisibilityButtons(

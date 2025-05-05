@@ -129,6 +129,19 @@ export const FlightTool = createTool({
   },
 });
 
+
+// Define a Zod schema for NationalityData (matching your desired structure)
+const nationalitySchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  english_name: z.string(),
+  iata: z.string().nullable(),
+  parto_iata: z.string().nullable(),
+  description: z.string().nullable(),
+  nationality: z.string(), // e.g., "IRN"
+  continental: z.string(),
+}).nullable();
+
 export const HotelTool = createTool({
   description: "Display a grid of hotel cards",
   parameters: z.object({
@@ -138,6 +151,7 @@ export const HotelTool = createTool({
     adultsCount: z.number().default(1),
     childCount: z.number().default(0),
     childAges: z.array(z.number()).default([]),
+    nationality: nationalitySchema.optional(),
   }),
 
   execute: async function ({
@@ -147,6 +161,7 @@ export const HotelTool = createTool({
     adultsCount,
     childCount,
     childAges,
+    nationality
   }) {
     if (!checkIn || !checkOut) {
       return {
@@ -158,11 +173,20 @@ export const HotelTool = createTool({
     try {
       // Determine city type and get city ID
       const cityData = await determineCityType(location);
+      console.log("City Data returned from determineCityType:", cityData); // Optional: Add logging to verify cityData
+
+      // --- Ensure parto_id exists before proceeding ---
+      if (typeof cityData?.parto_id === 'undefined' || cityData.parto_id === null) {
+        console.error("Error: parto_id is missing in cityData returned by determineCityType.", cityData);
+        throw new Error("Failed to retrieve the city identifier (parto_id).");
+      }
+      // --- End check ---
 
       // Construct the API URL
       const apiUrl = constructHotelApiUrl(
         cityData.isDomestic,
-        cityData.cityId,
+        // --- Use cityData.parto_id instead of cityData.cityId ---
+        cityData.parto_id.toString(),
         {
           location,
           checkIn,
@@ -172,7 +196,7 @@ export const HotelTool = createTool({
           childAges,
         }
       );
-      console.log("apiUrl:", apiUrl);
+      console.log("apiUrl:", apiUrl); // Verify the generated URL
 
       // Fetch hotel data
       const hotelResponse = await fetch(apiUrl, {
@@ -201,17 +225,16 @@ export const HotelTool = createTool({
         cityData.isDomestic,
         location,
         checkIn,
-        checkOut
+        checkOut,
       );
       return {
-        // hotels,
-        // cityData: { isDomestic: cityData.isDomestic },
         hotels: hotels,
         message:
           hotels.length > 0
             ? `${hotels.length} هتل در ${location} پیدا شد.`
             : `متاسفانه هتلی در ${location} پیدا نشد.`,
-        cityData: { ...cityData, isDomestic: cityData.isDomestic },
+        // cityData: { ...cityData, isDomestic: cityData.isDomestic },
+        cityData: cityData,
         gregorianCheckIn: checkIn, // Assuming 'checkIn' is the Gregorian date
         gregorianCheckOut: checkOut, // Assuming 'checkOut' is the Gregorian date
         searchParams: {
@@ -223,8 +246,7 @@ export const HotelTool = createTool({
               childAges: childAges,
             },
           ],
-          // You might need to fetch/pass nationality data here if required
-          // nationality: { ... } // Add nationality data if available/needed
+          nationality: nationality || null,
         },
 
       };
