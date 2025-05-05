@@ -8,7 +8,7 @@ import { Button } from "./shadcn/button";
 import { useTheme } from "next-themes";
 import { tools } from "@/ai/tools";
 import FlightCard from "@/components/cards/flight-card";
-import HotelCard from "@/components/cards/hotel-card";
+// import HotelCard from "@/components/cards/hotel-card";
 import FlightCardSkeleton from "@/components/skeletons/flight-card-skeleton";
 import HotelCardSkeleton from "@/components/skeletons/hotel-card-skeleton";
 import { Flight, Hotel, CityData } from "@/types/chat";
@@ -868,7 +868,7 @@ const VoiceChat = () => {
                 )}
 
                 {/* Display hotel cards */}
-                {hotels && hotels.hotels.length > 0 && (
+                {/* {hotels && hotels.hotels.length > 0 && (
                   <div className="mt-2 grid sm:grid-cols-2 grid-cols-1 gap-2 sm:gap-4 sm:w-2/3 mx-auto">
                     {hotels.hotels.slice(0, visibleHotels).map((hotel: Hotel) => (
                       <HotelCard
@@ -890,7 +890,7 @@ const VoiceChat = () => {
                         onHotelCardClick={handleHotelCardClick}
                       />
                     ))}
-                    {/* Show more/less buttons for hotels */}
+                
                     <div className="col-span-full flex justify-center mt-4 gap-2">
                       {visibleHotels < hotels.hotels.length && (
                         <Button variant="secondary" onClick={showMoreHotels}>
@@ -906,7 +906,7 @@ const VoiceChat = () => {
                       )}
                     </div>
                   </div>
-                )}
+                )} */}
               </div>
             );
           }
