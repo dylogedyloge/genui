@@ -395,7 +395,7 @@ const HotelCard = ({
     // Send message to parent window
     window.parent.postMessage(
       {
-        type: "SELECTED_HOTEL",
+        type: "SELECTED_INT_HOTEL",
         payload: {
           selectedHotel: transformedHotelInfo,
           generalInformation,
@@ -404,8 +404,8 @@ const HotelCard = ({
       },
       "*"
     );
-    console.log("selectedHotel (Domestic)", transformedHotelInfo);
-    console.log("generalInformation (Domestic)", generalInformation);
+    console.log("selectedHotel ", transformedHotelInfo);
+    console.log("generalInformation", generalInformation);
     console.log("intHotelInformation", intHotelInformation);
 
   };
