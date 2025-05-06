@@ -192,7 +192,8 @@ export const normalizeHotelData = (
 
     const validData = rawData.data.data.filter((hotel: any) => hotel !== null);
     return validData.map((hotel: any) => ({
-      id: hotel.id?.toString() || `hotel_${Math.random()}`,
+      id: hotel.id?.toString() || null,
+      hotel_id: hotel.hotel_id?.toString() || null, 
       hotelName: hotel.name || "Unknown Hotel",
       location: location,
       checkIn: DateService.toJalali(checkIn),
@@ -233,6 +234,7 @@ export const normalizeHotelData = (
 
     return {
       id: hotel.id?.toString() || `hotel_${Math.random()}`,
+      hotel_id: hotel.hotel_id?.toString() ?? null, // <-- FIXED: use hotel.hotel_id, not hotel.id
       hotelName: hotel.name || "Unknown Hotel",
       location: location,
       checkIn: DateService.toJalali(checkIn),
@@ -250,7 +252,6 @@ export const normalizeHotelData = (
       isDomestic: false,
       fare: hotel.fare || null,
       fare_source_code: hotel.fare_source_code ?? null,
-      hotel_id: hotel.id?.toString() ?? null,
       star_rating: hotel.star_rating ?? 0, 
       offer: hotel.offer ?? null,
       promotion: hotel.promotion ?? null,

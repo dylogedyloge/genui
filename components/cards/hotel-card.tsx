@@ -249,19 +249,19 @@ const HotelCard = ({
     console.log("Triggering International Hotel Purchase Logic...");
     const transformedHotelInfo = {
       fare_source_code: fare_source_code || "",
-      id: hotel_id ? parseInt(hotel_id) : id ? parseInt(id.toString()) : Math.floor(Math.random() * 1000000),
+      hotel_id: hotel_id ? parseInt(hotel_id.toString()) : 0,
+      id: id ? parseInt(id) : Math.floor(Math.random() * 1000000),
       name: hotelName,
       star: star || 0,
       star_rating: star_rating || 0,
       address: address || "",
       images: images || [],
-      features: amenities || [], // Map amenities to features
+      features: amenities || [], 
       city_id: destinationData?.id || 0,
       province_id: (destinationData?.province as any)?.id || 0,
       offer: offer || null,
       promotion: promotion || null,
       non_refundable: non_refundable || false,
-      hotel_id: hotel_id ? parseInt(hotel_id) : 0,
       policy: policy || null,
       extra_charge: extra_charge || null,
       payment_deadline: payment_deadline || null,
@@ -314,15 +314,6 @@ const HotelCard = ({
       check_in: gregorianCheckIn,   // Use the passed Gregorian check-in date
       check_out: gregorianCheckOut, // Use the passed Gregorian check-out date
       originRoomsCount: searchParams?.rooms || [], // Use rooms from searchParams
-      // roomsCount: searchParams?.rooms?.reduce((acc, room) => {
-      //   acc.adult = (parseInt(acc.adult || '0', 10) + room.adult).toString();
-      //   acc.child = (parseInt(acc.child || '0', 10) + room.child).toString();
-      //   // Simplified ages string - adjust logic if specific format needed
-      //   acc.ages = (acc.ages ? acc.ages + ',' : '') + room.childAges.join(',');
-      //   return acc;
-      // }, { adult: '0', child: '0', ages: '' })
-      //   // Clean up empty ages string
-      //   || { adult: '0', child: '0', ages: '' },
       adult_count: searchParams?.rooms?.reduce((acc, room) => acc + room.adult, 0).toString() || "0", // Changed from roomsCount.adult
       child_count: searchParams?.rooms?.reduce((acc, room) => acc + room.child, 0).toString() || "0", // 
       ages: searchParams?.rooms?.reduce((acc, room) => {
