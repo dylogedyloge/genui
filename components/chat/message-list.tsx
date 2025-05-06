@@ -70,7 +70,7 @@ function isFlightArray(result: any): result is FlightResult {
 }
 
 const isHotelArray = (result: any): result is HotelResult => {
-  console.log("[isHotelArray] Checking hotel result:", result);
+  // console.log("[isHotelArray] Checking hotel result:", result);
   return (
     result &&
     Array.isArray(result.hotels) &&
@@ -213,7 +213,7 @@ const MessageList: React.FC<MessageListProps> = ({
 
     // Call the FlightTool again with the selected passengers
     // You can use a function like `retryFlightTool(passengers)`
-    console.log("Selected passengers:", passengers);
+    // console.log("Selected passengers:", passengers);
     // Example: retryFlightTool(passengers);
   };
   const handleCabinTypeSelected = (cabinType: {
@@ -225,7 +225,7 @@ const MessageList: React.FC<MessageListProps> = ({
     setShowCabinTypeSelector(false);
   
     // Call the FlightTool again with the selected cabin type
-    console.log("Selected cabin type:", cabinType);
+    // console.log("Selected cabin type:", cabinType);
     // Example: retryFlightTool(cabinType);
   };
 

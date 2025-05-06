@@ -240,59 +240,14 @@ const HotelCard = ({
       },
       "*"
     );
-    console.log("selectedHotel (Domestic)", transformedHotelInfo);
-    console.log("generalInformation (Domestic)", generalInformation);
+    // console.log("selectedHotel (Domestic)", transformedHotelInfo);
+    // console.log("generalInformation (Domestic)", generalInformation);
   };
 
   // Function for "International" type purchase (placeholder, called from within accordion)
   const handleInternationalHotelPurchase = () => {
     console.log("Triggering International Hotel Purchase Logic...");
     const transformedHotelInfo = {
-      // name: hotelName,
-      // star,
-      // address,
-      // images,
-      // rooms: rooms.map(room => ({
-      //   room_type_name: room.room_type_name,
-      //   room_type_capacity: room.room_type_capacity,
-      //   rate_plans: room.rate_plans.map(plan => ({
-      //     name: plan.name,
-      //     cancelable: plan.cancelable,
-      //     meal_type_included: plan.meal_type_included,
-      //     prices: {
-      //       total_price: plan.prices.total_price,
-      //       inventory: plan.prices.inventory,
-      //       has_off: plan.prices.has_off
-      //     }
-      //   }))
-      // })),
-      // fare,
-      // amenities,
-      // id: hotel_id,
-      // star_rating, 
-      // fare_source_code,
-      // offer,
-      // promotion,
-      // non_refundable,
-      // policy,
-      // extra_charge,
-      // payment_deadline,
-      // available_rooms,
-      // cancellation_policy_text,
-      // cancellation_policies,
-      // surcharges,
-      // remarks,
-      // is_reserve_offline,
-      // is_blockout,
-      // is_min_stay_night,
-      // is_max_stay_night,
-      // max_stay_night,
-      // is_fix_stay_night,
-      // fix_stay_night,
-      // is_board_price,
-      // refund_type,
-      // transfers,
-      // metadata,
       fare_source_code: fare_source_code || "",
       id: hotel_id ? parseInt(hotel_id) : id ? parseInt(id.toString()) : Math.floor(Math.random() * 1000000),
       name: hotelName,
@@ -334,7 +289,7 @@ const HotelCard = ({
       is_reserve_offline: is_reserve_offline || false,
       is_blockout: is_blockout || false,
       is_min_stay_night: is_min_stay_night || false,
-      min_stay_night: 0, // Add this missing property
+      min_stay_night: 0, 
       is_max_stay_night: is_max_stay_night || false,
       max_stay_night: max_stay_night || 0,
       is_fix_stay_night: is_fix_stay_night || false,
@@ -348,7 +303,7 @@ const HotelCard = ({
       ticket: false,
       accommodation: true,
       itinerary: false,
-      isInternational: !isDomestic // Use the prop here
+      isInternational: !isDomestic 
     };
 
     const destinationDataToSend = { ...destinationData };
@@ -356,18 +311,25 @@ const HotelCard = ({
     delete destinationDataToSend.isDomestic;
     const intHotelInformation = {
       destination: destinationData, // Use the passed destinationData prop
-      checkIn: gregorianCheckIn,   // Use the passed Gregorian check-in date
-      checkOut: gregorianCheckOut, // Use the passed Gregorian check-out date
+      check_in: gregorianCheckIn,   // Use the passed Gregorian check-in date
+      check_out: gregorianCheckOut, // Use the passed Gregorian check-out date
       originRoomsCount: searchParams?.rooms || [], // Use rooms from searchParams
-      roomsCount: searchParams?.rooms?.reduce((acc, room) => {
-        acc.adult = (parseInt(acc.adult || '0', 10) + room.adult).toString();
-        acc.child = (parseInt(acc.child || '0', 10) + room.child).toString();
-        // Simplified ages string - adjust logic if specific format needed
-        acc.ages = (acc.ages ? acc.ages + ',' : '') + room.childAges.join(',');
-        return acc;
-      }, { adult: '0', child: '0', ages: '' })
-        // Clean up empty ages string
-        || { adult: '0', child: '0', ages: '' },
+      // roomsCount: searchParams?.rooms?.reduce((acc, room) => {
+      //   acc.adult = (parseInt(acc.adult || '0', 10) + room.adult).toString();
+      //   acc.child = (parseInt(acc.child || '0', 10) + room.child).toString();
+      //   // Simplified ages string - adjust logic if specific format needed
+      //   acc.ages = (acc.ages ? acc.ages + ',' : '') + room.childAges.join(',');
+      //   return acc;
+      // }, { adult: '0', child: '0', ages: '' })
+      //   // Clean up empty ages string
+      //   || { adult: '0', child: '0', ages: '' },
+      adult_count: searchParams?.rooms?.reduce((acc, room) => acc + room.adult, 0).toString() || "0", // Changed from roomsCount.adult
+      child_count: searchParams?.rooms?.reduce((acc, room) => acc + room.child, 0).toString() || "0", // 
+      ages: searchParams?.rooms?.reduce((acc, room) => {
+        return room.childAges.length > 0 
+          ? (acc ? acc + ',' : '') + room.childAges.join(',') 
+          : acc;
+      }, "") || "0",
       nationality: {
         id: 1,
         name: "ایران",
@@ -379,18 +341,16 @@ const HotelCard = ({
         continental: "آسیا"
       },
     };
-    // Remove trailing comma from ages if present
-    if (intHotelInformation.roomsCount.ages.endsWith(',')) {
-      intHotelInformation.roomsCount.ages = intHotelInformation.roomsCount.ages.slice(0, -1);
-    }
-    if (intHotelInformation.roomsCount.ages === '') {
-      // Handle case where there are no children to avoid sending just "0"
-      // You might want to adjust this based on how the receiving end expects it
-      // Option 1: Keep ages as "0" if child count is 0
-      // Option 2: Set ages to null or undefined if child count is 0
-      if (intHotelInformation.roomsCount.child === '0') {
-        intHotelInformation.roomsCount.ages = "0"; // Or null, or remove the key
+    // Handle empty ages string
+    if (intHotelInformation.ages === '') {
+      if (intHotelInformation.child_count === '0') {
+        intHotelInformation.ages = "0";
       }
+    }
+    
+    // Remove trailing comma from ages if present
+    if (intHotelInformation.ages.endsWith(',')) {
+      intHotelInformation.ages = intHotelInformation.ages.slice(0, -1);
     }
     // Send message to parent window
     window.parent.postMessage(

@@ -152,14 +152,14 @@ export const constructHotelApiUrl = (
   const formattedCheckIn = checkIn.split("T")[0];
   const formattedCheckOut = checkOut.split("T")[0];
 
-  console.log("Formatted dates:", {
-    checkIn: formattedCheckIn,
-    checkOut: formattedCheckOut,
-  });
+  // console.log("Formatted dates:", {
+  //   checkIn: formattedCheckIn,
+  //   checkOut: formattedCheckOut,
+  // });
 
   if (isDomestic) {
     const url = `${API_ENDPOINTS.DOMESTIC.HOTELS}/?city=${cityId}&check_in=${formattedCheckIn}&check_out=${formattedCheckOut}&adults_count=${adultsCount}`;
-    console.log("Generated URL:", url);
+    // console.log("Generated URL:", url);
     return url;
   }
 
