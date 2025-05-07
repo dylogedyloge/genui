@@ -453,6 +453,7 @@ const renderHotelCards = (
           is_reserve_offline={hotel.is_reserve_offline}
           is_blockout={hotel.is_blockout}
           is_min_stay_night={hotel.is_min_stay_night}
+          min_stay_night={hotel.min_stay_night}
           is_max_stay_night={hotel.is_max_stay_night}
           max_stay_night={hotel.max_stay_night}
           is_fix_stay_night={hotel.is_fix_stay_night}
