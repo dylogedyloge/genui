@@ -125,6 +125,7 @@ const HotelCard = ({
   remarks,
   is_reserve_offline,
   is_blockout,
+  min_stay_night,
   is_min_stay_night,
   is_max_stay_night,
   max_stay_night,
@@ -200,19 +201,19 @@ const HotelCard = ({
     console.log("Triggering International Hotel Purchase Logic...");
     const transformedHotelInfo = {
       fare_source_code: fare_source_code || "",
-      hotel_id: hotel_id ? parseInt(hotel_id.toString()) : 0,
-      id: id ? parseInt(id) : Math.floor(Math.random() * 1000000),
+      id: id ? parseInt(id.toString()) : Math.floor(Math.random() * 1000000),
       name: hotelName,
       star: star || 0,
       star_rating: star_rating || 0,
       address: address || "",
       images: images || [],
-      features: amenities || [], 
+      features: amenities || [],
       city_id: destinationData?.id || 0,
       province_id: (destinationData?.province as any)?.id || 0,
       offer: offer || null,
       promotion: promotion || null,
       non_refundable: non_refundable || false,
+      hotel_id: hotel_id ? parseInt(hotel_id.toString()) : 0,
       policy: policy || null,
       extra_charge: extra_charge || null,
       payment_deadline: payment_deadline || null,
@@ -220,27 +221,60 @@ const HotelCard = ({
       available_rooms: available_rooms || { "1": null },
       cancellation_policy_text: cancellation_policy_text || null,
       cancellation_policies: cancellation_policies || { "1": [] },
-      rooms: rooms.map(room => ({
-        room_type_name: room.room_type_name,
-        room_type_capacity: room.room_type_capacity,
-        rate_plans: room.rate_plans.map(plan => ({
-          name: plan.name,
-          cancelable: plan.cancelable,
-          meal_type_included: plan.meal_type_included,
-          prices: {
-            total_price: plan.prices.total_price,
-            inventory: plan.prices.inventory,
-            has_off: plan.prices.has_off
+      // Transform rooms from array to object with numbered keys
+      rooms: rooms.reduce<{
+        [key: string]: {
+          id: null;
+          unique_id: number;
+          name: string;
+          travelers: {
+            adult_count: { [key: string]: number };
+            child_count: { [key: string]: number };
+            child_ages: { [key: string]: number[] };
+          };
+          meal_type: string;
+          share_bedding: boolean;
+          bed_groups: { [key: string]: string };
+          check_in: {
+            time: null;
+            amount: null;
+          };
+          check_out: {
+            time: null;
+            amount: null;
+          };
+        };
+      }>((acc, room, index) => {
+        acc[(index + 1).toString()] = {
+          id: null,
+          unique_id: 235698,
+          name: room.room_type_name,
+          travelers: {
+            adult_count: { "1": room.room_type_capacity || 2 },
+            child_count: { "1": 0 },
+            child_ages: { "1": [] }
+          },
+          meal_type: "Room Only",
+          share_bedding: false,
+          bed_groups: { "1": "Standard" },
+          check_in: {
+            time: null,
+            amount: null
+          },
+          check_out: {
+            time: null,
+            amount: null
           }
-        }))
-      })),
+        };
+        return acc;
+      }, {}),
       surcharges: surcharges || [],
       remarks: remarks || [],
       amenities: amenities || [],
       is_reserve_offline: is_reserve_offline || false,
       is_blockout: is_blockout || false,
       is_min_stay_night: is_min_stay_night || false,
-      min_stay_night: 0, 
+      min_stay_night: min_stay_night || 0,
       is_max_stay_night: is_max_stay_night || false,
       max_stay_night: max_stay_night || 0,
       is_fix_stay_night: is_fix_stay_night || false,
@@ -260,18 +294,21 @@ const HotelCard = ({
     const destinationDataToSend = { ...destinationData };
     // Remove isDomestic property
     delete destinationDataToSend.isDomestic;
+    
     const intHotelInformation = {
-      destination: destinationData, // Use the passed destinationData prop
-      check_in: gregorianCheckIn,   // Use the passed Gregorian check-in date
-      check_out: gregorianCheckOut, // Use the passed Gregorian check-out date
-      originRoomsCount: searchParams?.rooms || [], // Use rooms from searchParams
-      adult_count: searchParams?.rooms?.reduce((acc, room) => acc + room.adult, 0).toString() || "0", // Changed from roomsCount.adult
-      child_count: searchParams?.rooms?.reduce((acc, room) => acc + room.child, 0).toString() || "0", // 
-      ages: searchParams?.rooms?.reduce((acc, room) => {
-        return room.childAges.length > 0 
-          ? (acc ? acc + ',' : '') + room.childAges.join(',') 
-          : acc;
-      }, "") || "0",
+      destination: destinationDataToSend,
+      checkIn: gregorianCheckIn,      // Changed from check_in
+      checkOut: gregorianCheckOut,    // Changed from check_out
+      originRoomsCount: searchParams?.rooms || [],
+      roomsCount: {                   // Group these under roomsCount
+        adult: searchParams?.rooms?.reduce((acc, room) => acc + room.adult, 0).toString() || "0",
+        child: searchParams?.rooms?.reduce((acc, room) => acc + room.child, 0).toString() || "0",
+        ages: searchParams?.rooms?.reduce((acc, room) => {
+          return room.childAges.length > 0 
+            ? (acc ? acc + ',' : '') + room.childAges.join(',') 
+            : acc;
+        }, "") || "0"
+      },
       nationality: {
         id: 1,
         name: "ایران",
@@ -283,17 +320,19 @@ const HotelCard = ({
         continental: "آسیا"
       },
     };
+
     // Handle empty ages string
-    if (intHotelInformation.ages === '') {
-      if (intHotelInformation.child_count === '0') {
-        intHotelInformation.ages = "0";
+    if (intHotelInformation.roomsCount.ages === '') {
+      if (intHotelInformation.roomsCount.child === '0') {
+        intHotelInformation.roomsCount.ages = "0";
       }
     }
     
     // Remove trailing comma from ages if present
-    if (intHotelInformation.ages.endsWith(',')) {
-      intHotelInformation.ages = intHotelInformation.ages.slice(0, -1);
+    if (intHotelInformation.roomsCount.ages.endsWith(',')) {
+      intHotelInformation.roomsCount.ages = intHotelInformation.roomsCount.ages.slice(0, -1);
     }
+
     // Send message to parent window
     window.parent.postMessage(
       {

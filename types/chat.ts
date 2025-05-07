@@ -146,6 +146,7 @@ export interface Hotel {
   remarks?: any;
   is_reserve_offline?: boolean;
   is_blockout?: boolean;
+  min_stay_night:number;
   is_min_stay_night?: boolean;
   is_max_stay_night?: boolean;
   max_stay_night?: number;
