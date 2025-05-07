@@ -147,55 +147,6 @@ const HotelCard = ({
   const handleOpenDetailsAccordion = () => {
     setIsAccordionOpen(!isAccordionOpen);
   };
-  // const handleHotelPurchase = () => {
-
-  //   const transformedHotelInfo = {
-  //     hotelName,
-  //     type,
-  //     star,
-  //     address,
-  //     images,
-  //     rooms: rooms.map(room => ({
-  //       room_type_name: room.room_type_name,
-  //       room_type_capacity: room.room_type_capacity,
-  //       rate_plans: room.rate_plans.map(plan => ({
-  //         name: plan.name,
-  //         cancelable: plan.cancelable,
-  //         meal_type_included: plan.meal_type_included,
-  //         prices: {
-  //           total_price: plan.prices.total_price,
-  //           inventory: plan.prices.inventory,
-  //           has_off: plan.prices.has_off
-  //         }
-  //       }))
-  //     })),
-  //     checkIn,
-  //     checkOut,
-  //     price,
-  //     amenities
-  //   };
-
-  //   const generalInformation = {
-  //     ticket: false,
-  //     accommodation: true,
-  //     itinerary: false,
-  //     isInternational: false
-  //   };
-
-  //   // Send message to parent window
-  //   window.parent.postMessage(
-  //     {
-  //       type: "SELECTED_HOTEL",
-  //       payload: {
-  //         selectedHotel: transformedHotelInfo,
-  //         generalInformation
-  //       }
-  //     },
-  //     "*"
-  //   );
-  //   console.log("selectedHotel", transformedHotelInfo);
-  //   console.log("generalInformation", generalInformation);
-  // };
   const handleDomesticHotelPurchase = () => {
     console.log("Triggering Domestic Hotel Purchase Logic...");
     const transformedHotelInfo = {
@@ -224,10 +175,10 @@ const HotelCard = ({
       amenities
     };
     const generalInformation = {
-      ticket: false,
-      accommodation: true,
-      itinerary: false,
-      isInternational: !isDomestic // Use the prop here
+      isTicket: false,
+      isAccommodation: true,
+      isItinerary: false,
+      isInternational: !isDomestic
     };
     // Send message to parent window
     window.parent.postMessage(
@@ -300,9 +251,9 @@ const HotelCard = ({
       metadata: metadata || []
     };
     const generalInformation = {
-      ticket: false,
-      accommodation: true,
-      itinerary: false,
+      isTicket: false,
+      isAccommodation: true,
+      isItinerary: false,
       isInternational: !isDomestic 
     };
 
