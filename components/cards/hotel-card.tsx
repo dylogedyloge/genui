@@ -439,13 +439,21 @@ const HotelCard = ({
               </Badge>
             )}
           </div>
-          <Button
-            onClick={handleOpenDetailsAccordion}
-            variant="outline"
-            className="w-full mt-4 text-foreground"
-          >
-            {isAccordionOpen ? "بستن جزئیات" : "مشاهده جزئیات"}
-          </Button>
+          <div className="flex gap-2 mt-4">
+            <Button
+              onClick={handleOpenDetailsAccordion}
+              variant="outline"
+              className="flex-1 text-foreground"
+            >
+              {isAccordionOpen ? "بستن جزئیات" : "مشاهده جزئیات"}
+            </Button>
+            <Button
+              onClick={isDomestic ? handleDomesticHotelPurchase : handleInternationalHotelPurchase}
+              className="flex-1"
+            >
+              خرید
+            </Button>
+          </div>
         </div>
 
         <Accordion
@@ -530,12 +538,7 @@ const HotelCard = ({
                         </motion.div>
                       ))}
                   </motion.div>
-                  <Button
-                    onClick={isDomestic ? handleDomesticHotelPurchase : handleInternationalHotelPurchase}
-                    className="w-full mt-4"
-                  >
-                    خرید
-                  </Button>
+                  {/* Remove the purchase button from here */}
                 </TabsContent>
 
                 <TabsContent value="rooms">
