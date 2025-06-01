@@ -124,16 +124,22 @@ export async function determineCityType(location: string) {
   let data = await response.json();
   if (data.data?.results?.length > 0) {
     const cityResult = data.data.results[0];
-    return { ...cityResult,isDomestic: true, parto_id: cityResult.parto_id || cityResult.id };}
+    return { 
+      ...cityResult,
+      isDomestic: true, 
+      parto_id: cityResult.id // Changed: For domestic cities, use id directly
+    };
+  }
 
   // 2. Try international hotel cities (new endpoint) ONLY
   response = await fetch(`${API_ENDPOINTS.INTERNATIONAL.HOTEL_CITIES}${encodeURIComponent(location)}`);
   data = await response.json();
   if (data.data?.results?.length > 0) {
     const cityResult = data.data.results[0];
-    return { ...cityResult, 
+    return { 
+      ...cityResult, 
       isDomestic: false,
-      parto_id: cityResult.parto_id || cityResult.id,
+      parto_id: cityResult.parto_id || cityResult.id // Keep using parto_id for international
     };
   }
 
