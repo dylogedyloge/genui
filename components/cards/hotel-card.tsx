@@ -127,8 +127,8 @@ const HotelCard = ({
       },
       "*"
     );
-    // console.log("selectedHotel (Domestic)", transformedHotelInfo);
-    // console.log("generalInformation (Domestic)", generalInformation);
+    console.log("selectedHotel (Domestic)", transformedHotelInfo);
+    console.log("generalInformation (Domestic)", generalInformation);
   };
 
   // Function for "International" type purchase (placeholder, called from within accordion)
