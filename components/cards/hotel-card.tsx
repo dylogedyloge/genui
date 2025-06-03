@@ -113,22 +113,27 @@ const HotelCard = ({
     };
 
     const hotelInformation = {
-      destination: {
-        ...destinationData,
-        country: destinationData?.country || {
-          id: 1,
-          name: "ایران",
-          english_name: "Iran",
-          iata: "IRN",
-          parto_iata: "IR",
-          description: null,
-          nationality: "IRN",
-          continental: "آسیا"
-        }
-      },
+      destination: (() => {
+        const { isDomestic: _, ...destinationDataWithoutIsDomestic } = destinationData || {};
+        return {
+          ...destinationDataWithoutIsDomestic,
+          country: destinationData?.country || {
+            id: 1,
+            name: "ایران",
+            english_name: "Iran",
+            iata: "IRN",
+            parto_iata: "IR",
+            description: null,
+            nationality: "IRN",
+            continental: "آسیا"
+          }
+        };
+      })(),
       checkIn: gregorianCheckIn,
       checkOut: gregorianCheckOut
     };
+
+
 
     const generalInformation = {
       isTicket: false,
