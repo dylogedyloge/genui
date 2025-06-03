@@ -91,6 +91,7 @@ const HotelCard = ({
       star,
       address,
       images,
+      hotel_id: id,  
       rooms: rooms.map(room => ({
         room_type_name: room.room_type_name,
         room_type_capacity: room.room_type_capacity,
