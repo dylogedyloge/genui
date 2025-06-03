@@ -23,72 +23,7 @@ type HotelProps = HotelType & {
   gregorianCheckIn: string;
   gregorianCheckOut: string;
   searchParams: HotelSearchParams | null; // Use imported HotelSearchParams
-  // Remove props already defined in HotelType from chat.ts if they are identical
-  // e.g., remove id, hotelName, location, etc., if they are in HotelType
-  // id: string;
-  // hotelName: string;
-  // location: string;
-  // checkIn: string;
-  // checkOut: string;
-  // roomType: string;
-  // price: number;
-  // images: Array<{
-  //   image: string;
-  //   alt: string;
-  //   caption: string | null;
-  // }>;
-  // rating: number;
-  // imageUrl?: string;
-  // amenities?: string[];
-  // onHotelCardClick: (hotelInfo: any) => void;
-  // address: string;
-  // star: number;
-  // type: string;
-  // rooms: Array<{
-  //   room_type_name: string;
-  //   room_type_capacity: number;
-  //   rate_plans: Array<{
-  //     name: string;
-  //     cancelable: number;
-  //     meal_type_included: string;
-  //     prices: {
-  //       total_price: number;
-  //       inventory: number;
-  //       has_off: boolean;
-  //     };
-  //   }>;
-  // }>;
-  // fare?: { total: number };
-  // isDomestic: boolean;
-  // fare_source_code?: string;
-  // hotel_id?: string; 
-  // star_rating?: number;
-  // offer?: any;
-  // promotion?: any;
-  // non_refundable?: boolean;
-  // policy?: any;
-  // extra_charge?: any;
-  // payment_deadline?: string;
-  // available_rooms?: number;
-  // cancellation_policy_text?: string;
-  // cancellation_policies?: any[];
-  // surcharges?: any;
-  // remarks?: any;
-  // is_reserve_offline?: boolean;
-  // is_blockout?: boolean;
-  // is_min_stay_night?: boolean;
-  // is_max_stay_night?: boolean;
-  // max_stay_night?: number;
-  // is_fix_stay_night?: boolean;
-  // fix_stay_night?: number;
-  // is_board_price?: boolean;
-  // refund_type?: string;
-  // transfers?: any;
-  // metadata?: any;
-  // destinationData: CityData | null; // Detailed data for the searched destination
-  // gregorianCheckIn: string; // Original check-in date (YYYY-MM-DD)
-  // gregorianCheckOut: string; // Original check-out date (YYYY-MM-DD)
-  // searchParams: HotelSearchParams | null;
+
 };
 
 const HotelCard = ({
@@ -192,8 +127,8 @@ const HotelCard = ({
       },
       "*"
     );
-    // console.log("selectedHotel (Domestic)", transformedHotelInfo);
-    // console.log("generalInformation (Domestic)", generalInformation);
+    console.log("selectedHotel (Domestic)", transformedHotelInfo);
+    console.log("generalInformation (Domestic)", generalInformation);
   };
 
   // Function for "International" type purchase (placeholder, called from within accordion)
@@ -448,7 +383,21 @@ const HotelCard = ({
               {isAccordionOpen ? "بستن جزئیات" : "مشاهده جزئیات"}
             </Button>
             <Button
-              onClick={isDomestic ? handleDomesticHotelPurchase : handleInternationalHotelPurchase}
+              onClick={(e) => {
+                isDomestic ? handleDomesticHotelPurchase() : handleInternationalHotelPurchase();
+                onHotelCardClick({
+                  hotelName,
+                  type,
+                  star,
+                  address,
+                  images,
+                  rooms,
+                  checkIn,
+                  checkOut,
+                  price,
+                  amenities
+                });
+              }}
               className="flex-1"
             >
               خرید
