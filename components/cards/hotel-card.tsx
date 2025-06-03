@@ -91,7 +91,7 @@ const HotelCard = ({
       star,
       address,
       images,
-      hotel_id: Number(id),  
+      hotel_id: id,
       rooms: rooms.map(room => ({
         room_type_name: room.room_type_name,
         room_type_capacity: room.room_type_capacity,
@@ -111,25 +111,48 @@ const HotelCard = ({
       price,
       amenities
     };
+
+    const hotelInformation = {
+      destination: {
+        ...destinationData,
+        country: destinationData?.country || {
+          id: 1,
+          name: "ایران",
+          english_name: "Iran",
+          iata: "IRN",
+          parto_iata: "IR",
+          description: null,
+          nationality: "IRN",
+          continental: "آسیا"
+        }
+      },
+      checkIn: gregorianCheckIn,
+      checkOut: gregorianCheckOut
+    };
+
     const generalInformation = {
       isTicket: false,
       isAccommodation: true,
       isItinerary: false,
       isInternational: !isDomestic
     };
+
     // Send message to parent window
     window.parent.postMessage(
       {
         type: "SELECTED_HOTEL",
         payload: {
           selectedHotel: transformedHotelInfo,
-          generalInformation
+          generalInformation,
+          hotelInformation
         }
       },
       "*"
     );
+    
     console.log("selectedHotel (Domestic)", transformedHotelInfo);
     console.log("generalInformation (Domestic)", generalInformation);
+    console.log("hotelInformation (Domestic)", hotelInformation);
   };
 
   // Function for "International" type purchase (placeholder, called from within accordion)
