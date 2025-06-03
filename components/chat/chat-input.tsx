@@ -55,7 +55,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         }}
       />
       <Button
-        size="icon"
+        size="lg"
         onClick={() => handleSubmit()} // Call the custom handleSubmit
         disabled={isLoading || error != null}
         className="bg-[#006363]"
